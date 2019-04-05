@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Help desk</title>
+	 <meta charset="utf-8">
+	 <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<script language="javascript" type="text/javascript">  
+
+$(document).ready(function(){
+ 
+
+//If parent option is changed
+$("#department_selection").change(function() {
+	var parent = $(this).val(); //get option value from parent 
+		select_category(parent);
+});
+
+//function to populate child select box
+function select_category(array_list)
+{
+	$("#category_selection").html(""); //reset child options
+	$("#category_selection").append("<option value=\"\"disabled selected>--Please Select--</option>");
+	//$(array_list).each(function (i) { //populate child options
+	
+	{%for i in category%}
+ 	var count ={{i.department_id_id}}
+	if(count == array_list){		
+		$("#category_selection").append("<option value={{i.id}}>{{i.title}}</option>");
+	}
+	{%endfor%}	
+}
+
+$("#category_selection").change(function() {
+	var parent = $(this).val(); //get option value from parent 
+		select_subcategory(parent);
+});
+
+function select_subcategory(array_list)
+{
+	$("#sub_Category").html(""); //reset child options
+	$("#sub_Category").append("<option value=\"\"disabled selected>--Please Select--</option>");
+	//$(array_list).each(function (i) { //populate child options
+	
+	{%for i in subCategory%}
+ 	var count ={{i.department_id_id}}
+ 	
+	if(count == array_list){		
+		$("#sub_Category").append("<option value={{i.id}}>{{i.title}}</option>");
+	}
+	{%endfor%}	
+}
+
+});
+
+</script>
+<style>
+</style>
+</head>
+<body>
+	<div class="modal-header">
+        		<button type="button" class="close" data-dismiss="modal">&times;</button>
+        		<h4 class="modal-title">Raise Request</h4>
+        	</div>
+        	<div class="modal-body">
+         		{% if item %}	
+         		<form action="updateTicket" method="POST" enctype="multipart/form-data">
+         		{%else%}
+         		<form action="addTicket/" method="POST" enctype="multipart/form-data">
+         		{%endif%}
+				{% csrf_token %}
+				<label><b>Request Type:</b></label>
+				<input type="radio" name="RequestType" value="Request" checked>Request
+				<input type="radio" name="RequestType" value="Issue">Issue
+
+				<br>
+
+				<label><b>Request For:</b></label>
+				<input type="radio" name="RequestFor" value="Self" checked>Self
+				<input type="radio" name="RequestFor" value="OnBehalf">On Behalf Of
+
+				<br>
+
+				<label><b>Department:</b></label>
+				
+					<select name="department" id="department_selection" required >
+						<option value=""disabled selected>-- Please Select --</option>
+						{% for dept in departments %}
+							{% if dept.department == item.department%}
+								<option value={{dept.id}} selected >{{dept.department}}
+								
+								</option>
+							{%else%}
+								<option value={{dept.id}}>{{dept.department}}</option>
+							{%endif%}
+						{%endfor%}
+					</select><br>
+					<label><b>Category:</b></label>
+					<select name="category" id="category_selection" required>
+						<option value=""disabled selected>-- Please Select --</option>
+						{% for dept in departments %}
+							{% if dept.department == item.department%}
+								{%for cat in category%}
+									{%if cat.department_id_id == dept.id%}
+									{%if cat.title == item.category%}
+									<option value={{cat.id}} selected>{{cat.title}}
+									</option>
+									{%else%}
+									<option value={{cat.id}} >{{cat.title}}
+									{%endif%}
+								
+								{%endif%}
+								{%endfor%}
+							{%endif%}
+						{%endfor%}
+					</select><br>
+
+						<label><b>Sub Category:</b></label>
+						<select name="sub_category" id="sub_Category">
+							<option value=""disabled selected>-- Please Select --</option>{% for cat in category %}
+
+							{% if cat.title == item.category%}
+							
+								{%for sub in subCategory%}
+									{%if sub.department_id_id == cat.id%}
+									{%if sub.title == item.sub_category%}
+									<option value={{sub.id}} selected>{{sub.title}}
+									</option>
+									{%else%}
+									<option value={{sub.id}}>{{sub.title}}</option>
+									{%endif%}
+								
+								{%endif%}
+								{%endfor%}
+							{%endif%}
+						{%endfor%}
+						</select><br>
+				
+			
+					<label><b>Priority:</b></label>
+					<select name="priority" required>
+						<option value=""disabled selected>-- Please Select --</option>
+						
+						<option value="Low">Low</option>
+						<option value="Medium">Medium</option>
+						<option value="High">High</option>
+					</select><br>
+					<label><b>Office Location:</b></label>
+					<select name="officeLocation" required>
+						<option value=""disabled selected>-- Please Select --</option>
+
+						{% for office in officelocation %}
+							{% if office.title == item.HelpdeskOffice%}
+								<option value={{office.id}} selected >{{office.title}}
+								
+								</option>
+							{%else%}
+								<option value={{office.id}}>{{office.title}}</option>
+							{%endif%}
+						{%endfor%}
+					</select>
+				 	<br>
+				 	<label><b>Desk Location:</b></label>
+					<input type="text" name="deskLocation" value="{{item.DeskLocation}}" required><br>
+					<label><b>Description:</b></label><br>
+					<textarea name="Description" value="{{item.description}}"rows="4" cols="28"></textarea><br>
+			
+
+				<label><b>Upload supporting documents:</b></label>
+					<input type="file" name="documents"><br>
+
+
+					<label><b>First Approver:{{firstApprover}}</b></label>
+					<br><br>
+					{%if item %}
+					<button type="Submit">Update</button><br><br><br>
+					{% else %}
+					<button type="Submit">Submit</button><br><br><br>
+					{%endif%}
+				</form>
+        	</div>
+        	

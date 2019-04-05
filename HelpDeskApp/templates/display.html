@@ -1,0 +1,171 @@
+<html>
+<head>
+<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+<style>
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: black;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Add padding to containers */
+.container {
+  padding: 16px;
+  background-color: white;
+}
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width:80%;
+}
+
+td, th {
+  
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+
+</style>
+</head>
+<body>
+
+<form action="/action_page.php">
+  <div class="container">
+ 
+   
+    
+  {%if item %}
+  <table>
+    <tr>
+      <td>
+        <b>Request Id:</b><i>2018-2019/Helpdesk/Request/{{item.id}}</i>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <b>Request For:</b><i>{{item.ticket_for}}</i>
+      </td>
+      <td> 
+        <b>Raised By:</b><i>{{item.EmployeeName}}</i>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <b>Department:</b><i>{{item.department}}</i>
+      </td>
+      <td>
+        <b>Category:</b><i>{{item.category}}</i>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <b>Sub Category:</b><i>{{item.sub_category}}</i>
+      </td>
+      <td>
+        <b>Priority:</b><i>{{item.priority}}</i>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <b>Office Location:</b><i>{{item.HelpdeskOffice}}</i>
+      </td>
+      <td>
+        <b>Desk Location:</b><i>{{item.DeskLocation}}</i>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <b>Description:</b><i>{{item.description}}</i>
+      </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        <b>First Approver:</b><i>{{item.FirstLevelApproverEmployeeName}}</i>
+      </td>
+    </tr><tr></tr>
+  <tr></tr>
+  
+  <tr>
+  
+    
+     {% if workflow %}
+
+      <form method="POST">
+    {% csrf_token %}
+
+      
+      {% if workflow.RequestStatus == 'Pending' and  workflow.Process == 'Complete' and workflow.WorkflowPendingWith == emp %}
+      
+        <td><b>Comments:</b></td><td></td></tr>
+        <tr>
+        <td><textarea name="comments" rows="4" cols="28"></textarea><br></td>
+       <td>
+        <button type="submit" formaction="/complete/{{item.id}}" class="btn btn-primary"><span class="glyphicon glyphicon-ok" ></span> Complete</button>
+        
+         
+      {%elif workflow.RequestStatus == 'Pending' and workflow.Process == 'For First Approver' and workflow.WorkflowPendingWith == emp%}
+    
+        <td><b>Comments:</b></td><td></td></tr>
+    <tr>
+    <td><textarea name="comments" rows="4" cols="28"></textarea><br></td>
+       
+      <td><button type="submit" formaction="/approve/{{item.id}}" class="btn btn-primary"><span class="glyphicon glyphicon-ok" ></span> Approve</button>
+      <button type="button" formaction="/reject/{{item.id}}" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Reject </button>
+
+      <button type="submit" class="btn btn-default" formaction="/raiseQuery/{{item.id}}"><span class="glyphicon glyphicon-hand-up"></span> Raise Query</button>
+     
+
+       
+       {%elif workflow.RequestStatus == 'Pending' and  workflow.Process == 'For Helpdesk Approver' and workflow.WorkflowPendingWith == emp1 %}
+
+      <td><b>Comments:</b></td><td></td></tr>
+    <tr>
+    <td><textarea name="comments" rows="4" cols="28"></textarea><br></td>
+        
+      <td><button type="submit" formaction="/approve1/{{item.id}}" class="btn btn-primary"><span class="glyphicon glyphicon-ok" ></span> Approve</button>
+      <button type="button" formaction="/reject/{{item.id}}" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Reject </button>
+      <button type="submit" formaction="/raiseQuery/{{item.id}}" class="btn btn-default"><span class="glyphicon glyphicon-hand-up"></span> Raise Query</button>
+      
+     
+
+       
+       
+       {%elif workflow.RequestStatus == 'Pending' and  workflow.Process == "Answer Query" and workflow.WorkflowPendingWith == emp%}
+      <td><b>Comments:</b></td><td></td></tr>
+    <tr>
+    <td><textarea name="comments" rows="4" cols="28"></textarea><br></td>
+      <td>
+      <button type="submit" formaction="/answer/{{item.id}}" class="btn btn-primary"><span class="glyphicon glyphicon-ok" ></span> Answer Query</button>
+
+      
+      
+     
+
+       
+       {%endif%}
+      
+      {% endif%}
+
+  </form>
+
+  </td></tr>
+      </table>
+  {%endif%}
+  
+
+</body>
+</html>

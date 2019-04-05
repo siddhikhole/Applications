@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+
+	<title>Help desk</title>
+	 <meta charset="utf-8">
+	 <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script language="javascript" type="text/javascript">  
+
+</script>
+
+</head>
+<body>
+	{% if messages %}
+	{% for message in messages %}
+		<div class="alert alert-warning alert-dismissable" role="alert"> 
+	 	
+			{{message}}
+	 		<button class="close" data-dismiss="alert">x</button>
+		</div>
+	{%endfor%}
+	{%endif%}
+	
+	 <button type="button" onclick="window.location.href='/raiseTicket'" class="btn btn-info btn-lg" >Raise Ticket</button> <a class="navbar-brand" href="/logout/">Logout</a>
+	 <br><br>
+
+<nav class="navbar">
+  
+	<ul class="nav nav-tabs ">
+		<li class="nav-item"><a href="/pending">Pending</a></li>
+		<li class="nav-item active"><a href="/approved">Approved</a></li>
+		<li class="nav-item"><a href="/completed">Completed</a></li>
+		<li class="nav-item"><a href="/reopened">Reopened</a></li>
+		<li class="nav-item"><a href="/raisedQ">Raised Query</a></li>
+		<li class="nav-item"><a href="/closed">Closed</a></li>
+		<li class="nav-item"><a href="/cancelled">Cancelled</a></li>
+		<li class="nav-item"><a href="/approval">For First Approval</a></li>
+		<li class="nav-item"><a href="/rejected">Rejected</a></li>
+		<li class="nav-item"><a href="/HelpdeskApprover">Helpdesk Approver</a></li>
+		<li class="nav-item"><a href="/HelpdeskFulfillerHead">Fulfiller Head</a></li>
+		<li class="nav-item"><a href="/AssignedTickets">Assigned</a></li>
+	</ul>
+	
+</nav>
+ {% if all_items %}
+	<table class="table"> 
+	<thead>
+	     <tr>
+	    <th>Request ID</th>
+	    <th>Raised By</th>
+	    <th>Raised Date</th>
+	    <th>Department</th>
+	    <th>Category</th> 
+	    <th>Sub-Category</th>
+	    <th>Status</th> 
+	    <th>Cancel</th>
+	    <th>History</th>
+		</tr>
+	</thead>
+	<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+           <div class="modal-body">
+          
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div> 
+	{%for key,things in all_items.items%}
+    
+      <tr>
+        <td><a href="/display/{{key}}">2018-2019/Helpdesk/Request/{{things.id}}</a></td>
+        <td>{{things.EmployeeName}}</td>
+        <td>{{things.created_at}}</td>
+        <td>{{things.department}}</td>
+        <td>{{things.category}}</td>
+        <td>{{things.sub_category}}</td>
+        <td>{{things.WorkflowCurrentStatus}}</td>
+        
+    
+        
+        <td><a href="/cancel/{{things.id}}" class="btn btn-danger ">Cancel</a></td>
+
+       
+       
+        
+        <td><center><a href="/workflow/{{things.id}}"  data-toggle="modal" data-target="#myModal" ><span class="glyphicon glyphicon-eye-open" ></span></a>
+        
+        </center>
+        </td>
+      </tr>
+    {%endfor%}
+</table>
+	</table>
+{% else %}
+<div class="alert alert-warning alert-dismissable" role="alert">  
+      <h4>No tickets found!</h4>
+ </div>
+
+{% endif %}
+
+<script>
+$(document).ready(function(){
+
+  $("#myModal").on('hidden.bs.modal', function(){
+     console.log("Hello world!");
+    location.reload();
+  });
+});
+</script>
+</body>
+</html>
