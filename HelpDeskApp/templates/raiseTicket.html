@@ -1,14 +1,53 @@
-<!DOCTYPE html>
+{%extends 'index.html' %}
+{%block content %}
 <html>
 <head>
+	<style type="text/css">
+	.header {
+    padding:7px 15px ;
+	padding-left: 10px;
+    border-bottom:1px solid #eee;
+    background-color:#616D7E;
+     font-size:20px;
+    color: white;
+
+margin-right: -55px;
+}
+
+    
+
+   #t1 td{
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+
+ padding-left: 2px;
+ padding-right: 2px;
+margin-right: -55px;
+
+}
+
+#t1 {
+  border-collapse: separate;
+  border-spacing: -50px;
+   padding-left: 30px;
+   padding-right: 50px;
+}
+
+
+  
+
+
+
+
+</style>
 	<title>Help desk</title>
-	 <meta charset="utf-8">
+ <meta charset="utf-8">
 	 <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
 <script language="javascript" type="text/javascript">  
 
 $(document).ready(function(){
@@ -58,36 +97,126 @@ function select_subcategory(array_list)
 });
 
 </script>
+
+<script type="text/javascript">
+
+function yesnoCheck() {
+    if (document.getElementById('yesCheck').checked) {
+        document.getElementById('ifYes').style.visibility = 'visible';
+    }
+    else document.getElementById('ifYes').style.visibility = 'hidden';
+
+}
+
+</script>
+</SCRIPT>
 <style>
 </style>
 </head>
 <body>
-	<div class="modal-header">
-        		<button type="button" class="close" data-dismiss="modal">&times;</button>
-        		<h4 class="modal-title">Raise Request</h4>
+
+<div class="header">
+        	
+        		  <span class="glyphicon glyphicon-hand-up"></span> Raise Request
         	</div>
-        	<div class="modal-body">
+        	
+        		<table style="width:100%"id="t1" >
          		{% if item %}	
-         		<form action="updateTicket" method="POST" enctype="multipart/form-data">
+         		<form action="updateTicket"  method="POST" enctype="multipart/form-data">
          		{%else%}
-         		<form action="addTicket/" method="POST" enctype="multipart/form-data">
+         		<form action="addTicket/"   method="POST" enctype="multipart/form-data">
          		{%endif%}
 				{% csrf_token %}
-				<label><b>Request Type:</b></label>
-				<input type="radio" name="RequestType" value="Request" checked>Request
+
+<div class="input-group mb-3">
+				<tr >
+					
+				<td ><label><b>Request Type:</b></label>&nbsp;&nbsp;
+				<input type="radio" name="RequestType" value="Request" checked>Request&nbsp;&nbsp;&nbsp;
 				<input type="radio" name="RequestType" value="Issue">Issue
-
-				<br>
-
-				<label><b>Request For:</b></label>
-				<input type="radio" name="RequestFor" value="Self" checked>Self
-				<input type="radio" name="RequestFor" value="OnBehalf">On Behalf Of
-
-				<br>
-
-				<label><b>Department:</b></label>
+				</td>
 				
-					<select name="department" id="department_selection" required >
+				</tr>
+				
+				<tr>
+					<td width="20%">
+				<label><b>Request For:</b></label>
+				
+					&nbsp;&nbsp;&nbsp;
+				
+				 <input type="radio" checked onclick="javascript:yesnoCheck();" value="Self" name="yesno" id="noCheck"> Self &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				 <input type="radio" value="OnBehalf" onclick="javascript:yesnoCheck();" name="yesno" id="yesCheck">On Behalf Of<br></td><td>
+
+    <div id="ifYes" style="visibility:hidden">
+    	<input type="test" name="onBehalfOf" placeholder="People Picker" id="default" list="languages">
+       
+    </div>
+        
+   <div id="page-wrapper">
+ 
+
+  
+  <datalist id="languages">
+
+   
+    	{% for emp in employee%}
+  	<option value="{{emp.associated_user_account}}">
+  		{%endfor%}
+  </datalist>
+  
+  
+
+
+
+  <script type="text/javascript">
+  	var dataList = document.getElementById('json-datalist');
+var input = document.getElementById('ajax');
+
+// Create a new XMLHttpRequest.
+var request = new XMLHttpRequest();
+
+// Handle state changes for the request.
+request.onreadystatechange = function(response) {
+  if (request.readyState === 4) {
+    if (request.status === 200) {
+      // Parse the JSON
+      var jsonOptions = JSON.parse(request.responseText);
+  
+      // Loop over the JSON array.
+      jsonOptions.forEach(function(item) {
+        // Create a new <option> element.
+        var option = document.createElement('option');
+        // Set the value using the item in the JSON array.
+        option.value = item;
+        // Add the <option> element to the <datalist>.
+        dataList.appendChild(option);
+      });
+      
+      // Update the placeholder text.
+      input.placeholder = "e.g. datalist";
+    } else {
+      // An error occured :(
+      input.placeholder = "Couldn't load datalist options :(";
+    }
+  }
+};
+
+// Update the placeholder text.
+input.placeholder = "Loading options...";
+
+// Set up and make the request.
+
+  </script>
+
+  
+</div>
+			
+			</td></tr>
+				
+				<tr><td style="margin-left: 500px;">
+				<label><b>Department:</b></label><br>
+				
+					<select name="department" data-size="5" class="form-control" style="width:280px;" id="department_selection" required >
 						<option value=""disabled selected>-- Please Select --</option>
 						{% for dept in departments %}
 							{% if dept.department == item.department%}
@@ -98,9 +227,9 @@ function select_subcategory(array_list)
 								<option value={{dept.id}}>{{dept.department}}</option>
 							{%endif%}
 						{%endfor%}
-					</select><br>
-					<label><b>Category:</b></label>
-					<select name="category" id="category_selection" required>
+					</select></td><td width="20%">
+					<label><b>Category:</b></label><br>
+					<select  style="width:280px;"  class="form-control" name="category" id="category_selection" required>
 						<option value=""disabled selected>-- Please Select --</option>
 						{% for dept in departments %}
 							{% if dept.department == item.department%}
@@ -117,10 +246,11 @@ function select_subcategory(array_list)
 								{%endfor%}
 							{%endif%}
 						{%endfor%}
-					</select><br>
+					</select></td>
+					<td width="20%">
 
-						<label><b>Sub Category:</b></label>
-						<select name="sub_category" id="sub_Category">
+						<label><b>Sub Category:</b></label><br>
+						<select name="sub_category"  style="width:280px;" class="form-control"  id="sub_Category">
 							<option value=""disabled selected>-- Please Select --</option>{% for cat in category %}
 
 							{% if cat.title == item.category%}
@@ -138,19 +268,26 @@ function select_subcategory(array_list)
 								{%endfor%}
 							{%endif%}
 						{%endfor%}
-						</select><br>
-				
+						</select>
+				</td><td width="30%">
 			
-					<label><b>Priority:</b></label>
-					<select name="priority" required>
+					<label><b>Priority:</b></label><br>
+					<select name="priority" style="width:280px;" class="form-control" required>
 						<option value=""disabled selected>-- Please Select --</option>
 						
 						<option value="Low">Low</option>
 						<option value="Medium">Medium</option>
 						<option value="High">High</option>
-					</select><br>
-					<label><b>Office Location:</b></label>
-					<select name="officeLocation" required>
+					</select>
+					 </td></tr>
+					
+				 	
+				
+				 	<tr><td colspan="2">
+					<label><b>Description:</b></label>
+					<textarea name="Description" style="width:560px;" class="form-control" value="{{item.description}}"rows="4" cols="10"></textarea></td><td>
+					<label><b>Office Location:</b></label><br>
+					<select name="officeLocation" style="width:280px;" class="form-control"  required>
 						<option value=""disabled selected>-- Please Select --</option>
 
 						{% for office in officelocation %}
@@ -162,25 +299,36 @@ function select_subcategory(array_list)
 								<option value={{office.id}}>{{office.title}}</option>
 							{%endif%}
 						{%endfor%}
-					</select>
-				 	<br>
-				 	<label><b>Desk Location:</b></label>
-					<input type="text" name="deskLocation" value="{{item.DeskLocation}}" required><br>
-					<label><b>Description:</b></label><br>
-					<textarea name="Description" value="{{item.description}}"rows="4" cols="28"></textarea><br>
+					</select></td><td>
+			<label><b>Desk Location:</b></label><br>
+					<input style="width:280px;" class="form-control"  type="text" name="deskLocation" value="{{item.DeskLocation}}" required>
+					</td>
 			
+				</tr>
+				<tr><td colspan="4">
+	<label><b>Upload supporting documents:</b></label><br>
+	
+		<label for="files"  class="btn btn-primary"><span class="glyphicon glyphicon-folder-open"></span>  Browse</label>
+	
+	
 
-				<label><b>Upload supporting documents:</b></label>
-					<input type="file" name="documents"><br>
 
+					<input type="file" style="visibility:hidden;" id="files" name="documents">
+					
+</td></tr><tr>
+<td>					<label><b>First Approver:{{firstApprover}}</b></label>
 
-					<label><b>First Approver:{{firstApprover}}</b></label>
-					<br><br>
+					</td>
+</tr><tr><td>
 					{%if item %}
-					<button type="Submit">Update</button><br><br><br>
+					<button class="btn btn-primary" type="Submit"> <span class="glyphicon glyphicon-pencil"></span> Update</button>
 					{% else %}
-					<button type="Submit">Submit</button><br><br><br>
+					<button class="btn btn-primary" type="Submit"><span class="glyphicon glyphicon-ok-sign"></span> Submit</button>
 					{%endif%}
+				</td>
+				</tr>
 				</form>
         	</div>
+
+        	{%endblock%}
         	

@@ -1,7 +1,33 @@
+{%extends 'index.html' %}
+{%block content %}
 <!DOCTYPE html>
 <html>
 <head>
+<style type="text/css">
 
+#t1 td{
+  padding-top: 20px;
+  padding-bottom: 12px;
+  text-align: left;
+
+ padding-left: 2px;
+ 
+
+
+	}
+
+	
+	.header {
+    padding:7px 15px ;
+	padding-left: 10px;
+    border-bottom:1px solid #eee;
+    background-color:#616D7E;
+     font-size:20px;
+    color: white;
+
+margin-right: -55px;
+}
+</style>
 
 	<title>Help desk</title>
 	 <meta charset="utf-8">
@@ -10,13 +36,14 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+   
 <script language="javascript" type="text/javascript">  
 
 </script>
 
 </head>
 <body>
+
 	{% if messages %}
 	{% for message in messages %}
 		<div class="alert alert-warning alert-dismissable" role="alert"> 
@@ -26,30 +53,14 @@
 		</div>
 	{%endfor%}
 	{%endif%}
+  <div class="header">
+          
+           For First Approval
+          </div><br>
 	
-	 <button type="button" onclick="window.location.href='/raiseTicket'" class="btn btn-info btn-lg" >Raise Ticket</button> <a class="navbar-brand" href="/logout/">Logout</a>
-	 <br><br>
 
-<nav class="navbar">
-  
-	<ul class="nav nav-tabs ">
-		<li class="nav-item"><a href="/pending">Pending</a></li>
-		<li class="nav-item active"><a href="/approved">Approved</a></li>
-		<li class="nav-item"><a href="/completed">Completed</a></li>
-		<li class="nav-item"><a href="/reopened">Reopened</a></li>
-		<li class="nav-item"><a href="/raisedQ">Raised Query</a></li>
-		<li class="nav-item"><a href="/closed">Closed</a></li>
-		<li class="nav-item"><a href="/cancelled">Cancelled</a></li>
-		<li class="nav-item"><a href="/approval">For First Approval</a></li>
-		<li class="nav-item"><a href="/rejected">Rejected</a></li>
-		<li class="nav-item"><a href="/HelpdeskApprover">Helpdesk Approver</a></li>
-		<li class="nav-item"><a href="/HelpdeskFulfillerHead">Fulfiller Head</a></li>
-		<li class="nav-item"><a href="/AssignedTickets">Assigned</a></li>
-	</ul>
-	
-</nav>
  {% if all_items %}
-	<table class="table"> 
+	<table class="table table-striped" style="width: 100%"id="t1" > 
 	<thead>
 	     <tr>
 	    <th>Request ID</th>
@@ -59,7 +70,8 @@
 	    <th>Category</th> 
 	    <th>Sub-Category</th>
 	    <th>Status</th> 
-	    <th>Cancel</th>
+	    <th>Approve</th>
+   		<th>Reject</th>
 	    <th>History</th>
 		</tr>
 	</thead>
@@ -78,6 +90,9 @@
       
     </div>
   </div> 
+
+<br>
+        	
 	{%for key,things in all_items.items%}
     
       <tr>
@@ -88,13 +103,12 @@
         <td>{{things.category}}</td>
         <td>{{things.sub_category}}</td>
         <td>{{things.WorkflowCurrentStatus}}</td>
-        
+        <td><a href="/approve/{{things.id}}" class="btn btn-primary" ><span class="glyphicon glyphicon-ok" ></span> Approve</a>
+        </td>
+        <td><a href="/reject/{{things.id}}" class="btn btn-warning">Reject</a>
+        </td>
     
         
-        <td><a href="/cancel/{{things.id}}" class="btn btn-danger ">Cancel</a></td>
-
-       
-       
         
         <td><center><a href="/workflow/{{things.id}}"  data-toggle="modal" data-target="#myModal" ><span class="glyphicon glyphicon-eye-open" ></span></a>
         
@@ -122,3 +136,4 @@ $(document).ready(function(){
 </script>
 </body>
 </html>
+{%endblock%}

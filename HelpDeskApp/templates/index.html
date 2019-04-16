@@ -1,58 +1,213 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+.row{
+    margin-left:0px;
+    margin-right:0px;
+}
 
+#wrapper {
+    padding-left: 70px;
+    transition: all .4s ease 0s;
+    height: 100%
+}
 
-	<title>Help desk</title>
-	 <meta charset="utf-8">
-	 <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script language="javascript" type="text/javascript">  
+#sidebar-wrapper {
+    margin-left: -150px;
+    left: 70px;
+    width: 150px;
+    background: #222;
+    position: fixed;
+    height: 100%;
+    z-index: 10000;
+    transition: all .4s ease 0s;
+}
 
+.sidebar-nav {
+    display: block;
+    float: left;
+    width: 150px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+#page-content-wrapper {
+    padding-left: 0;
+    margin-left: 0;
+    width: 100%;
+    height: auto;
+}
+#wrapper.active {
+    padding-left: 150px;
+}
+#wrapper.active #sidebar-wrapper {
+    left: 150px;
+}
 
+#page-content-wrapper {
+  width: 100%;
+}
 
+#sidebar_menu li a, .sidebar-nav li a {
+    color: white;
+    size:20px;
+    display: block;
+    float: left;
+    text-decoration: none;
+    width: 150px;
+    background: #3498DB  ;
+    border-top: 1px solid #3498DB;
+    border-bottom: 1px solid #3498DB;
+    -webkit-transition: background .5s;
+    -moz-transition: background .5s;
+    -o-transition: background .5s;
+    -ms-transition: background .5s;
+    transition: background .5s;
+}
+.sidebar_name {
+    padding-top: 25px;
+    color: #fff;
+    opacity: .7;
+}
 
- 
+.sidebar-nav li {
+  line-height: 40px;
+  text-indent: 20px;
+  background-color: #3498DB;
+}
 
-</script>
+.sidebar-nav li a {
+  color: #999999;
+  display: block;
+  text-decoration: none;
+}
 
+.sidebar-nav li a:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.2);
+  text-decoration: none;
+}
+
+.sidebar-nav li a:active,
+.sidebar-nav li a:focus {
+  text-decoration: none;
+}
+
+.sidebar-nav > .sidebar-brand {
+  height: 80px;
+  line-height: 60px;
+  font-size: 18px;
+}
+
+.sidebar-nav > .sidebar-brand a {
+  color: #3498DB;
+}
+
+.sidebar-nav > .sidebar-brand a:hover {
+  color: #3498DB;
+  background: none;
+}
+
+#main_icon
+{
+    float:right;
+   padding-right: 65px;
+   padding-top:20px;
+}
+.sub_icon
+{
+    float:right;
+   padding-right: 65px;
+   padding-top:10px;
+}
+.content-header {
+  height: 65px;
+  line-height: 65px;
+}
+
+.content-header h1 {
+  margin: 0;
+  margin-left: 20px;
+  line-height: 65px;
+  display: inline-block;
+}
+
+@media (max-width:767px) {
+    #wrapper {
+    padding-left: 70px;
+    transition: all .4s ease 0s;
+}
+#sidebar-wrapper {
+    left: 70px;
+}
+#wrapper.active {
+    padding-left: 150px;
+}
+#wrapper.active #sidebar-wrapper {
+    left: 150px;
+    width: 150px;
+    transition: all .4s ease 0s;
+}
+}
+
+</style>
 </head>
 <body>
-	{% if messages %}
-	{% for message in messages %}
-		<div class="alert alert-warning alert-dismissable" role="alert"> 
-	 	
-			{{message}}
-	 		<button class="close" data-dismiss="alert">x</button>
-		</div>
-	{%endfor%}
-	{%endif%}
-	
-	 <button type="button" onclick="window.location.href='/raiseTicket'" class="btn btn-info btn-lg" >Raise Ticket</button> <a class="navbar-brand" href="/logout/">Logout</a>
-	 <br><br>
-<ul class="nav nav-tabs">
-    <li class="nav-item"><a href="/pending">Pending</a></li>
-    <li class="nav-item"><a href="/approved">Approved</a></li>
-    <li class="nav-item"><a href="/completed">Completed</a></li>
-    <li class="nav-item"><a href="/reopened">Reopened</a></li>
-    <li class="nav-item"><a href="/raisedQ">Raised Query</a></li>
-    <li class="nav-item"><a href="/closed">Closed</a></li>
-    <li class="nav-item"><a href="/cancelled">Cancelled</a></li>
-    <li class="nav-item"><a href="/approval">For First Approval</a></li>
-    <li class="nav-item"><a href="/rejected">Rejected</a></li>
-    <li class="nav-item"><a href="/HelpdeskApprover">Helpdesk Approver</a></li>
-    <li class="nav-item"><a href="/HelpdeskFulfillerHead">Fulfiller Head</a></li>
-    <li class="nav-item"><a href="/AssignedTickets">Assigned</a></li>
+
+
+  
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<!------ Include the above in your HEAD tag ---------->
+
+<div id="wrapper" class="active">
+      
+      <!-- Sidebar -->
+            <!-- Sidebar -->
+      <div id="sidebar-wrapper">
+      <ul id="sidebar_menu" class="sidebar-nav">
+      <li class="sidebar-brand"><a id="menu-toggle" href="#">Menu<span id="main_icon" class="glyphicon glyphicon-align-justify"></span></a></li>
+      <li class="sidebar-brand"><a href="/raiseTicket">Raise Ticket</a></li>
+      <li class="sidebar-brand"><a href="/pending">My Requests</b></a></li>
+  
     
-    
-  </ul>
+  
+    <li class="sidebar-brand"><a href="/approval">First Approval</a></li>
+    <li class="sidebar-brand"><a href="/HelpdeskApprover">Approver Head</a></li>
+    <li class="sidebar-brand"><a href="/HelpdeskFulfillerHead">Fulfiller Head</a></li>
+    <li class="sidebar-brand"><a href="/AssignedTickets">Assigned</a></li>
+    <li class="sidebar-brand"><a href="/logout"><span class="glyphicon glyphicon-off"></span>   </a></li>
+          
+      </div>
+          
+      <!-- Page content -->
+      <div id="page-content-wrapper">
+        <!-- Keep all page content within the page-content inset div! -->
+        <div class="page-content inset">
+          <div class="row">
+              <div class="col-md-12">
+              {%block content %}
 
-	
+{%endblock%}
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+ 
+</div>
+</div>
+<script>
+$("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("active");
+});
 
-
+</script>
+   
 </body>
-</html>
+</html> 

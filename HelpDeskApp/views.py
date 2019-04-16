@@ -13,10 +13,18 @@ from .service import get_users
 from HelpDeskApp.email import send_html_mail 
 # Create your views here.
 
+def trial(request):
+	file=request.FILES.get('file')
+	print(file)
+	print(type(file))
+	print(len(file))
+	return HttpResponseRedirect('/main')
+
 def home(request):
 	redirect_uri = request.build_absolute_uri(reverse('HelpDeskApp:gettoken'))
 	sign_in_url = get_signin_url(redirect_uri)
-	return HttpResponse('<a href="' + sign_in_url +'" >Click here to sign in and view your mail</a>')
+	return render(request,"login.html",{'sign_in_url':sign_in_url})
+	#return HttpResponse('<a href="' + sign_in_url +'" >Click here to sign in and view your mail</a>')
 
 # Add import statement to include new function
 
@@ -47,21 +55,20 @@ def gettoken(request):
 
 
 def main(request):
-	#Default page	
-	#return render(request,"pending.html",{})
+	#return render (request, "home.html",{})
 	return render(request,"index.html",{})
 	
 
 def pending(request):
 	#Default page
-	all_items=HelpRequest.objects.all().filter(employee_id=request.session['username'],WorkflowStatus="Workflow Initiated")
+	all_items=HelpRequest.objects.all().filter(OnBehalfUserEmployeeId=request.session['username'],WorkflowStatus="Workflow Initiated")
 	all_items = get_users(all_items)
 	return render(request,"pending.html",{'all_items':all_items})
 	
 
 def approved(request):
 	#Default page
-	all_items=HelpRequest.objects.all().filter(employee_id=request.session['username'],WorkflowStatus="Activated")
+	all_items=HelpRequest.objects.all().filter(OnBehalfUserEmployeeId=request.session['username'],WorkflowStatus="Activated")
 	
 	all_items = get_users(all_items)
 	return render(request,"approved.html",{'all_items':all_items})
@@ -70,7 +77,7 @@ def approved(request):
 
 def completed(request):
 	#Default page
-	all_items=HelpRequest.objects.all().filter(employee_id=request.session['username'],WorkflowStatus="Completed")
+	all_items=HelpRequest.objects.all().filter(OnBehalfUserEmployeeId=request.session['username'],WorkflowStatus="Completed")
 	
 	all_items = get_users(all_items)
 	return render(request,"complete.html",{'all_items':all_items})
@@ -78,7 +85,7 @@ def completed(request):
 
 def reopened(request):
 	#Default page
-	all_items=HelpRequest.objects.all().filter(employee_id=request.session['username'],WorkflowStatus="Reopened")
+	all_items=HelpRequest.objects.all().filter(OnBehalfUserEmployeeId=request.session['username'],WorkflowStatus="Reopened")
 	
 	all_items = get_users(all_items)
 	return render(request,"reopen.html",{'all_items':all_items})
@@ -86,21 +93,21 @@ def reopened(request):
 
 def raisedQ(request):
 	#Default page
-	all_items=HelpRequest.objects.all().filter(employee_id=request.session['username'],WorkflowStatus="Raised Query")
+	all_items=HelpRequest.objects.all().filter(OnBehalfUserEmployeeId=request.session['username'],WorkflowStatus="Raised Query")
 	
 	all_items = get_users(all_items)
 	return render(request,"raisedQ.html",{'all_items':all_items})
 
 def closed(request):
 	#Default page
-	all_items=HelpRequest.objects.all().filter(employee_id=request.session['username'],WorkflowStatus="Closed")
+	all_items=HelpRequest.objects.all().filter(OnBehalfUserEmployeeId=request.session['username'],WorkflowStatus="Closed")
 	
 	all_items = get_users(all_items)
 	return render(request,"closed.html",{'all_items':all_items})
 
 def cancelled(request):
 	#Default page
-	all_items=HelpRequest.objects.all().filter(employee_id=request.session['username'],WorkflowStatus="Cancel")
+	all_items=HelpRequest.objects.all().filter(OnBehalfUserEmployeeId=request.session['username'],WorkflowStatus="Cancel")
 	
 	all_items = get_users(all_items)
 	return render(request,"cancelled.html",{'all_items':all_items})
@@ -115,7 +122,7 @@ def approval(request):
 
 def rejected(request):
 	#Default page
-	all_items=HelpRequest.objects.all().filter(employee_id=request.session['username'],WorkflowStatus="Rejected")
+	all_items=HelpRequest.objects.all().filter(OnBehalfUserEmployeeId=request.session['username'],WorkflowStatus="Rejected")
 		
 	all_items = get_users(all_items)
 	return render(request,"reject.html",{'all_items':all_items})
@@ -184,7 +191,15 @@ def complete(request,ticket_id):
 	item.RequestStatus="Completed"
 	item.ActedOn=str(datetime.datetime.utcnow())
 	item.ActionData=request.GET.get('comments')
+	item.WorkflowPendingWith=item1.OnBehalfUserEmployeeName
 	item.save()
+
+	key="HelpdeskTemplate_UpdateTicket"
+	msg="Your service request is completed of which details are:"
+	emailid=HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat=True).filter(id=ticket_id)
+	Employee=EmployeeMaster.objects.values_list('email',flat=True).filter(empid=emailid[0])
+	Employee=[Employee[0]]
+	email(key,ticket_id,Employee,msg)
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
@@ -226,22 +241,25 @@ def email(key,t_id,emailid,msg):
 	#To send email notification
 	Email=Workflow_email_templates.objects.values_list('template_body','template_subject').filter(key=key)
 	print(t_id)
-	message=HelpRequest.objects.values_list('EmployeeName','id','created_at','request_type','HelpdeskOffice','department','category','sub_category','priority','description','Files').filter(id=t_id)
+	message=HelpRequest.objects.values_list('OnBehalfUserEmployeeName','id','created_at','request_type','HelpdeskOffice','department','category','sub_category','priority','description','Files').filter(id=t_id)
 	print(message)
 	email_msg=Email[0][0].replace('@@message', str(msg)).replace('@@links','<a href="http://127.0.0.1:8000/display/'+str(t_id)+'">Click here</a>' ).replace('@@RequestorName',str(message[0][0])).replace('@@RequestId',str(message[0][1])).replace('@@Created',str(message[0][2])).replace('@@TicketType',str(message[0][3])).replace('@@Location',str(message[0][4])).replace('@@DepartmentName',str(message[0][5])).replace('@@CategoryName',str(message[0][6])).replace('@@SubCategoryName',str(message[0][7])).replace('@@Priority',str(message[0][8])).replace('@@Description',str(message[0][9]))
-
-	Files=message[0][10]
-	
-	print(email_msg)
+	if(message[0][10]==""):
+		files=" "
+	else:
+		files=settings.MEDIA_URL+message[0][10]
+	print(files)
+	#print(email_msg)
 	try:
 		subject=Email[0][1].replace('@@EmployeeName',str(message[0][0]))
 	except:
 		subject="Ticket 2018-2019/Helpdesk/Request/"+str(t_id)+" -Helpdesk Ticket Updated"
-	print(email_msg)
+	#print(email_msg)
 	to=emailid
 	email=EmailMultiAlternatives(subject,email_msg, 'aditip@nitorinfotech.com', to)
 	sender="siddhikhole@gmail.com"
-	send_html_mail(subject, email_msg, to, sender)
+	print("&"*100)
+	send_html_mail(subject, email_msg, to, sender,files)
 
 	'''if Files:
 		print(Files)
@@ -271,36 +289,65 @@ def addTicket(request):
 		sub_category=sub_categories.objects.values_list('title',flat=True).filter(id=request.POST.get('sub_category'))
 		sub_category=sub_category[0]
 		priority=request.POST.get('priority')
-		ticket_for=request.POST.get('RequestFor')
+		ticket_for=request.POST.get('yesno')
+		onBehalfOf=request.POST.get('onBehalfOf')
 		HelpdeskOffice=HelpdeskOfficeLocation.objects.values_list('title',flat=True).filter(id=request.POST.get('officeLocation'))
 		HelpdeskOffice=HelpdeskOffice[0]
 		DeskLocation=request.POST.get('deskLocation')
 		Files=request.FILES.get('documents')
-		Employee=EmployeeMaster.objects.values_list('reporting_to','associated_user_account','email').filter(new_emp_id=employee_id)
+
+
+		if(ticket_for=="OnBehalf"):
+
+			Employee=EmployeeMaster.objects.values_list('reporting_to','empid','email').filter(associated_user_account=onBehalfOf)
+			OnBehalfUserEmployeeId=Employee[0][1]
+			OnBehalfUserEmployeeName=onBehalfOf
+			Employee1=EmployeeMaster.objects.values_list('associated_user_account','email').filter(empid=employee_id)
+			EmployeeName=Employee1[0][0]
+		else:
+			Employee=EmployeeMaster.objects.values_list('reporting_to','associated_user_account','email').filter(empid=employee_id)
+			EmployeeName=Employee[0][1]
+			OnBehalfUserEmployeeId=employee_id
+			OnBehalfUserEmployeeName=EmployeeName
+
+
 		FirstLevelApproverEmployeeName=Employee[0][0]
-		EmployeeName=Employee[0][1]
+			
 		FirstApprover=EmployeeMaster.objects.values_list('empid','email').filter(associated_user_account=FirstLevelApproverEmployeeName)
 		FirstLevelApproverEmployeeId=FirstApprover[0][0]
 		FirstApproverEmail=FirstApprover[0][1]
 		print("#"*40)
-		form=HelpRequest(WorkflowStatus="Workflow Initiated",employee_id=employee_id,FirstLevelApproverEmployeeId=FirstLevelApproverEmployeeId,FirstLevelApproverEmployeeName=FirstLevelApproverEmployeeName,EmployeeName=EmployeeName,created_at=created_at,description=description,request_type=request_type,department=department,category=category,sub_category=sub_category,priority=priority,ticket_for=ticket_for,HelpdeskOffice=HelpdeskOffice,DeskLocation=DeskLocation,Files=Files)
+		form=HelpRequest(OnBehalfUserEmployeeId=OnBehalfUserEmployeeId,OnBehalfUserEmployeeName=OnBehalfUserEmployeeName,WorkflowStatus="Workflow Initiated",employee_id=employee_id,FirstLevelApproverEmployeeId=FirstLevelApproverEmployeeId,FirstLevelApproverEmployeeName=FirstLevelApproverEmployeeName,EmployeeName=EmployeeName,created_at=created_at,description=description,request_type=request_type,department=department,category=category,sub_category=sub_category,priority=priority,ticket_for=ticket_for,HelpdeskOffice=HelpdeskOffice,DeskLocation=DeskLocation,Files=Files)
 		try:
 			form.save()
 			messages.success(request,"successfully added")
 			key='HelpdeskTemplate_AssignTask'
 			t_id=form.id
 			
-			form1=WorkflowRequest(ActedByUser=employee_id,Process="Raised Ticket",ActedOn=str(datetime.datetime.utcnow()),Action="Raised Ticket",Actor=EmployeeName,RequestStatus="Workflow Initiated",WorkflowPendingWith=FirstLevelApproverEmployeeName,RequestID_id=t_id)
+			form1=WorkflowRequest(ActedByUser=OnBehalfUserEmployeeId,Process="Raised Ticket",ActedOn=str(datetime.datetime.utcnow()),Action="Raised Ticket",Actor=OnBehalfUserEmployeeName,RequestStatus="Workflow Initiatedemail",WorkflowPendingWith=FirstLevelApproverEmployeeName,RequestID_id=t_id)
 			form1.save()
 			form1=WorkflowRequest(ActedByUser=FirstLevelApproverEmployeeId,Process="For First Approver",ActedOn=str(datetime.datetime.utcnow()),Actor=FirstLevelApproverEmployeeName,RequestStatus="Pending",WorkflowPendingWith=FirstLevelApproverEmployeeName,RequestID_id=t_id)
 			form1.save()
 			msg="You have been assigned a service request for approval of which details are:"
 			FirstApproverEmail=[FirstApproverEmail]
 			email(key,t_id,FirstApproverEmail,msg)
-			key='HelpdeskTemplate_InitiateWorkflow'
-			msg="You have raised a service request of which the details are:"
-			to=[Employee[0][2]]
-			email(key,t_id,to,msg)
+			if(ticket_for=="OnBehalf"):
+				key='HelpdeskTemplate_InitiateWorkflow'
+				msg="You have raised a service request on behalf of "+onBehalfOf+" for which the details are:"
+				to=[Employee1[0][1]]
+				email(key,t_id,to,msg)
+
+				key='HelpdeskTemplate_InitiateWorkflow'
+				msg=EmployeeName+" have raised a service request on behalf of you for which the details are:"
+				to=[Employee[0][1]]
+				email(key,t_id,to,msg)
+
+			else:
+
+				key='HelpdeskTemplate_InitiateWorkflow'
+				msg="You have raised a service request of which the details are:"
+				to=[Employee[0][2]]
+				email(key,t_id,to,msg)
 			return HttpResponseRedirect('/main')
 		except:
 			return HttpResponseRedirect('/main')
@@ -323,6 +370,13 @@ def updateTicket(request,ticket_id):
 		item.DeskLocation=request.POST.get('deskLocation')
 		item.Files=request.FILES.get('documents')
 		item.save()
+
+		key="HelpdeskTemplate_UpdateTicket"
+		msg="Your ticket is updated successfully of which details are:"
+		emailid=HelpRequest.objects.values_list('employee_id',flat=True).filter(id=ticket_id)
+		Employee=EmployeeMaster.objects.values_list('email',flat=True).filter(empid=emailid[0])
+		Employee=[Employee[0]]
+		email(key,ticket_id,Employee,msg)
 		return HttpResponseRedirect('/main')
 
 
@@ -358,14 +412,14 @@ def approve(request,ticket_id):
 
 	key="HelpdeskTemplate_UpdateTicket"
 	msg="Your service request is approved by "+item1.EmployeeName+" of which details are:"
-	emailid=HelpRequest.objects.values_list('employee_id',flat=True).filter(id=ticket_id)
+	emailid=HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat=True).filter(id=ticket_id)
 	Employee=EmployeeMaster.objects.values_list('email',flat=True).filter(empid=emailid[0])
 	Employee=[Employee[0]]
 	email(key,ticket_id,Employee,msg)
 
 
 	Employee=[]
-	key="HelpdeskTemplate_Common"
+	key="HelpdeskTemplate_AssignTask"
 	msg="You have been assigned a service request for approval of which details are:"
 	user=AppList.objects.all().filter(roles=roles)
 	for i in user:
@@ -416,14 +470,14 @@ def approve1(request,ticket_id):
 
 	key="HelpdeskTemplate_UpdateTicket"
 	msg="Your service request is approved by "+item.Actor+" of which details are:"
-	emailid=HelpRequest.objects.values_list('employee_id',flat=True).filter(id=ticket_id)
+	emailid=HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat=True).filter(id=ticket_id)
 	Employee=EmployeeMaster.objects.values_list('email',flat=True).filter(empid=emailid[0])
 	Employee=[Employee[0]]
 	email(key,ticket_id,Employee,msg)
 
 
 	Employee=[]
-	key="HelpdeskTemplate_Common"
+	key="HelpdeskTemplate_AssignTask"
 	msg="You have been assigned a service request of which details are:"
 	user=AppList.objects.all().filter(roles=roles)
 	for i in user:
@@ -445,9 +499,10 @@ def reject(request,ticket_id):
 	item.save()
 	key="HelpdeskTemplate_UpdateTicket"
 	msg="Your service request is rejected of which details are:"
-	emailid=HelpRequest.objects.values_list('employee_id',flat=True).filter(id=ticket_id)
+	emailid=HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat=True).filter(id=ticket_id)
 	Employee=EmployeeMaster.objects.values_list('email',flat=True).filter(empid=emailid[0])
-	email(key,ticket_id,Employee[0],msg)
+	Employee=[Employee[0]]
+	email(key,ticket_id,Employee,msg)
 	messages.success(request,"Ticket Rejected!!!")
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -457,14 +512,15 @@ def reject1(request,ticket_id):
 	item.WorkflowStatus="Rejected"
 	item.WorkflowCurrentStatus="Rejected"
 	item.save()
-	item=WorkflowRequest.objects.get(RequestID_id=ticket_id,ActedByUser=request.session['username'])
+	item=WorkflowRequest.objects.get(RequestID_id=ticket_id,RequestStatus="Pending")
 	item.RequestStatus="Rejected"
 	item.save()
 	key="HelpdeskTemplate_UpdateTicket"
 	msg="Your service request is rejected of which details are:"
-	emailid=HelpRequest.objects.values_list('employee_id',flat=True).filter(id=ticket_id)
+	emailid=HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat=True).filter(id=ticket_id)
 	Employee=EmployeeMaster.objects.values_list('email',flat=True).filter(empid=emailid[0])
-	email(key,ticket_id,Employee[0],msg)
+	Employee=[Employee[0]]
+	email(key,ticket_id,Employee,msg)
 	messages.success(request,"Ticket Rejected!!!")
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -475,9 +531,12 @@ def display(request,ticket_id):
 	item=HelpRequest.objects.get(pk=ticket_id)
 	emp1=""
 	print(item.id)
-	emp=request.session['username']
-	empName=EmployeeMaster.objects.get(empid=emp)
-	empName=empName.associated_user_account
+	try:
+		emp=request.session['username']
+		empName=EmployeeMaster.objects.get(empid=emp)
+		empName=empName.associated_user_account
+	except:
+		return HttpResponseRedirect('/home')
 	Approver=AppList.objects.all()
 	for i in Approver:
 		if(i.user==empName and i.roles=="HelpdeskHRApprover1"):
@@ -492,11 +551,11 @@ def display(request,ticket_id):
 			emp1="Helpdesk Finance Approver"
 
 	try:
-		workflow=WorkflowRequest.objects.get(RequestID_id=ticket_id,RequestStatus="Pending")
+		workflow=WorkflowRequest.objects.get((Q(RequestStatus="Pending")|(Q(RequestStatus="Completed",Process="Complete"))),RequestID_id=ticket_id)
 		print(workflow.Process)
-		return render(request,"display.html",{'item':item,'emp':empName,'workflow':workflow,'emp1':emp1})
+		return render(request,"display.html",{'item':item,'emp':empName,'workflow':workflow,'emp1':emp1,'media_url':settings.MEDIA_URL})
 	except:
-		return render(request,"display.html",{'item':item,'emp':empName,'emp1':emp1})
+		return render(request,"display.html",{'item':item,'emp':empName,'emp1':emp1,'media_url':settings.MEDIA_URL})
 
 def workflow(request,ticket_id):
 	#To delete pending ticket
@@ -554,38 +613,25 @@ def assignTicket(request,ticket_id):
 
 	item1=HelpRequest.objects.get(id=ticket_id)
 
-	form1=WorkflowRequest(ActedByUser=assignTo,Process="Complete",ActedOn=str(datetime.datetime.utcnow()),Actor=assignToName,RequestStatus="Pending",WorkflowPendingWith=assignToName,RequestID_id=ticket_id)
+	form1=WorkflowRequest(ActedByUser=assignTo.empid,Process="Complete",ActedOn=str(datetime.datetime.utcnow()),Actor=assignToName,RequestStatus="Pending",WorkflowPendingWith=assignToName,RequestID_id=ticket_id)
 	form1.save()
 
 
 	##########################################################
 	key="HelpdeskTemplate_UpdateTicket"
 	msg="Your service request is assigned to "+assignToName+" of which details are:"
-	emailid=HelpRequest.objects.values_list('employee_id',flat=True).filter(id=ticket_id)
+	emailid=HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat=True).filter(id=ticket_id)
 	Employee=EmployeeMaster.objects.values_list('email',flat=True).filter(empid=emailid[0])
 	Employee=[item1.EmployeeName]
 	email(key,ticket_id,Employee,msg)
 
-	key="HelpdeskTemplate_Common"
+	key="HelpdeskTemplate_AssignTask"
 	msg="You have been assigned a service request for fulfillment of which details are:"
-	emailid=HelpRequest.objects.values_list('employee_id',flat=True).filter(id=ticket_id)
+	emailid=HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat=True).filter(id=ticket_id)
 	Employee=EmployeeMaster.objects.values_list('email',flat=True).filter(empid=emailid[0])
 	Employee=[assignTo.email]
 	email(key,ticket_id,Employee,msg)
 	#########################################################
-	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-
-
-
-
-
-
-def delete(request,ticket_id):
-	#To delete pending ticket
-	item=HelpRequest.objects.get(pk=ticket_id)
-	item.delete()
-	messages.success(request,"Ticket Deleted!!!")
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 def update(request,ticket_id):
@@ -595,8 +641,11 @@ def update(request,ticket_id):
 	departments=HelpdeskDepartments.objects.all().filter(request_type="Request")
 	category=Categories.objects.all()
 	subCategory=sub_categories.objects.all()
-	messages.success(request,"Ticket Updated!!!")
-	return render(request,"raiseTicket.html",{'item':item,'subCategory':subCategory,'officelocation':officelocation,'departments':departments,'category':category})
+	employee=EmployeeMaster.objects.all()
+	
+
+	
+	return render(request,"raiseTicket.html",{'employee':employee,'item':item,'subCategory':subCategory,'officelocation':officelocation,'departments':departments,'category':category})
 
 
 def log(request):
@@ -609,7 +658,9 @@ def raiseTicket(request):
 	subCategory=sub_categories.objects.all()
 	firstApprover=EmployeeMaster.objects.values_list('reporting_to',flat=True).filter(empid=request.session['username'])
 	firstApprover=firstApprover[0]
-	return render(request, "raiseTicket.html",{'firstApprover':firstApprover,'subCategory':subCategory,'officelocation':officelocation,'departments':departments,'category':category})
+	employee=EmployeeMaster.objects.all()
+
+	return render(request, "raiseTicket.html",{'employee':employee,'firstApprover':firstApprover,'subCategory':subCategory,'officelocation':officelocation,'departments':departments,'category':category})
 
 def raiseQuery(request,ticket_id):
 	item=HelpRequest.objects.get(id=ticket_id)
@@ -617,6 +668,8 @@ def raiseQuery(request,ticket_id):
 	print(item.EmployeeName)
 	item.WorkflowStatus="Raised Query"
 	name=EmployeeMaster.objects.get(empid=request.session['username'])
+
+
 	
 
 	item.save()
@@ -646,8 +699,16 @@ def raiseQuery(request,ticket_id):
 	item1.WorkflowPendingWith=name.associated_user_account
 	item1.save()
 
-	form=WorkflowRequest(ActedByUser=item.employee_id,Process="Answer Query",ActedOn=str(datetime.datetime.utcnow()),Actor=item.EmployeeName,RequestStatus="Pending",WorkflowPendingWith=item.EmployeeName,RequestID_id=ticket_id)
+
+	form=WorkflowRequest(ActedByUser=item.OnBehalfUserEmployeeId,Process="Answer Query",ActedOn=str(datetime.datetime.utcnow()),Actor=item.OnBehalfUserEmployeeName,RequestStatus="Pending",WorkflowPendingWith=item.OnBehalfUserEmployeeName,RequestID_id=ticket_id)
 	form.save()
+
+	key="HelpdeskTemplate_AssignTask"
+	msg=name.associated_user_account+" raised a query for ticket of which details are:"
+	emailid=HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat=True).filter(id=ticket_id)
+	Employee=EmployeeMaster.objects.values_list('email',flat=True).filter(empid=emailid[0])
+	Employee=[Employee[0]]
+	email(key,ticket_id,Employee,msg)
 	
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -662,7 +723,7 @@ def cancel(request,ticket_id):
 	item1=WorkflowRequest.objects.get(RequestID_id=ticket_id,RequestStatus="Pending")
 	item1.RequestStatus="Incomplete"
 	item1.save()
-	form=WorkflowRequest(ActedByUser=request.session['username'],Process="Cancel",ActedOn=str(datetime.datetime.utcnow()),Actor=item.EmployeeName,RequestStatus="Cancelled",RequestID_id=ticket_id)
+	form=WorkflowRequest(ActedByUser=request.session['username'],Process="Cancel",ActedOn=str(datetime.datetime.utcnow()),Actor=item.OnBehalfUserEmployeeName,RequestStatus="Cancelled",RequestID_id=ticket_id)
 	form.save()
 
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -672,7 +733,7 @@ def cancel(request,ticket_id):
 def ansQuery(request,ticket_id):
 	item=HelpRequest.objects.get(id=ticket_id)
 
-	print(item.EmployeeName)
+	print(item.OnBehalfUserEmployeeName)
 			
 	item.WorkflowStatus=item.WorkflowCurrentStatus
 
@@ -692,9 +753,69 @@ def ansQuery(request,ticket_id):
 	print(item2.Process)
 	item2.Action="Raise Query"
 	item2.save()
+
+
+	key="HelpdeskTemplate_AssignTask"
+	msg=item.OnBehalfUserEmployeeName+" answered a query for ticket of which details are:"
+	emailid=HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat=True).filter(id=ticket_id)
+	Employee=EmployeeMaster.objects.values_list('email',flat=True).filter(empid=item2.ActedByUser)
+	Employee=[Employee[0]]
+	email(key,ticket_id,Employee,msg)
+
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-	
+def Reopen(request,ticket_id):
+	item=WorkflowRequest.objects.get(RequestID_id=ticket_id,RequestStatus="Completed",Process="Complete")
+	item.Process="Reopened"
+	item.save()
+
+	item1=HelpRequest.objects.get(id=ticket_id)
+	item1.WorkflowStatus="Reopened"
+	item1.WorkflowCurrentStatus="Reopened"
+	item1.save()
+
+	comments=request.GET.get('comments')
+
+	form1=WorkflowRequest(ActionData=comments,ActedByUser=request.session['username'],Process="Reopen",ActedOn=str(datetime.datetime.utcnow()),Actor=item1.OnBehalfUserEmployeeName,RequestStatus="Reopened",WorkflowPendingWith=item.Actor,RequestID_id=ticket_id)
+	form1.save()
+
+	form=WorkflowRequest(ActedByUser=item.ActedByUser,ActedOn=str(datetime.datetime.utcnow()),Actor=item.Actor,Process="Complete",RequestStatus="Pending",WorkflowPendingWith=item.Actor,RequestID_id=ticket_id)
+	form.save()
+
+	key="HelpdeskTemplate_AssignTask"
+	msg=item1.OnBehalfUserEmployeeName+" reopened ticket of which details are:"
+	emailid=HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat=True).filter(id=ticket_id)
+	Employee=EmployeeMaster.objects.values_list('email',flat=True).filter(empid=item.ActedByUser)
+	Employee=[Employee[0]]
+	email(key,ticket_id,Employee,msg)
+
+	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))	
+
+def Close(request,ticket_id):
+	item=HelpRequest.objects.get(id=ticket_id)
+	item.WorkflowStatus="Closed"
+	item.WorkflowCurrentStatus="Closed"
+	item.save()
+
+	item1=WorkflowRequest.objects.get(RequestID_id=ticket_id,RequestStatus="Completed",Process="Complete")
+	item1.Process="Closed"
+	item1.save()
+
+	comments=request.GET.get('comments')
+
+	form1=WorkflowRequest(ActionData=comments,ActedByUser=request.session['username'],Process="Close",ActedOn=str(datetime.datetime.utcnow()),Actor=item.OnBehalfUserEmployeeName,RequestStatus="Closed",RequestID_id=ticket_id)
+	form1.save()
+
+	key="HelpdeskTemplate_AssignTask"
+	msg="You closed a service ticket of which details are:"
+	emailid=HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat=True).filter(id=ticket_id)
+	Employee=EmployeeMaster.objects.values_list('email',flat=True).filter(empid=emailid[0])
+	Employee=[Employee[0]]
+	email(key,ticket_id,Employee,msg)
+	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))	
+
+
+
 
 
 def logout(request):

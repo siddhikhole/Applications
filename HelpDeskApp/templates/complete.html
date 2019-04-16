@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+{%extends 'index.html' %}
+{%block content %}<!DOCTYPE html>
 <html>
 <head>
 
@@ -10,13 +11,27 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <style type="text/css">
+	.header {
+    padding:7px 15px ;
+	padding-left: 10px;
+    border-bottom:1px solid #eee;
+    background-color:#616D7E;
+     font-size:20px;
+    color: white;
+
+margin-right: -55px;
+}</style> 
 <script language="javascript" type="text/javascript">  
 
 </script>
 
 </head>
 <body>
+	<div class="header">
+        	
+        	 My Requests
+        	</div>
 	{% if messages %}
 	{% for message in messages %}
 		<div class="alert alert-warning alert-dismissable" role="alert"> 
@@ -27,9 +42,7 @@
 	{%endfor%}
 	{%endif%}
 	
-	 <button type="button" onclick="window.location.href='/raiseTicket'" class="btn btn-info btn-lg" >Raise Ticket</button> <a class="navbar-brand" href="/logout/">Logout</a>
-	 <br><br>
-
+	
 <nav class="navbar">
   
 	<ul class="nav nav-tabs ">
@@ -40,11 +53,9 @@
 		<li class="nav-item"><a href="/raisedQ">Raised Query</a></li>
 		<li class="nav-item"><a href="/closed">Closed</a></li>
 		<li class="nav-item"><a href="/cancelled">Cancelled</a></li>
-		<li class="nav-item"><a href="/approval">For First Approval</a></li>
+		
 		<li class="nav-item"><a href="/rejected">Rejected</a></li>
-		<li class="nav-item"><a href="/HelpdeskApprover">Helpdesk Approver</a></li>
-		<li class="nav-item"><a href="/HelpdeskFulfillerHead">Fulfiller Head</a></li>
-		<li class="nav-item"><a href="/AssignedTickets">Assigned</a></li>
+		
 	</ul>
 	
 </nav>
@@ -60,6 +71,7 @@
 	    <th>Sub-Category</th>
 	    <th>Status</th> 
 	    <th>Reopen</th>
+	    <th>Close</th>
 	    <th>History</th>
 		</tr>
 	</thead>
@@ -91,12 +103,13 @@
         
     
 
-        <td><a href="#" class="btn btn-info ">Reopen</a></td>
+        <td><a href="/display/{{things.id}}" class="btn btn-info ">Reopen</a></td>
+         <td><a href="/close/{{things.id}}" class="btn btn-warning ">Close</a></td>
 
        
        
         
-        <td><center><a href="/workflow/{{things.id}}"  data-toggle="modal" data-target="#myModal" ><span class="glyphicon glyphicon-eye-open" ></span></a>
+        <td><center><a href="/workflow/{{things.id}}"  data-toggle="modal" data-target="#myModal" ><span class="glyphicon glyphicon" ></span></a>
         
         </center>
         </td>
@@ -122,3 +135,4 @@ $(document).ready(function(){
 </script>
 </body>
 </html>
+{%endblock%}

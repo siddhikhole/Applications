@@ -12,10 +12,10 @@ urlpatterns = [
   url(r'^HelpDeskApp/gettoken/$', views.gettoken, name='gettoken'),
 
 
+path('trial/',views.trial,name="trial"),
 path('raiseTicket/addTicket/',views.addTicket,name="addTicket"),
 path('update/<ticket_id>/updateTicket',views.updateTicket,name="updateTicket"),
 path('raiseTicket/',views.raiseTicket,name="raiseTicket"),
-path('delete/<ticket_id>/',views.delete,name="delete"),
 path('update/<ticket_id>/',views.update,name="update"),
 path('cancel/<ticket_id>/',views.cancel,name="cancel"),
 path('approve/<ticket_id>',views.approve,name="approve"),
@@ -43,5 +43,6 @@ path('rejected/',views.rejected,name="rejected"),
 path('AssignedTickets/',views.AssignedTickets,name="AssignedTickets"),
 path('HelpdeskApprover/',views.HelpdeskApprover,name="HelpdeskApprover"),
 path('HelpdeskFulfillerHead/',views.HelpdeskFulfillerHead,name="HelpdeskFulfillerHead"),
-
+path('reopen/<ticket_id>',views.Reopen,name="Reopen"),
+path('close/<ticket_id>',views.Close,name="Close")
 ]

@@ -56,7 +56,7 @@ tr:nth-child(even) {
     </tr>
     <tr>
       <td>
-        <b>Request For:</b><i>{{item.ticket_for}}</i>
+        <b>Request For:</b><i>{{item.OnBehalfUserEmployeeName}}</i>
       </td>
       <td> 
         <b>Raised By:</b><i>{{item.EmployeeName}}</i>
@@ -98,7 +98,9 @@ tr:nth-child(even) {
       </td>
     </tr><tr></tr>
   <tr></tr>
-  
+  <tr><td><b>Attachments:</b></td></tr>
+  <tr><td><img src="{{media_url}}{{item.Files}}"></td></tr>
+</tr>
   <tr>
   
     
@@ -107,7 +109,6 @@ tr:nth-child(even) {
       <form method="POST">
     {% csrf_token %}
 
-      
       {% if workflow.RequestStatus == 'Pending' and  workflow.Process == 'Complete' and workflow.WorkflowPendingWith == emp %}
       
         <td><b>Comments:</b></td><td></td></tr>
@@ -150,6 +151,16 @@ tr:nth-child(even) {
     <td><textarea name="comments" rows="4" cols="28"></textarea><br></td>
       <td>
       <button type="submit" formaction="/answer/{{item.id}}" class="btn btn-primary"><span class="glyphicon glyphicon-ok" ></span> Answer Query</button>
+
+      {%elif workflow.RequestStatus == 'Completed' and workflow.Process == "Complete" and workflow.WorkflowPendingWith == emp%}
+      <td><b>Comments:</b></td><td></td></tr>
+    <tr>
+    <td><textarea name="comments" rows="4" cols="28"></textarea><br></td>
+      <td>
+      <button type="submit" formaction="/reopen/{{item.id}}" class="btn btn-primary"><span class="glyphicon glyphicon-ok" ></span> Reopen Ticket</button>
+      <button type="submit" formaction="/close/{{item.id}}" class="btn btn-warning"><span class="glyphicon glyphicon-remove" ></span>Close Ticket</button>
+    
+
 
       
       
