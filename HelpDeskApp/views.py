@@ -256,9 +256,11 @@ def email(key,t_id,emailid,msg):
 		subject="Ticket 2018-2019/Helpdesk/Request/"+str(t_id)+" -Helpdesk Ticket Updated"
 	#print(email_msg)
 	to=emailid
-	email=EmailMultiAlternatives(subject,email_msg, 'aditip@nitorinfotech.com', to)
-	sender="siddhikhole@gmail.com"
+	print(to)
 	print("&"*100)
+	#email=EmailMultiAlternatives(subject,email_msg, 'aditip@nitorinfotech.com', to)
+	sender="siddhikhole@gmail.com"
+	
 	send_html_mail(subject, email_msg, to, sender,files)
 
 	'''if Files:
@@ -320,7 +322,7 @@ def addTicket(request):
 		form=HelpRequest(OnBehalfUserEmployeeId=OnBehalfUserEmployeeId,OnBehalfUserEmployeeName=OnBehalfUserEmployeeName,WorkflowStatus="Workflow Initiated",employee_id=employee_id,FirstLevelApproverEmployeeId=FirstLevelApproverEmployeeId,FirstLevelApproverEmployeeName=FirstLevelApproverEmployeeName,EmployeeName=EmployeeName,created_at=created_at,description=description,request_type=request_type,department=department,category=category,sub_category=sub_category,priority=priority,ticket_for=ticket_for,HelpdeskOffice=HelpdeskOffice,DeskLocation=DeskLocation,Files=Files)
 		try:
 			form.save()
-			messages.success(request,"successfully added")
+
 			key='HelpdeskTemplate_AssignTask'
 			t_id=form.id
 			
@@ -335,11 +337,13 @@ def addTicket(request):
 				key='HelpdeskTemplate_InitiateWorkflow'
 				msg="You have raised a service request on behalf of "+onBehalfOf+" for which the details are:"
 				to=[Employee1[0][1]]
+				print("****************"+str(Employee[0][1])+"************)********")
 				email(key,t_id,to,msg)
 
 				key='HelpdeskTemplate_InitiateWorkflow'
 				msg=EmployeeName+" have raised a service request on behalf of you for which the details are:"
-				to=[Employee[0][1]]
+				to=[Employee[0][2]]
+				print("****************"+str(Employee[0][1])+"********************")
 				email(key,t_id,to,msg)
 
 			else:
