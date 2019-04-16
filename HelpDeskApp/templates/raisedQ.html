@@ -10,7 +10,12 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css"><style type="text/css">
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+   
+<script language="javascript" type="text/javascript">  
+
+</script>
+<style type="text/css">
 	.header {
     padding:7px 15px ;
 	padding-left: 10px;
@@ -21,18 +26,12 @@
 
 margin-right: -55px;
 }</style>
-   
-<script language="javascript" type="text/javascript">  
-
-</script>
-
 </head>
 <body>
-	<div class="header">
+		<div class="header">
         	
         	 My Requests
         	</div>
-        	
 	{% if messages %}
 	{% for message in messages %}
 		<div class="alert alert-warning alert-dismissable" role="alert"> 
@@ -43,25 +42,24 @@ margin-right: -55px;
 	{%endfor%}
 	{%endif%}
 	
-
 <nav class="navbar">
   
 	<ul class="nav nav-tabs ">
-		<li class="nav-item active"><a href="/pending">Pending</a></li>
+		<li class="nav-item"><a href="/pending">Pending</a></li>
 		<li class="nav-item"><a href="/approved">Approved</a></li>
 		<li class="nav-item"><a href="/completed">Completed</a></li>
 		<li class="nav-item"><a href="/reopened">Reopened</a></li>
-		<li class="nav-item"><a href="/raisedQ">Raised Query</a></li>
+		<li class="nav-item active"><a href="/raisedQ">Raised Query</a></li>
 		<li class="nav-item"><a href="/closed">Closed</a></li>
 		<li class="nav-item"><a href="/cancelled">Cancelled</a></li>
-	
+
 		<li class="nav-item"><a href="/rejected">Rejected</a></li>
 		
 	</ul>
 	
 </nav>
  {% if all_items %}
-	<table class="table" style=" padding-left: 70px;"> 
+	<table class="table"> 
 	<thead>
 	     <tr>
 	    <th>Request ID</th>
@@ -71,7 +69,7 @@ margin-right: -55px;
 	    <th>Category</th> 
 	    <th>Sub-Category</th>
 	    <th>Status</th> 
-	    <th>Upadate</th>
+	    <th>Answer Query</th>
 	    <th>Cancel</th>
 	    <th>History</th>
 		</tr>
@@ -103,7 +101,7 @@ margin-right: -55px;
         <td>{{things.WorkflowCurrentStatus}}</td>
         
     
-        <td><a href="/update/{{things.id}}" class="btn btn-info">Update</a></td>
+        <td><a href="/display/{{key}}" class="btn btn-info">Answer Query</a></td>
         <td><a href="/cancel/{{things.id}}" class="btn btn-danger ">Cancel</a></td>
 
        
@@ -126,13 +124,12 @@ margin-right: -55px;
 
 <script>
 $(document).ready(function(){
-   console.log("Hello world!");
+
   $("#myModal").on('hidden.bs.modal', function(){
      console.log("Hello world!");
-     location.reload();
+    location.reload();
   });
 });
-
 </script>
 </body>
 </html>
