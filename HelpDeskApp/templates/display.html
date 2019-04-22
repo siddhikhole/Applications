@@ -1,4 +1,5 @@
-<html>
+{%extends 'index.html' %}
+{%block content %}<html>
 <head>
 <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -6,6 +7,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 <style>
+
 body {
   font-family: Arial, Helvetica, sans-serif;
   background-color: black;
@@ -27,21 +29,37 @@ table {
   width:80%;
 }
 
-td, th {
+td{
   
   text-align: left;
   padding: 8px;
 }
 
-tr:nth-child(even) {
-  background-color: #dddddd;
+th {
+  background-color: #51B0F0;
+   text-align: left;
+  padding: 8px;
 }
 
 
 </style>
+ <style type="text/css">
+  .header {
+    padding:7px 15px ;
+  padding-left: 10px;
+    border-bottom:1px solid #eee;
+    background-color:#616D7E;
+     font-size:18px;
+    color: white;
+
+margin-right: -55px;
+}</style> 
 </head>
 <body>
-
+<div class="header">
+       <span class="glyphicon glyphicon-eye-open"></span>
+           View Request Details
+          </div>
 <form action="/action_page.php">
   <div class="container">
  
@@ -98,8 +116,7 @@ tr:nth-child(even) {
       </td>
     </tr><tr></tr>
   <tr></tr>
-  <tr><td><b>Attachments:</b></td></tr>
-  <tr><td><img src="{{media_url}}{{item.Files}}"></td></tr>
+  
 </tr>
   <tr>
   
@@ -141,14 +158,49 @@ tr:nth-child(even) {
       <button type="button" formaction="/reject/{{item.id}}" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Reject </button>
       <button type="submit" formaction="/raiseQuery/{{item.id}}" class="btn btn-default"><span class="glyphicon glyphicon-hand-up"></span> Raise Query</button>
       
+      {%elif workflow.RequestStatus == 'Pending' and  workflow.Process == 'For Helpdesk Approver' and workflow.WorkflowPendingWith == emp %}
+
+      <td><b>Comments:</b></td><td></td></tr>
+    <tr>
+    <td><textarea name="comments" rows="4" cols="28"></textarea><br></td>
+        
+      <td><button type="submit" formaction="/approve1/{{item.id}}" class="btn btn-primary"><span class="glyphicon glyphicon-ok" ></span> Approve</button>
+      <button type="button" formaction="/reject/{{item.id}}" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span> Reject </button>
+      <button type="submit" formaction="/raiseQuery/{{item.id}}" class="btn btn-default"><span class="glyphicon glyphicon-hand-up"></span> Raise Query</button></td></tr>
+      
      
 
        
        
        {%elif workflow.RequestStatus == 'Pending' and  workflow.Process == "Answer Query" and workflow.WorkflowPendingWith == emp%}
+       {% if workflow1 %}
+           
+              <tr><td colspan="5"><table>
+                <b><th>Raised Query Details</th></b>
+                <th></th><th></th>
+              </tr>
+               
+             <tr><td colspan="4"><table><th>Raised Date</th>
+              <th>Raised By</th>
+             <th>Raised Query</th></tr>
+              {% for i in workflow1 %}
+              <tr>
+               <td>{{i.ActedOn}}</td>
+               <td>{{i.Actor}}</td>
+        
+                <td>{{i.ActionData}}</td>
+              </tr>
+                {% endfor %}</table></td></tr>
+                </tr> 
+              </table></td></tr>
+              
+        {% endif %}
+ </tr><tr>
+  
       <td><b>Comments:</b></td><td></td></tr>
     <tr>
     <td><textarea name="comments" rows="4" cols="28"></textarea><br></td>
+        
       <td>
       <button type="submit" formaction="/answer/{{item.id}}" class="btn btn-primary"><span class="glyphicon glyphicon-ok" ></span> Answer Query</button>
 
@@ -180,3 +232,4 @@ tr:nth-child(even) {
 
 </body>
 </html>
+{%endblock%}

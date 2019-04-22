@@ -153,11 +153,68 @@
 }
 
 </style>
+<style type="text/css">
+  .header {
+    padding:7px 15px ;
+  padding-left: 10px;
+    border-bottom:1px solid #eee;
+  background-color:#616D7E;
+     font-size:25px;
+     color: white;
+     font-style: bold;
+    
+
+margin-right: -55px;
+}
+.topnav-right {
+  float: right;
+  margin-right:70px; 
+  padding-top:   
+ }
+</style>
+<style>
+
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 16px 16px;
+  text-decoration: none;
+  display: block;
+  font-size: 15px;
+}
+
+.dropdown-content a:hover {background-color: #ddd;}
+
+.dropdown:hover .dropdown-content {display: block;}
+
+.dropdown:hover .dropbtn {background-color: #3e8e41;}</style>
 </head>
 <body>
+      <div class="header">
+          <h4><b>Help Desk App</b>
+        <div class="topnav-right">
+        
 
+   
+      <div class="dropdown">
+  <a class="dropbtn" style="color:white"> {{user.associated_user_account}}</a>
+  <div class="dropdown-content">
+    <a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Log out
+        </a>    
+  </div>
+</div>
+          
+  </div></h4></div>
 
-  
 <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
@@ -179,7 +236,8 @@
     <li class="sidebar-brand"><a href="/HelpdeskApprover">Approver Head</a></li>
     <li class="sidebar-brand"><a href="/HelpdeskFulfillerHead">Fulfiller Head</a></li>
     <li class="sidebar-brand"><a href="/AssignedTickets">Assigned</a></li>
-    <li class="sidebar-brand"><a href="/logout"><span class="glyphicon glyphicon-off"></span>   </a></li>
+    <li class="sidebar-brand"> </li>
+
           
       </div>
           
@@ -190,6 +248,8 @@
           <div class="row">
               <div class="col-md-12">
               {%block content %}
+        
+  
 
 {%endblock%}
             </div>
