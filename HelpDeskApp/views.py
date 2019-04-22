@@ -12,6 +12,61 @@ from HelpDeskApp.outlookservice import get_me
 from .service import get_users
 from HelpDeskApp.email import send_html_mail 
 # Create your views here.
+import schedule 
+import time
+import datetime
+from datetime import timedelta
+import threading
+
+def autocancel():
+	threading.Timer(60.0, autocancel).start()
+	item=HelpRequest.objects.all().filter(WorkflowStatus="Workflow Initiated")
+	for i in item:
+		print(i.created_at)
+
+
+	 
+		datetimeFormat = '%Y-%m-%d %H:%M:%S.%f'
+		date1 =  str(datetime.datetime.utcnow())
+		date2 = str(i.created_at)
+		diff = datetime.datetime.strptime(date1, '%Y-%m-%d %H:%M:%S.%f') - datetime.datetime.strptime(date2, '%Y-%m-%d %H:%M:%S.%f+00:00')
+		hours = (diff.seconds) / 3600  
+		print ("Hours:",hours)
+		minutes=(diff.seconds)/60
+		print ("Min:",minutes)
+		if(minutes>50):
+			item=HelpRequest.objects.get(id=i.id)
+			item.WorkflowStatus="Cancel"
+			item.save()
+			item1=WorkflowRequest.objects.get(RequestID_id=i.id,RequestStatus="Pending")
+			item1.RequestStatus="Incomplete"
+			item1.save()
+			form=WorkflowRequest(Process="Cancel",ActedOn=str(datetime.datetime.utcnow()),RequestStatus="Auto Cancelled",RequestID_id=i.id)
+			form.save()
+			key="HelpdeskTemplate_AssignTask"
+			msg="Your attention is requested for following helpdesk ticket-"
+			FirstApprover=EmployeeMaster.objects.values_list('email',flat=True).filter(associated_user_account=i.FirstLevelApproverEmployeeName)
+			
+			
+			emailid=HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat=True).filter(id=i.id)
+			Employee=EmployeeMaster.objects.values_list('email',flat=True).filter(empid=emailid[0])
+			Employee=[Employee[0],FirstApprover[0]]
+			email(key,i.id,Employee,msg)
+			
+		print("_"*50)
+	print("#"*40)
+autocancel()
+
+
+
+'''def geeks(): 
+    print("#"*40)
+
+schedule.every(1).minutes.do(geeks)
+while True:
+	schedule.run_pending()
+	time.sleep(1)'''
+	
 
 def trial(request):
 	file=request.FILES.get('file')
@@ -20,7 +75,12 @@ def trial(request):
 	print(len(file))
 	return HttpResponseRedirect('/main')
 
+
+
+
 def home(request):
+	
+
 	redirect_uri = request.build_absolute_uri(reverse('HelpDeskApp:gettoken'))
 	sign_in_url = get_signin_url(redirect_uri)
 	return render(request,"login.html",{'sign_in_url':sign_in_url})
@@ -137,6 +197,7 @@ def approval(request):
 	user=request.session['username']
 	user=EmployeeMaster.objects.get(empid=user)
 	return render(request,"approval.html",{'user':user,'all_items':all_items})
+
 
 def rejected(request):
 	#Default page
@@ -290,19 +351,7 @@ def email(key,t_id,emailid,msg):
 	
 	send_html_mail(subject, email_msg, to, sender,files)
 
-	'''if Files:
-		print(Files)
-			
-		email.attach(Files,Files.read(),Files.content_type)
-	email.attach_alternative(email_msg, "text/html")
-	print(to)
-	try:
-		email.send()
-	except Exception as e:
-		print(e)
-		print("@"*50)
-	print("HI")
-'''
+	
 
 def addTicket(request):
 	#To add ticket

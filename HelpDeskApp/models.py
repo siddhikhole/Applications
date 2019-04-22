@@ -135,7 +135,7 @@ class Workflow_email_templates(models.Model):
 	template_subject=models.TextField(null=True)
 
 class HelpRequest(models.Model):  
-    created_at=models.DateField(default=None,null=True)
+    created_at=models.DateTimeField(default=None,null=True)
     description=models.CharField(max_length=1000,null=True)
     request_type=models.CharField(max_length=50,null=True)
     department=models.CharField(max_length=50,null=True)
