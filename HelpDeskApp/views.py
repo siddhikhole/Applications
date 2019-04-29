@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import messages
-from .models import WorkflowRequest,EmployeeMaster,AppList,HelpdeskCategories,HelpdeskOfficeLocation,HelpdeskConfigurationMaster,HelpdeskDepartments,Categories,sub_categories,HelpdeskFulfillerGroups,HelpdeskExpectedClosureDetails,HelpRequest,Workflow_email_templates
+from .models import WorkflowRequest,HelpdeskRequestSLAs,EmployeeMaster,AppList,HelpdeskCategories,HelpdeskOfficeLocation,HelpdeskConfigurationMaster,HelpdeskDepartments,Categories,sub_categories,HelpdeskFulfillerGroups,HelpdeskExpectedClosureDetails,HelpRequest,Workflow_email_templates
 from django.db.models import Q
 from django.core.mail import send_mail,EmailMessage,EmailMultiAlternatives
 from django.conf import settings
@@ -17,32 +17,135 @@ import time
 import datetime
 from datetime import timedelta
 import threading
+import dateutil.parser
+import numpy as np
+
+
+def email(key,t_id,emailid,msg):
+	#To send email notification
+	Email=Workflow_email_templates.objects.values_list('template_body','template_subject').filter(key=key)
+	print(t_id)
+	message=HelpRequest.objects.values_list('OnBehalfUserEmployeeName','id','created_at','request_type','HelpdeskOffice','department','category','sub_category','priority','description','Files','expected_closure').filter(id=t_id)
+	print(message)
+	created=datetime.datetime.strptime(str(message[0][2]), '%Y-%m-%d %H:%M:%S.%f+00:00')
+
+	created=created.strftime("%Y-%m-%d %H:%M:%S")
+	exp=datetime.datetime.strptime(str(message[0][11]), '%Y-%m-%d %H:%M:%S.%f')
+	exp=exp.strftime("%Y-%m-%d %H:%M:%S")
+	email_msg=Email[0][0].replace('@@ExpectedClosure',str(exp)).replace('@@message', str(msg)).replace('@@links','<a href="http://127.0.0.1:8000/display/'+str(t_id)+'">Click here</a>' ).replace('@@RequestorName',str(message[0][0])).replace('@@RequestId',str(message[0][1])).replace('@@Created',str(created)).replace('@@TicketType',str(message[0][3])).replace('@@Location',str(message[0][4])).replace('@@DepartmentName',str(message[0][5])).replace('@@CategoryName',str(message[0][6])).replace('@@SubCategoryName',str(message[0][7])).replace('@@Priority',str(message[0][8])).replace('@@Description',str(message[0][9]))
+	if(message[0][10]==""):
+		files=" "
+	else:
+		files=settings.MEDIA_URL+message[0][10]
+	print(files)
+	#print(email_msg)
+	try:
+		subject=Email[0][1].replace('@@EmployeeName',str(message[0][0]))
+	except:
+		subject="Ticket 2018-2019/Helpdesk/Request/"+str(t_id)+" -Helpdesk Ticket Updated"
+	#print(email_msg)
+	to=emailid
+	print(to)
+	print("&"*100)
+	#email=EmailMultiAlternatives(subject,email_msg, 'aditip@nitorinfotech.com', to)
+	sender="siddhikhole@gmail.com"
+	
+	send_html_mail(subject, email_msg, to, sender,files)
+
+	
 
 def autocancel():
+	
 	threading.Timer(60.0, autocancel).start()
+	
+	TATHrs=40
+	seconds=0
+	days=TATHrs/8	
+	while TATHrs >= 8:
+		seconds=seconds+86400
+		TATHrs=TATHrs-8
+		
+	seconds=seconds+(TATHrs*3600)
+	
+	a=0
+	for i in range(int(days)):
+		
+		dt1=datetime.datetime.now() + timedelta(i+1)
+		if(dt1.strftime("%A") == "Saturday"):
+			
+			a=a+172800
+				
+				
+	
+				
+	dt=datetime.datetime.now() + timedelta(seconds=a+seconds)
+	
+	date=datetime.datetime.strptime(str(datetime.datetime.now()), '%Y-%m-%d %H:%M:%S.%f')
+	'''print(date.strftime("%Y-%m-%d %H:%M:%S"))
+	print("----"+str(datetime.datetime.now()))
+	print(str(dt))'''
+	
+
+
+	###############################################################################################
+				#####Auto Cancel#####
+	###############################################################################################
+
 	item=HelpRequest.objects.all().filter(WorkflowStatus="Workflow Initiated")
+
 	for i in item:
-		print(i.created_at)
-
-
-	 
-		datetimeFormat = '%Y-%m-%d %H:%M:%S.%f'
-		date1 =  str(datetime.datetime.utcnow())
+		#print(datetime.datetime.strptime(str(i.created_at), '%Y-%m-%d %H:%M:%S.%f').date())
+		date1 =  str(datetime.datetime.now())
+		date1=datetime.datetime.strptime(date1, '%Y-%m-%d %H:%M:%S.%f')
 		date2 = str(i.created_at)
-		diff = datetime.datetime.strptime(date1, '%Y-%m-%d %H:%M:%S.%f') - datetime.datetime.strptime(date2, '%Y-%m-%d %H:%M:%S.%f+00:00')
-		hours = (diff.seconds) / 3600  
-		print ("Hours:",hours)
-		minutes=(diff.seconds)/60
-		print ("Min:",minutes)
-		if(minutes>50):
-			item=HelpRequest.objects.get(id=i.id)
-			item.WorkflowStatus="Cancel"
-			item.save()
+		date2=datetime.datetime.strptime(date2, '%Y-%m-%d %H:%M:%S.%f')
+		'''print(date1)
+		print(date2)
+'''
+		
+		diff = date1 - date2 
+		days = diff.days
+	#	print (str(days) + ' day(s)')
+
+		days_to_hours = days * 24
+		diff_btw_two_times = (diff.seconds) / 3600
+		overall_hours = days_to_hours + diff_btw_two_times
+		
+		#print (str(overall_hours) + ' hours');
+
+		hours_to_minutes=overall_hours * 60
+		diff_btw_two_times = (diff.seconds) / 60
+		overall_minutes = hours_to_minutes + diff_btw_two_times
+		#print (str(overall_minutes) + ' minutes');
+	
+
+		days = np.busday_count( date2.date(), date1.date())
+		#print(days) 
+		hour=48
+		
+		
+		for d in range(days + 1):
+			d1=date2 + timedelta(d)
+		#	print(d1.strftime("%A"))
+
+			if(d1.strftime("%A")=="Saturday"):
+				hour=hour+48
+
+		#print(d1.strftime("%A"))
+
+
+		#print("Waiting for: "+str(hour))
+
+		if(overall_hours>hour):
+			item2=HelpRequest.objects.get(id=i.id)
+			item2.WorkflowStatus="Cancel"
+			item2.save()
 			item1=WorkflowRequest.objects.get(RequestID_id=i.id,RequestStatus="Pending")
 			item1.RequestStatus="Incomplete"
 			item1.save()
-			form=WorkflowRequest(Process="Cancel",ActedOn=str(datetime.datetime.utcnow()),RequestStatus="Auto Cancelled",RequestID_id=i.id)
+			form=WorkflowRequest(Process="Cancel",ActedOn=str(datetime.datetime.now()),RequestStatus="Auto Cancelled",RequestID_id=i.id)
 			form.save()
+
 			key="HelpdeskTemplate_AssignTask"
 			msg="Your attention is requested for following helpdesk ticket-"
 			FirstApprover=EmployeeMaster.objects.values_list('email',flat=True).filter(associated_user_account=i.FirstLevelApproverEmployeeName)
@@ -51,21 +154,117 @@ def autocancel():
 			emailid=HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat=True).filter(id=i.id)
 			Employee=EmployeeMaster.objects.values_list('email',flat=True).filter(empid=emailid[0])
 			Employee=[Employee[0],FirstApprover[0]]
-			email(key,i.id,Employee,msg)
-			
+			email(key,i.id,Employee,msg)	
 		print("_"*50)
-	print("#"*40)
+
+	###############################################################################################
+				#####Auto Close#####
+	###############################################################################################
+
+	item=HelpRequest.objects.all().filter(WorkflowStatus="Completed")
+	for i in item:
+		#print("#"*40)
+		item1=WorkflowRequest.objects.get(Process="Complete",RequestStatus="Completed",RequestID_id=i.id)
+		date1 =  str(datetime.datetime.now())
+		date1=datetime.datetime.strptime(date1, '%Y-%m-%d %H:%M:%S.%f')
+		date2 = str(item1.ActedOn)
+		date2=datetime.datetime.strptime(date2, '%Y-%m-%d %H:%M:%S.%f')
+		diff = date1 - date2
+
+		days = diff.days
+		#print (str(days) + ' day(s)')
+
+		days_to_hours = days * 24
+		diff_btw_two_times = (diff.seconds) / 3600
+		overall_hours = days_to_hours + diff_btw_two_times
+		#print (str(overall_hours) + ' hours');
+
+		hours_to_minutes=overall_hours * 60
+		diff_btw_two_times = (diff.seconds) / 60
+		overall_minutes = hours_to_minutes + diff_btw_two_times
+		#print (str(overall_minutes) + ' minutes');
+	
+
+		days = np.busday_count( date2.date(), date1.date())
+		#print(days) 
+		hour=48
+		
+		
+		for d in range(days + 1):
+			d1=date2 + timedelta(d)
+	#print(d1.strftime("%A"))
+
+			if(d1.strftime("%A")=="Saturday"):
+				hour=hour+48
+
+	#	print(d1.strftime("%A"))
+
+
+	#	print("Waiting for: "+str(hour))
+
+		if(overall_hours>hour):
+			i.WorkflowStatus="Closed"
+			i.WorkflowCurrentStatus="Closed"
+			i.save()
+
+			item1.Process="Closed"
+			item1.save()
+
+			form1=WorkflowRequest(Process="Close",ActedOn=str(datetime.datetime.now()),RequestStatus="Auto Closed",RequestID_id=i.id)
+			form1.save()
+
+			key="HelpdeskTemplate_AssignTask"
+			msg="Your attention is requested for following helpdesk ticket-"
+			
+			emailid=HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat=True).filter(id=i.id)
+			Employee=EmployeeMaster.objects.values_list('email',flat=True).filter(empid=emailid[0])
+			Employee=[Employee[0]]
+			email(key,i.id,Employee,msg)
+	#################################################################################
+	############Escalation############
+	#################################################################################
+	item=HelpRequest.objects.all().filter(WorkflowStatus="Activated")
+	for i in item:
+		print(i.WorkflowStatus)
+		print(i.id)
+		date1 =  str(datetime.datetime.now())
+		date1=datetime.datetime.strptime(date1, '%Y-%m-%d %H:%M:%S.%f')
+		date2 = str(i.expected_closure)
+		date2=datetime.datetime.strptime(date2, '%Y-%m-%d %H:%M:%S.%f')
+		diff = date1 - date2
+		
+		days = diff.days
+	#	print (str(days) + ' day(s)')
+
+		days_to_hours = days * 24
+		diff_btw_two_times = (diff.seconds) / 3600
+		overall_hours = days_to_hours + diff_btw_two_times
+		
+		#print (str(overall_hours) + ' hours');
+
+		hours_to_minutes=overall_hours * 60
+		diff_btw_two_times = (diff.seconds) / 60
+		overall_minutes = hours_to_minutes + diff_btw_two_times
+		print("-----------")
+		print(overall_minutes)
+		overall_minutes=1
+		if(overall_minutes > 0):
+			print("HO")
+			item1=HelpdeskRequestSLAs.objects.all().filter(HelpdeskCategory=i.category,HelpdeskDepartment=i.department,HelpdeskPriority=i.priority,HelpdeskSubCategory=i.sub_category)
+			for i1 in item1:
+				print(i1.EM_0_To)
+				Email=EmployeeMaster.objects.values_list('email',flat=True).filter(associated_user_account=i1.EM_0_Name)
+				print(Email[0])
+				Pending=WorkflowRequest.objects.values_list('WorkflowPendingWith',flat=True).filter(RequestStatus="Pending",RequestID_id=i.id)
+				print(Pending[0])
+
+
+
+
+
+
 autocancel()
 
-
-
-'''def geeks(): 
-    print("#"*40)
-
-schedule.every(1).minutes.do(geeks)
-while True:
-	schedule.run_pending()
-	time.sleep(1)'''
 	
 
 def trial(request):
@@ -118,7 +317,10 @@ def main(request):
 	try:
 		user=request.session['username']
 		user=EmployeeMaster.objects.get(empid=user)
-		return render(request,"index.html",{'user':user})
+		item=" "
+		item=AppList.objects.all().filter(user=user.associated_user_account,roles="HelpdeskFulfillerHead_1")
+
+		return render(request,"index.html",{'user':user,'item':item})
 	except:
 
 		return redirect('home')	
@@ -275,7 +477,7 @@ def complete(request,ticket_id):
 	item1.save()
 	item=WorkflowRequest.objects.get(RequestID_id=ticket_id,ActedByUser=request.session['username'],RequestStatus="Pending")
 	item.RequestStatus="Completed"
-	item.ActedOn=str(datetime.datetime.utcnow())
+	item.ActedOn=str(datetime.datetime.now())
 	item.ActionData=request.GET.get('comments')
 	item.WorkflowPendingWith=item1.OnBehalfUserEmployeeName
 	item.save()
@@ -325,39 +527,12 @@ def HelpdeskFulfillerHead(request):
 	
 		
 
-def email(key,t_id,emailid,msg):
-	#To send email notification
-	Email=Workflow_email_templates.objects.values_list('template_body','template_subject').filter(key=key)
-	print(t_id)
-	message=HelpRequest.objects.values_list('OnBehalfUserEmployeeName','id','created_at','request_type','HelpdeskOffice','department','category','sub_category','priority','description','Files').filter(id=t_id)
-	print(message)
-	email_msg=Email[0][0].replace('@@message', str(msg)).replace('@@links','<a href="http://127.0.0.1:8000/display/'+str(t_id)+'">Click here</a>' ).replace('@@RequestorName',str(message[0][0])).replace('@@RequestId',str(message[0][1])).replace('@@Created',str(message[0][2])).replace('@@TicketType',str(message[0][3])).replace('@@Location',str(message[0][4])).replace('@@DepartmentName',str(message[0][5])).replace('@@CategoryName',str(message[0][6])).replace('@@SubCategoryName',str(message[0][7])).replace('@@Priority',str(message[0][8])).replace('@@Description',str(message[0][9]))
-	if(message[0][10]==""):
-		files=" "
-	else:
-		files=settings.MEDIA_URL+message[0][10]
-	print(files)
-	#print(email_msg)
-	try:
-		subject=Email[0][1].replace('@@EmployeeName',str(message[0][0]))
-	except:
-		subject="Ticket 2018-2019/Helpdesk/Request/"+str(t_id)+" -Helpdesk Ticket Updated"
-	#print(email_msg)
-	to=emailid
-	print(to)
-	print("&"*100)
-	#email=EmailMultiAlternatives(subject,email_msg, 'aditip@nitorinfotech.com', to)
-	sender="siddhikhole@gmail.com"
-	
-	send_html_mail(subject, email_msg, to, sender,files)
-
-	
 
 def addTicket(request):
 	#To add ticket
 	if(request.method=="POST"):
 		employee_id=request.session['username']
-		created_at=datetime.datetime.utcnow()
+		created_at=datetime.datetime.now()
 		description=request.POST.get('Description')
 		request_type=request.POST.get('RequestType')
 		department=HelpdeskDepartments.objects.values_list('department',flat=True).filter(id=request.POST.get('department'))
@@ -373,8 +548,41 @@ def addTicket(request):
 		HelpdeskOffice=HelpdeskOffice[0]
 		DeskLocation=request.POST.get('deskLocation')
 		Files=request.FILES.get('documents')
-
-
+		print("#"*100)
+		print(category)
+		print(department)
+		print(sub_category)
+		print(priority)
+		print("#"*100)
+		try:
+			item=HelpdeskRequestSLAs.objects.all().filter(HelpdeskCategory=category,HelpdeskDepartment=department,HelpdeskPriority=priority,HelpdeskSubCategory=sub_category)
+			
+			for i in item:
+				TATHrs=i.TATHrs
+			
+			seconds=0
+			days=TATHrs/8	
+			while TATHrs >= 8:
+				seconds=seconds+86400
+				TATHrs=TATHrs-8
+			
+			seconds=seconds+(TATHrs*3600)
+		
+			a=0
+			for i in range(int(days)):
+			
+				dt1=datetime.datetime.now() + timedelta(i+1)
+				if(dt1.strftime("%A") == "Saturday"):
+				
+					a=a+172800
+						
+			dt=datetime.datetime.now() + timedelta(seconds=a+seconds)
+		
+		
+				
+			print(dt)
+		except:
+			dt=""
 		if(ticket_for=="OnBehalf"):
 
 			Employee=EmployeeMaster.objects.values_list('reporting_to','empid','email').filter(associated_user_account=onBehalfOf)
@@ -395,16 +603,16 @@ def addTicket(request):
 		FirstLevelApproverEmployeeId=FirstApprover[0][0]
 		FirstApproverEmail=FirstApprover[0][1]
 		print("#"*40)
-		form=HelpRequest(OnBehalfUserEmployeeId=OnBehalfUserEmployeeId,OnBehalfUserEmployeeName=OnBehalfUserEmployeeName,WorkflowStatus="Workflow Initiated",employee_id=employee_id,FirstLevelApproverEmployeeId=FirstLevelApproverEmployeeId,FirstLevelApproverEmployeeName=FirstLevelApproverEmployeeName,EmployeeName=EmployeeName,created_at=created_at,description=description,request_type=request_type,department=department,category=category,sub_category=sub_category,priority=priority,ticket_for=ticket_for,HelpdeskOffice=HelpdeskOffice,DeskLocation=DeskLocation,Files=Files)
+		form=HelpRequest(expected_closure=dt,OnBehalfUserEmployeeId=OnBehalfUserEmployeeId,OnBehalfUserEmployeeName=OnBehalfUserEmployeeName,WorkflowStatus="Workflow Initiated",employee_id=employee_id,FirstLevelApproverEmployeeId=FirstLevelApproverEmployeeId,FirstLevelApproverEmployeeName=FirstLevelApproverEmployeeName,EmployeeName=EmployeeName,created_at=created_at,description=description,request_type=request_type,department=department,category=category,sub_category=sub_category,priority=priority,ticket_for=ticket_for,HelpdeskOffice=HelpdeskOffice,DeskLocation=DeskLocation,Files=Files)
 		try:
 			form.save()
 
 			key='HelpdeskTemplate_AssignTask'
 			t_id=form.id
 			
-			form1=WorkflowRequest(ActedByUser=OnBehalfUserEmployeeId,Process="Raised Ticket",ActedOn=str(datetime.datetime.utcnow()),Action="Raised Ticket",Actor=OnBehalfUserEmployeeName,RequestStatus="Workflow Initiated",WorkflowPendingWith=FirstLevelApproverEmployeeName,RequestID_id=t_id)
+			form1=WorkflowRequest(ActedByUser=OnBehalfUserEmployeeId,Process="Raised Ticket",ActedOn=str(datetime.datetime.now()),Action="Raised Ticket",Actor=OnBehalfUserEmployeeName,RequestStatus="Workflow Initiated",WorkflowPendingWith=FirstLevelApproverEmployeeName,RequestID_id=t_id)
 			form1.save()
-			form1=WorkflowRequest(ActedByUser=FirstLevelApproverEmployeeId,Process="For First Approver",ActedOn=str(datetime.datetime.utcnow()),Actor=FirstLevelApproverEmployeeName,RequestStatus="Pending",WorkflowPendingWith=FirstLevelApproverEmployeeName,RequestID_id=t_id)
+			form1=WorkflowRequest(ActedByUser=FirstLevelApproverEmployeeId,Process="For First Approver",ActedOn=str(datetime.datetime.now()),Actor=FirstLevelApproverEmployeeName,RequestStatus="Pending",WorkflowPendingWith=FirstLevelApproverEmployeeName,RequestID_id=t_id)
 			form1.save()
 			msg="You have been assigned a service request for approval of which details are:"
 			FirstApproverEmail=[FirstApproverEmail]
@@ -413,13 +621,13 @@ def addTicket(request):
 				key='HelpdeskTemplate_InitiateWorkflow'
 				msg="You have raised a service request on behalf of "+onBehalfOf+" for which the details are:"
 				to=[Employee1[0][1]]
-				print("****************"+str(Employee[0][1])+"************)********")
+				
 				email(key,t_id,to,msg)
 
 				key='HelpdeskTemplate_InitiateWorkflow'
 				msg=EmployeeName+" have raised a service request on behalf of you for which the details are:"
 				to=[Employee[0][2]]
-				print("****************"+str(Employee[0][1])+"********************")
+				
 				email(key,t_id,to,msg)
 
 			else:
@@ -466,6 +674,7 @@ def approve(request,ticket_id):
 	item1=HelpRequest.objects.get(pk=ticket_id)
 	item1.WorkflowStatus="Activated"
 	item1.WorkflowCurrentStatus="Activated"
+	item1.WorkflowModifiedOn=datetime.datetime.now()
 	item1.save()
 	print(item1.department)
 	item=WorkflowRequest.objects.get(RequestID_id=ticket_id,ActedByUser=request.session['username'],RequestStatus="Pending")
@@ -482,11 +691,11 @@ def approve(request,ticket_id):
 	elif(item1.department == "Finance"):
 		item.WorkflowPendingWith="Helpdesk Finance Approver"
 		roles="HelpdeskFinanceApprover1"
-	item.ActedOn=datetime.datetime.utcnow()
+	item.ActedOn=datetime.datetime.now()
 	item.ActionData=request.GET.get('comments')
 	#print(ActionData)
 	item.save()
-	form1=WorkflowRequest(ActedOn=str(datetime.datetime.utcnow()),Actor=item.WorkflowPendingWith,RequestStatus="Pending",WorkflowPendingWith=item.WorkflowPendingWith,Process="For Helpdesk Approver",RequestID_id=ticket_id)
+	form1=WorkflowRequest(ActedOn=str(datetime.datetime.now()),Actor=item.WorkflowPendingWith,RequestStatus="Pending",WorkflowPendingWith=item.WorkflowPendingWith,Process="For Helpdesk Approver",RequestID_id=ticket_id)
 	form1.save()
 	
 
@@ -506,7 +715,7 @@ def approve(request,ticket_id):
 		item=EmployeeMaster.objects.get(associated_user_account=i.user)
 		Employee.append(item.email)
 	email(key,ticket_id,Employee,msg)
-	messages.success(request,"Ticket Accepted!!!")
+	
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
@@ -536,14 +745,14 @@ def approve1(request,ticket_id):
 
 	item.RequestStatus="Approved"
 	item.ActedByUser=request.session['username']
-	item.ActedOn=str(datetime.datetime.utcnow())
+	item.ActedOn=str(datetime.datetime.now())
 	Actor=EmployeeMaster.objects.get(empid=request.session['username'])
 	item.Actor=Actor.associated_user_account
 	item.ActionData=request.GET.get('comments')
 	
 	item.save()
 
-	form1=WorkflowRequest(ActedOn=str(datetime.datetime.utcnow()),Process="For Helpdesk Fulfiller Head",Actor=item.WorkflowPendingWith,RequestStatus="Pending",WorkflowPendingWith=item.WorkflowPendingWith,RequestID_id=ticket_id)
+	form1=WorkflowRequest(ActedOn=str(datetime.datetime.now()),Process="For Helpdesk Fulfiller Head",Actor=item.WorkflowPendingWith,RequestStatus="Pending",WorkflowPendingWith=item.WorkflowPendingWith,RequestID_id=ticket_id)
 	print(form1)
 	form1.save()
 	
@@ -643,7 +852,7 @@ def display(request,ticket_id):
 
 def workflow(request,ticket_id):
 	#To delete pending ticket
-	workflow=WorkflowRequest.objects.all().filter(RequestID_id=ticket_id).order_by('created_at').order_by('ActedOn')
+	workflow=WorkflowRequest.objects.all().filter(RequestID_id=ticket_id).order_by('ActedOn')
 	print(ticket_id)
 	user=request.session['username']
 	user=EmployeeMaster.objects.get(empid=user)
@@ -689,7 +898,7 @@ def assignTicket(request,ticket_id):
 	item.RequestStatus="Assigned"
 
 	item.ActedByUser=request.session['username']
-	item.ActedOn=str(datetime.datetime.utcnow())
+	item.ActedOn=str(datetime.datetime.now())
 	Actor=EmployeeMaster.objects.get(empid=request.session['username'])
 
 	item.ActionData=request.POST.get('comments')
@@ -701,7 +910,7 @@ def assignTicket(request,ticket_id):
 
 	item1=HelpRequest.objects.get(id=ticket_id)
 
-	form1=WorkflowRequest(ActedByUser=assignTo.empid,Process="Complete",ActedOn=str(datetime.datetime.utcnow()),Actor=assignToName,RequestStatus="Pending",WorkflowPendingWith=assignToName,RequestID_id=ticket_id)
+	form1=WorkflowRequest(ActedByUser=assignTo.empid,Process="Complete",ActedOn=str(datetime.datetime.now()),Actor=assignToName,RequestStatus="Pending",WorkflowPendingWith=assignToName,RequestID_id=ticket_id)
 	form1.save()
 
 
@@ -782,7 +991,7 @@ def raiseQuery(request,ticket_id):
 				item1=WorkflowRequest.objects.get(RequestID_id=ticket_id,Actor="Helpdesk Finance Approver",RequestStatus="Pending")
 	item1.Action="Raised Query"			
 	item1.RequestStatus="Raised Query"
-	item1.ActedOn=str(datetime.datetime.utcnow())
+	item1.ActedOn=str(datetime.datetime.now())
 	item1.ActionData=request.GET.get('comments')
 	item1.ActedByUser=name.empid
 	item1.Actor=name.associated_user_account
@@ -790,7 +999,7 @@ def raiseQuery(request,ticket_id):
 	item1.save()
 
 
-	form=WorkflowRequest(ActedByUser=item.OnBehalfUserEmployeeId,Process="Answer Query",ActedOn=str(datetime.datetime.utcnow()),Actor=item.OnBehalfUserEmployeeName,RequestStatus="Pending",WorkflowPendingWith=item.OnBehalfUserEmployeeName,RequestID_id=ticket_id)
+	form=WorkflowRequest(ActedByUser=item.OnBehalfUserEmployeeId,Process="Answer Query",ActedOn=str(datetime.datetime.now()),Actor=item.OnBehalfUserEmployeeName,RequestStatus="Pending",WorkflowPendingWith=item.OnBehalfUserEmployeeName,RequestID_id=ticket_id)
 	form.save()
 
 	key="HelpdeskTemplate_AssignTask"
@@ -813,7 +1022,7 @@ def cancel(request,ticket_id):
 	item1=WorkflowRequest.objects.get(RequestID_id=ticket_id,RequestStatus="Pending")
 	item1.RequestStatus="Incomplete"
 	item1.save()
-	form=WorkflowRequest(ActedByUser=request.session['username'],Process="Cancel",ActedOn=str(datetime.datetime.utcnow()),Actor=item.OnBehalfUserEmployeeName,RequestStatus="Cancelled",RequestID_id=ticket_id)
+	form=WorkflowRequest(ActedByUser=request.session['username'],Process="Cancel",ActedOn=str(datetime.datetime.now()),Actor=item.OnBehalfUserEmployeeName,RequestStatus="Cancelled",RequestID_id=ticket_id)
 	form.save()
 
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -831,14 +1040,14 @@ def ansQuery(request,ticket_id):
 
 	item1=WorkflowRequest.objects.get(RequestID_id=ticket_id,ActedByUser=request.session['username'],RequestStatus="Pending")
 	item1.RequestStatus="Answered Query"
-	item1.ActedOn=str(datetime.datetime.utcnow())
+	item1.ActedOn=str(datetime.datetime.now())
 	item1.ActionData=request.GET.get('comments')
 	
 
 	item2=WorkflowRequest.objects.get(Action="Raised Query",RequestStatus="Raised Query",RequestID_id=ticket_id)
 	item.save()
 	item1.save()
-	form=WorkflowRequest(ActedByUser=item2.ActedByUser,Process=item2.Process,ActedOn=str(datetime.datetime.utcnow()),Actor=item2.Actor,RequestStatus="Pending",WorkflowPendingWith=item2.Actor,RequestID_id=ticket_id)
+	form=WorkflowRequest(ActedByUser=item2.ActedByUser,Process=item2.Process,ActedOn=str(datetime.datetime.now()),Actor=item2.Actor,RequestStatus="Pending",WorkflowPendingWith=item2.Actor,RequestID_id=ticket_id)
 	form.save()
 	print(item2.Process)
 	item2.Action="Raise Query"
@@ -866,10 +1075,10 @@ def Reopen(request,ticket_id):
 
 	comments=request.GET.get('comments')
 
-	form1=WorkflowRequest(ActionData=comments,ActedByUser=request.session['username'],Process="Reopen",ActedOn=str(datetime.datetime.utcnow()),Actor=item1.OnBehalfUserEmployeeName,RequestStatus="Reopened",WorkflowPendingWith=item.Actor,RequestID_id=ticket_id)
+	form1=WorkflowRequest(ActionData=comments,ActedByUser=request.session['username'],Process="Reopen",ActedOn=str(datetime.datetime.now()),Actor=item1.OnBehalfUserEmployeeName,RequestStatus="Reopened",WorkflowPendingWith=item.Actor,RequestID_id=ticket_id)
 	form1.save()
 
-	form=WorkflowRequest(ActedByUser=item.ActedByUser,ActedOn=str(datetime.datetime.utcnow()),Actor=item.Actor,Process="Complete",RequestStatus="Pending",WorkflowPendingWith=item.Actor,RequestID_id=ticket_id)
+	form=WorkflowRequest(ActedByUser=item.ActedByUser,ActedOn=str(datetime.datetime.now()),Actor=item.Actor,Process="Complete",RequestStatus="Pending",WorkflowPendingWith=item.Actor,RequestID_id=ticket_id)
 	form.save()
 
 	key="HelpdeskTemplate_AssignTask"
@@ -893,7 +1102,7 @@ def Close(request,ticket_id):
 
 	comments=request.GET.get('comments')
 
-	form1=WorkflowRequest(ActionData=comments,ActedByUser=request.session['username'],Process="Close",ActedOn=str(datetime.datetime.utcnow()),Actor=item.OnBehalfUserEmployeeName,RequestStatus="Closed",RequestID_id=ticket_id)
+	form1=WorkflowRequest(ActionData=comments,ActedByUser=request.session['username'],Process="Close",ActedOn=str(datetime.datetime.now()),Actor=item.OnBehalfUserEmployeeName,RequestStatus="Closed",RequestID_id=ticket_id)
 	form1.save()
 
 	key="HelpdeskTemplate_AssignTask"
@@ -917,3 +1126,7 @@ def logout(request):
 	#messages.success(request, key_variable+" logged out")
 	return redirect('home')
 
+
+def sla(request):
+	all_items=HelpdeskRequestSLAs.objects.all().order_by('HelpdeskDepartment')
+	return render(request,"sla.html",{'all_items':all_items})

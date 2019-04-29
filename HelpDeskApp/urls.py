@@ -11,7 +11,7 @@ urlpatterns = [
   # Redirect to get token ('/tutorial/gettoken/')
   url(r'^HelpDeskApp/gettoken/$', views.gettoken, name='gettoken'),
 
-
+path('sla/',views.sla,name="sla"),
 path('trial/',views.trial,name="trial"),
 path('raiseTicket/addTicket/',views.addTicket,name="addTicket"),
 path('update/<ticket_id>/updateTicket',views.updateTicket,name="updateTicket"),

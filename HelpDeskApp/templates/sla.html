@@ -1,0 +1,65 @@
+{%extends 'index.html' %}
+{%block content %}<!DOCTYPE html>
+<html>
+<head>
+
+
+	<title>Help desk</title>
+	 <meta charset="utf-8">
+	 <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css"><style type="text/css">
+	.header {
+    padding:7px 15px ;
+	padding-left: 10px;
+    border-bottom:1px solid #eee;
+    background-color:#616D7E;
+     font-size:20px;
+    color: white;
+
+margin-right: -55px;
+}</style>
+   
+<script language="javascript" type="text/javascript">  
+
+</script>
+
+</head>
+<body>
+	<div class="header">
+        	
+        	SLA's
+        	</div>
+<center>
+          {% if all_items %}
+  <table class="table" style=" padding-left: 70px;"> 
+  <thead>
+       <tr>
+        <th>Select</th>
+      <th>Location</th>
+      <th>Department</th>
+      
+      <th>Category</th> 
+      <th>Sub-Category</th>
+      
+      <th>Priority</th>
+    </tr>
+  </thead>
+  {% for item in all_items %}
+  <tr>
+    <td><input type="checkbox"></td>
+    <td>{{item.HelpdeskLocation}}</td>
+    <td>{{item.HelpdeskDepartment}}</td>
+    <td>{{item.HelpdeskCategory}}</td>
+    <td>{{item.HelpdeskSubCategory}}</td>
+    <td>{{item.HelpdeskPriority}}</td>
+  </tr>
+  {%endfor%}
+{%endif%}
+
+
+</body>
+</html>
+{%endblock%}

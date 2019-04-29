@@ -164,10 +164,10 @@ class HelpRequest(models.Model):
     WorkflowCurrentStatus=models.CharField(max_length=100,null=True,default="Workflow Initiated")
     WorkflowOverallStatus=models.CharField(max_length=100,null=True)
     WorkflowCurrentActor=models.CharField(max_length=100,null=True)
-    WorkflowModifiedOn=models.CharField(max_length=100,null=True)
+    WorkflowModifiedOn=models.DateTimeField(default=None,null=True)
     InActive=models.BooleanField(default=True,null=True)
     Files=models.FileField(upload_to="Documents",default="media/Documents/no-image.jpg",null=True)
-    FulfillmentCompletedDate=models.DateField(null=True)
+    FulfillmentCompletedDate=models.DateTimeField(default=None,null=True)
     #"EscalationCount" : NumberInt(0), 
     #"ReminderCount" : NumberInt(0), 
     #"CategoryApprover" : null,
@@ -187,3 +187,25 @@ class WorkflowRequest(models.Model):
     WorkflowPendingWith=models.CharField(max_length=100,null=True)  
   
 
+class HelpdeskRequestSLAs(models.Model):
+	EM_0_AfterHrs=models.IntegerField(null=True)
+	EM_0_AfterMin=models.IntegerField(null=True)
+	EM_0_Name=models.CharField(null=True,max_length=100)
+	EM_0_To=models.CharField(null=True,max_length=100)
+	EM_1_AfterHrs=models.IntegerField(null=True)
+	EM_1_AfterMin=models.IntegerField(null=True)
+	EM_1_Name=models.CharField(null=True,max_length=100)
+	EM_1_To=models.CharField(null=True,max_length=100)
+	EM_2_AfterHrs=models.IntegerField(null=True)
+	EM_2_AfterMin=models.IntegerField(null=True)
+	EM_2_Name=models.CharField(null=True,max_length=100)
+	EM_2_To=models.CharField(null=True,max_length=100)
+	FulfillerExecutive=models.CharField(null=True,max_length=100)
+	HelpdeskCategory=models.CharField(null=True,max_length=100)
+	HelpdeskDepartment=models.CharField(null=True,max_length=100)
+	HelpdeskLocation=models.CharField(null=True,max_length=100)
+	HelpdeskPriority=models.CharField(null=True,max_length=100)
+	HelpdeskSubCategory=models.CharField(null=True,max_length=100)
+	ReminderMechanism=models.CharField(null=True,max_length=100)
+	TATHrs=models.IntegerField(null=True)
+	TATMins=models.IntegerField(null=True)
