@@ -33,6 +33,7 @@ margin-right: -55px;
         	SLA's
         	</div>
 <center>
+  
           {% if all_items %}
   <table class="table" style=" padding-left: 70px;"> 
   <thead>
@@ -46,18 +47,43 @@ margin-right: -55px;
       
       <th>Priority</th>
     </tr>
-  </thead>
+  </thead><center>
   {% for item in all_items %}
   <tr>
-    <td><input type="checkbox"></td>
+    <td> <input type="radio" name="Select"></td>
     <td>{{item.HelpdeskLocation}}</td>
     <td>{{item.HelpdeskDepartment}}</td>
     <td>{{item.HelpdeskCategory}}</td>
     <td>{{item.HelpdeskSubCategory}}</td>
     <td>{{item.HelpdeskPriority}}</td>
   </tr>
-  {%endfor%}
+  {%endfor%}</center>
 {%endif%}
+ <div class="pagination">
+
+    <span class="step-links">
+
+        {% if all_items.has_previous %}
+
+           <button> <a href="?page={{ all_items.previous_page_number }}">previous</a></button>
+
+        {% endif %}
+
+        <span class="current">
+
+           <button> Page {{ all_items.number }} of {{ all_items.paginator.num_pages }}</button>
+
+        </span>
+
+        {% if all_items.has_next %}
+
+           <button> <a href="?page={{ all_items.next_page_number }}">next</a></button>
+
+        {% endif %}
+
+    </span>
+
+</div>
 
 
 </body>

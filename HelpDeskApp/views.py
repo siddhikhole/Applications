@@ -19,6 +19,7 @@ from datetime import timedelta
 import threading
 import dateutil.parser
 import numpy as np
+from django.core.paginator import Paginator,PageNotAnInteger,EmptyPage 	
 
 
 def email(key,t_id,emailid,msg):
@@ -98,7 +99,7 @@ def autocancel():
 		date1 =  str(datetime.datetime.now())
 		date1=datetime.datetime.strptime(date1, '%Y-%m-%d %H:%M:%S.%f')
 		date2 = str(i.created_at)
-		date2=datetime.datetime.strptime(date2, '%Y-%m-%d %H:%M:%S.%f')
+		date2=datetime.datetime.strptime(date2, '%Y-%m-%d %H:%M:%S.%f+00:00')
 		'''print(date1)
 		print(date2)
 '''
@@ -223,40 +224,94 @@ def autocancel():
 	#################################################################################
 	############Escalation############
 	#################################################################################
-	item=HelpRequest.objects.all().filter(WorkflowStatus="Activated")
+	item=HelpRequest.objects.all().filter((Q(RequestStatus="1")|Q(RequestStatus="2")),WorkflowStatus="Activated")
 	for i in item:
+		item1=HelpdeskRequestSLAs.objects.all().filter(HelpdeskCategory=i.category,HelpdeskDepartment=i.department,HelpdeskPriority=i.priority,HelpdeskSubCategory=i.sub_category)
 		print(i.WorkflowStatus)
 		print(i.id)
 		date1 =  str(datetime.datetime.now())
 		date1=datetime.datetime.strptime(date1, '%Y-%m-%d %H:%M:%S.%f')
-		date2 = str(i.expected_closure)
-		date2=datetime.datetime.strptime(date2, '%Y-%m-%d %H:%M:%S.%f')
+		date2 = str(i.WorkflowModifiedOn)
+		date2=datetime.datetime.strptime(date2, '%Y-%m-%d %H:%M:%S.%f+00:00')
 		diff = date1 - date2
 		
 		days = diff.days
-	#	print (str(days) + ' day(s)')
+	
+		#print (str(days) + ' day(s)')
 
 		days_to_hours = days * 24
 		diff_btw_two_times = (diff.seconds) / 3600
 		overall_hours = days_to_hours + diff_btw_two_times
-		
 		#print (str(overall_hours) + ' hours');
 
 		hours_to_minutes=overall_hours * 60
 		diff_btw_two_times = (diff.seconds) / 60
 		overall_minutes = hours_to_minutes + diff_btw_two_times
-		print("-----------")
-		print(overall_minutes)
-		overall_minutes=1
-		if(overall_minutes > 0):
+		#print (str(overall_minutes) + ' minutes');
+		
+
+
+		days = np.busday_count( date2.date(), date1.date())
+		#print(days) 
+		for h in item1:
+			if(i.RequestStatus=="1"):	
+				receiver=h.EM_0_To
+				wait=h.EM_0_AfterHrs
+				#wait=0.0166667
+			elif(i.RequestStatus=="2"):
+				wait=h.EM_1_AfterHrs
+				#wait=0.0166667
+				receiver=h.EM_1_To
+				
+			else:
+				wait=0
+			hour=0
+			hours=h.TATHrs+wait
+			#hours=0.0166667+wait
+			while hours >= 8:
+				hour=hour+24
+				hours=hours-8
+
+		
+		
+		for d in range(days + 1):
+			d1=date2 + timedelta(d)
+	#print(d1.strftime("%A"))
+
+			if(d1.strftime("%A")=="Saturday"):
+				hour=hour+48
+
+	#	print(d1.strftime("%A"))
+
+
+		print("Waiting for: "+str(hour))
+		print(overall_hours)
+		#overall_hours=125
+		if(overall_hours > hour):
 			print("HO")
-			item1=HelpdeskRequestSLAs.objects.all().filter(HelpdeskCategory=i.category,HelpdeskDepartment=i.department,HelpdeskPriority=i.priority,HelpdeskSubCategory=i.sub_category)
+			
 			for i1 in item1:
 				print(i1.EM_0_To)
-				Email=EmployeeMaster.objects.values_list('email',flat=True).filter(associated_user_account=i1.EM_0_Name)
+				Email=EmployeeMaster.objects.values_list('email',flat=True).filter(empid=receiver)
 				print(Email[0])
 				Pending=WorkflowRequest.objects.values_list('WorkflowPendingWith',flat=True).filter(RequestStatus="Pending",RequestID_id=i.id)
 				print(Pending[0])
+
+
+				key="HelpdeskTemplate_AssignTask"
+				msg="Your attention is requested for following helpdesk ticket pending for "+Pending[0]+"-"
+				
+				#emailid=HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat=True).filter(id=i.id)
+				#Employee=EmployeeMaster.objects.values_list('email',flat=True).filter(empid=emailid[0])
+				Employee=[Email[0]]
+				email(key,i.id,Employee,msg)
+				if(i.RequestStatus=="1"):
+					i.RequestStatus=2
+					i.save()
+				elif(i.RequestStatus=="2"):
+					i.RequestStatus=3
+					i.save()
+
 
 
 
@@ -603,7 +658,7 @@ def addTicket(request):
 		FirstLevelApproverEmployeeId=FirstApprover[0][0]
 		FirstApproverEmail=FirstApprover[0][1]
 		print("#"*40)
-		form=HelpRequest(expected_closure=dt,OnBehalfUserEmployeeId=OnBehalfUserEmployeeId,OnBehalfUserEmployeeName=OnBehalfUserEmployeeName,WorkflowStatus="Workflow Initiated",employee_id=employee_id,FirstLevelApproverEmployeeId=FirstLevelApproverEmployeeId,FirstLevelApproverEmployeeName=FirstLevelApproverEmployeeName,EmployeeName=EmployeeName,created_at=created_at,description=description,request_type=request_type,department=department,category=category,sub_category=sub_category,priority=priority,ticket_for=ticket_for,HelpdeskOffice=HelpdeskOffice,DeskLocation=DeskLocation,Files=Files)
+		form=HelpRequest(RequestStatus="1",expected_closure=dt,OnBehalfUserEmployeeId=OnBehalfUserEmployeeId,OnBehalfUserEmployeeName=OnBehalfUserEmployeeName,WorkflowStatus="Workflow Initiated",employee_id=employee_id,FirstLevelApproverEmployeeId=FirstLevelApproverEmployeeId,FirstLevelApproverEmployeeName=FirstLevelApproverEmployeeName,EmployeeName=EmployeeName,created_at=created_at,description=description,request_type=request_type,department=department,category=category,sub_category=sub_category,priority=priority,ticket_for=ticket_for,HelpdeskOffice=HelpdeskOffice,DeskLocation=DeskLocation,Files=Files)
 		try:
 			form.save()
 
@@ -1129,4 +1184,12 @@ def logout(request):
 
 def sla(request):
 	all_items=HelpdeskRequestSLAs.objects.all().order_by('HelpdeskDepartment')
-	return render(request,"sla.html",{'all_items':all_items})
+	paginator=Paginator(all_items, 10)
+	page=request.GET.get('page')
+	try:
+		contacts=paginator.page(page)
+	except PageNotAnInteger:
+		contacts=paginator.page(1)
+	except EmptyPage:
+		contacts=paginator.page(paginator.num_pages)
+	return render(request,"sla.html",{'all_items':contacts})
