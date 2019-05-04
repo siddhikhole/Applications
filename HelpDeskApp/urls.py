@@ -10,9 +10,11 @@ urlpatterns = [
   url(r'^home/$', views.home, name='home'),
   # Redirect to get token ('/tutorial/gettoken/')
   url(r'^HelpDeskApp/gettoken/$', views.gettoken, name='gettoken'),
-
+path('add_sla',views.add_sla,name="add_sla"),
+path('delete_sla/<ticket_id>',views.delete_sla,name="delete_sla"),
+path('edit_sla/<ticket_id>',views.edit_sla,name="edit_sla"),
+path('slas/<ticket_id>',views.slas,name="slas"),
 path('sla/',views.sla,name="sla"),
-path('trial/',views.trial,name="trial"),
 path('raiseTicket/addTicket/',views.addTicket,name="addTicket"),
 path('update/<ticket_id>/updateTicket',views.updateTicket,name="updateTicket"),
 path('raiseTicket/',views.raiseTicket,name="raiseTicket"),

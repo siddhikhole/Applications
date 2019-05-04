@@ -10,7 +10,8 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css"><style type="text/css">
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+   <style type="text/css">
 	.header {
     padding:7px 15px ;
 	padding-left: 10px;
@@ -20,7 +21,28 @@
     color: white;
 
 margin-right: -55px;
+}
+
+.footer{
+    padding:5px 15px ;
+  padding-left: 10px;
+    border-bottom:1px solid #eee;
+    background-color:   #D3D3D3;
+     font-size:20px;
+    color: white;
+
+margin-right: -55px;
+
+
 }</style>
+
+ <script>
+  {% if messages %}
+    {% for message in messages%}
+      alert("{{message}}")
+    {%endfor%}
+  {% endif %}
+</script>
    
 <script language="javascript" type="text/javascript">  
 
@@ -28,17 +50,30 @@ margin-right: -55px;
 
 </head>
 <body>
+ 
+
 	<div class="header">
         	
         	SLA's
         	</div>
-<center>
+           <div class="footer" style="padding-right: 5px;">
+
   
-          {% if all_items %}
+
+<a  data-toggle="modal" data-target="#myModal" href="/slas/0"   style="margin-left: 1000px;" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add</a>
+</div>
+<center>
+
+
+          
+
+
+{% if all_items %}
+  
   <table class="table" style=" padding-left: 70px;"> 
   <thead>
        <tr>
-        <th>Select</th>
+        
       <th>Location</th>
       <th>Department</th>
       
@@ -46,46 +81,72 @@ margin-right: -55px;
       <th>Sub-Category</th>
       
       <th>Priority</th>
+      <th>Select</th>
     </tr>
   </thead><center>
   {% for item in all_items %}
-  <tr>
-    <td> <input type="radio" name="Select"></td>
+  <tr style="font-size: 14px;">
+    
     <td>{{item.HelpdeskLocation}}</td>
     <td>{{item.HelpdeskDepartment}}</td>
     <td>{{item.HelpdeskCategory}}</td>
     <td>{{item.HelpdeskSubCategory}}</td>
     <td>{{item.HelpdeskPriority}}</td>
+    <td>   <a  data-toggle="modal" data-target="#myModal" href="/slas/{{item.id}}" > <span class="glyphicon glyphicon-pencil"></span> Edit</a> </td>
   </tr>
   {%endfor%}</center>
+  </table>
 {%endif%}
- <div class="pagination">
+</center>
+ <ul class="pager" style="margin-left: 900px;">
+  <li class="page-link"><a href="?page=1"><span class="glyphicon glyphicon-fast-backward"></span></a></li>
 
-    <span class="step-links">
-
+   
+     
         {% if all_items.has_previous %}
 
-           <button> <a href="?page={{ all_items.previous_page_number }}">previous</a></button>
-
+           <li class="page-link"><a href="?page={{ all_items.previous_page_number }}"><span class="glyphicon glyphicon-step-backward"></a></li>
+        {% else %}
+          <li class="page-link"><a href="?page=1"><span class="glyphicon glyphicon-step-backward"></a></li>       
         {% endif %}
 
-        <span class="current">
+        
+          <li> Page {{ all_items.number }} of {{ all_items.paginator.num_pages }}</li>
 
-           <button> Page {{ all_items.number }} of {{ all_items.paginator.num_pages }}</button>
-
-        </span>
+       
 
         {% if all_items.has_next %}
-
-           <button> <a href="?page={{ all_items.next_page_number }}">next</a></button>
-
+          
+           <li> <a href="?page={{ all_items.next_page_number }}"><span class="glyphicon glyphicon-step-forward"></span></a></li>
+        {% else %}
+          <li> <a href="?page={{ all_items.paginator.num_pages }}"><span class="glyphicon glyphicon-step-forward"></span></a></li>
         {% endif %}
+        <li class="page-link"><a href="?page={{ all_items.paginator.num_pages }}"><span class="glyphicon glyphicon-fast-forward"></span></a></li>
+  </ul>
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+           <div class="modal-body">
+          
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div> 
 
-    </span>
 
-</div>
 
+</form>
 
 </body>
+
 </html>
+
+
+
 {%endblock%}

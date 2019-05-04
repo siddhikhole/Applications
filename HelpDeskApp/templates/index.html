@@ -227,17 +227,23 @@ margin-right: -55px;
       <div id="sidebar-wrapper">
       <ul id="sidebar_menu" class="sidebar-nav">
       <!-- <li class="sidebar-brand"><a id="menu-toggle" href="#">Menu<span id="main_icon" class="glyphicon glyphicon-align-justify"></span></a></li> -->
+    
       <li class="sidebar-brand"><a href="/raiseTicket">Raise Ticket</a></li>
       <li class="sidebar-brand"><a href="/pending">My Requests</b></a></li>
-  
-    
-  
-    <li class="sidebar-brand"><a href="/approval">First Approval</a></li>
+      {%if FirstApprover%}
+        <li class="sidebar-brand"><a href="/approval">First Approval</a></li>
+      {%endif%}
+      {%if ApproverHead%}
     <li class="sidebar-brand"><a href="/HelpdeskApprover">Approver Head</a></li>
+    {% endif %}
+    {% if FulfillerHead%}
     <li class="sidebar-brand"><a href="/HelpdeskFulfillerHead">Fulfiller Head</a></li>
+    {% endif %}
+    {% if Fulfiller %}
     <li class="sidebar-brand"><a href="/AssignedTickets">Assigned</a></li>
-    {%if item%}
-     <li class="sidebar-brand"> <a href="/sla">SLA's</a></li>
+    {% endif %}
+    {%if SLAFulfillerHead%}
+     <li class="sidebar-brand"> <a href="/sla?page=1">SLA's</a></li>
      <li class="sidebar-brand"> </li>
     {%else %}
     <li class="sidebar-brand"> </li>
