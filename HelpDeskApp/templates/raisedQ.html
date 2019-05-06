@@ -17,6 +17,7 @@
 </script>
 <style type="text/css">
 	.header {
+		margin-top: -20px;
     padding:7px 15px ;
 	padding-left: 10px;
     border-bottom:1px solid #eee;
@@ -30,7 +31,7 @@ margin-right: -55px;
 <body>
 		<div class="header">
         	
-        	 My Requests
+        	<span class="glyphicon glyphicon-question-sign"></span> My Requests
         	</div>
 	{% if messages %}
 	{% for message in messages %}
@@ -42,7 +43,7 @@ margin-right: -55px;
 	{%endfor%}
 	{%endif%}
 	
-<nav class="navbar">
+<nav class="navbar" style="margin-left: -50px;">
   
 	<ul class="nav nav-tabs ">
 		<li class="nav-item"><a href="/pending">Pending</a></li>
@@ -59,7 +60,7 @@ margin-right: -55px;
 	
 </nav>
  {% if all_items %}
-	<table class="table"> 
+	<table class="table" style="margin-left: -50px;"> 
 	<thead>
 	     <tr>
 	    <th>Request ID</th>
@@ -116,7 +117,7 @@ margin-right: -55px;
 </table>
 	</table>
 {% else %}
-<div class="alert alert-warning alert-dismissable" role="alert">  
+<div class="alert alert-warning alert-dismissable" role="alert" style="margin-left: -50px;">  
       <h4>No tickets found!</h4>
  </div>
 

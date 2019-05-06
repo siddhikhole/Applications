@@ -12,25 +12,15 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
    <style type="text/css">
-	.header {
-    padding:7px 15px ;
-	padding-left: 10px;
-    border-bottom:1px solid #eee;
-    background-color:#616D7E;
-     font-size:20px;
-    color: white;
-
-margin-right: -55px;
-}
-
-.footer{
+	
+ .footer{
     padding:5px 15px ;
   padding-left: 10px;
     border-bottom:1px solid #eee;
     background-color:   #D3D3D3;
      font-size:20px;
     color: white;
-
+margin-left: -50px;
 margin-right: -55px;
 
 
@@ -52,10 +42,11 @@ margin-right: -55px;
 <body>
  
 
-	<div class="header">
-        	
-        	SLA's
-        	</div>
+	<body>
+  <div class="header">
+          
+         <span class="glyphicon glyphicon-dashboard"></span> SLA's
+          </div>
            <div class="footer" style="padding-right: 5px;">
 
   
@@ -70,7 +61,7 @@ margin-right: -55px;
 
 {% if all_items %}
   
-  <table class="table" style=" padding-left: 70px;"> 
+  <table class="table" style=" padding-left: 70px;margin-left: -50px;"> 
   <thead>
        <tr>
         
@@ -98,7 +89,7 @@ margin-right: -55px;
   </table>
 {%endif%}
 </center>
- <ul class="pager" style="margin-left: 900px;">
+ <ul class="pager" style="margin-left: 700px;">
   <li class="page-link"><a href="?page=1"><span class="glyphicon glyphicon-fast-backward"></span></a></li>
 
    

@@ -3,16 +3,7 @@
 <html>
 <head>
 	<style type="text/css">
-	.header {
-    padding:7px 15px ;
-	padding-left: 10px;
-    border-bottom:1px solid #eee;
-    background-color:#616D7E;
-     font-size:20px;
-    color: white;
-
-margin-right: -55px;
-}
+	
 
     
 
@@ -23,23 +14,12 @@ margin-right: -55px;
 
  padding-left: 2px;
  padding-right: 2px;
-margin-right: -55px;
+    margin-left: -50px;
 
 }
-
-#t1 {
-  border-collapse: separate;
-  border-spacing: -50px;
-   padding-left: 30px;
-   padding-right: 50px;
+#t1{
+	    margin-left: -40px;
 }
-
-
-  
-
-
-
-
 </style>
 	<title>Help desk</title>
  <meta charset="utf-8">
@@ -115,10 +95,12 @@ function yesnoCheck() {
 </head>
 <body>
 
-<div class="header">
+
         	
-        		  <span class="glyphicon glyphicon-hand-up"></span> Raise Request
-        	</div>
+        		  <div class="header">
+        		  	<span class="glyphicon glyphicon-hand-up"></span> Raise Request
+        		  </div>
+        
         	
         		<table style="width:100%"id="t1" >
          		{% if item %}	
@@ -145,9 +127,16 @@ function yesnoCheck() {
 					&nbsp;&nbsp;&nbsp;
 				
 				 <input type="radio" checked onclick="javascript:yesnoCheck();" value="Self" name="yesno" id="noCheck"> Self &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				 <input type="radio" value="OnBehalf" onclick="javascript:yesnoCheck();" name="yesno" id="yesCheck">On Behalf Of<br></td><td>
+				 {% if item %}
+				 <td></td>
+				 {% else %}
+				 <input type="radio" value="OnBehalf" onclick="javascript:yesnoCheck();" name="yesno" id="yesCheck">On Behalf Of<br>
+				{%endif%}
+				</td><td>
+
 
     <div id="ifYes" style="visibility:hidden">
+    	
     	<input type="test" name="onBehalfOf" placeholder="People Picker" id="default" list="languages">
        
     </div>
@@ -232,10 +221,23 @@ function yesnoCheck() {
 					<label><b>Priority <font color="red">*</font></b></label><br>
 					<select name="priority" style="width:280px;" class="form-control" required>
 						<option value=""disabled selected>-- Please Select --</option>
-						
-						<option value="Low">Low</option>
-						<option value="Medium">Medium</option>
-						<option value="High">High</option>
+						{% if item.Priority == "Low" %}
+							<option value="Low" selected>Low</option>
+							<option value="Medium">Medium</option>
+							<option value="High">High</option>
+						{% elif item.Priority == "Medium"%}
+							<option value="Low">Low</option>
+							<option value="Medium" selected>Medium</option>
+							<option value="High">High</option>
+						{% elif item.Priority == "High"%}
+							<option value="Low">Low</option>
+							<option value="Medium">Medium</option>
+							<option value="High" selected>High</option>
+						{% else %}
+							<option value="Low">Low</option>
+							<option value="Medium">Medium</option>
+							<option value="High">High</option>
+						{% endif %}
 					</select>
 					 </td></tr>
 					

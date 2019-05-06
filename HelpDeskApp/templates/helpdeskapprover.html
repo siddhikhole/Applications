@@ -15,17 +15,7 @@
 <script language="javascript" type="text/javascript">  
 
 </script>
- <style type="text/css">
-	.header {
-    padding:7px 15px ;
-	padding-left: 10px;
-    border-bottom:1px solid #eee;
-    background-color:#616D7E;
-     font-size:20px;
-    color: white;
-
-margin-right: -55px;
-}</style>
+ 
 </head>
 <body>
 	{% if messages %}
@@ -39,10 +29,10 @@ margin-right: -55px;
 	{%endif%}
 	<div class="header">
         	
-        	 For Helpdesk Approver
+        	<span class="glyphicon glyphicon-check"></span> For Helpdesk Approver
         	</div><br>
 	 {% if all_items %}
-	<table class="table"> 
+	<table class="table" style="margin-left: -50px;"> 
 	<thead>
 	     <tr>
 	    <th>Request ID</th>
@@ -76,7 +66,7 @@ margin-right: -55px;
 	{%for key,things in all_items.items%}
     
       <tr>
-        <td><a href="/display/{{key}}">2018-2019/Helpdesk/Request/{{things.id}}</a></td>
+        <td><a href="/display/{{key}}">Helpdesk/Request/{{things.id}}</a></td>
         <td>{{things.EmployeeName}}</td>
         <td>{{things.created_at}}</td>
         <td>{{things.department}}</td>
@@ -100,7 +90,7 @@ margin-right: -55px;
 </table>
 	</table>
 {% else %}
-<div class="alert alert-warning alert-dismissable" role="alert">  
+<div class="alert alert-warning alert-dismissable" role="alert" style="margin-left: -50px;">  
       <h4>No tickets found!</h4>
  </div>
 

@@ -1,284 +1,143 @@
 <!DOCTYPE html>
-<html>
-<head>
+<html lang="en">
+<title>HelpdeskApp</title>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="one.css">
+
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+
 <style>
-.row{
-    margin-left:0px;
-    margin-right:0px;
-}
 
-#wrapper {
-    padding-left: 70px;
-    transition: all .4s ease 0s;
-    height: 100%
+html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif;}
+.w3-sidebar {
+  z-index: 3;
+  width: 250px;
+  top: 43px;
+  bottom: 0;
+  height: inherit;
 }
+.header {
 
-#sidebar-wrapper {
-    margin-left: -150px;
-    left: 70px;
-    width: 150px;
-    background: #222;
-    position: fixed;
-    height: 100%;
-    z-index: 10000;
-    transition: all .4s ease 0s;
-}
-
-.sidebar-nav {
-    display: block;
-    float: left;
-    width: 150px;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-#page-content-wrapper {
-    padding-left: 0;
-    margin-left: 0;
-    width: 100%;
-    height: auto;
-}
-#wrapper.active {
-    padding-left: 150px;
-}
-#wrapper.active #sidebar-wrapper {
-    left: 150px;
-}
-
-#page-content-wrapper {
-  width: 100%;
-}
-
-#sidebar_menu li a, .sidebar-nav li a {
-    color: white;
-    size:20px;
-    display: block;
-    float: left;
-    text-decoration: none;
-    width: 150px;
-    background: #3498DB  ;
-    border-top: 1px solid #3498DB;
-    border-bottom: 1px solid #3498DB;
-    -webkit-transition: background .5s;
-    -moz-transition: background .5s;
-    -o-transition: background .5s;
-    -ms-transition: background .5s;
-    transition: background .5s;
-}
-.sidebar_name {
-    padding-top: 25px;
-    color: #fff;
-    opacity: .7;
-}
-
-.sidebar-nav li {
-  line-height: 40px;
-  text-indent: 20px;
-  background-color: #3498DB;
-}
-
-.sidebar-nav li a {
-  color: #999999;
-  display: block;
-  text-decoration: none;
-}
-
-.sidebar-nav li a:hover {
-  color: #fff;
-  background: rgba(255,255,255,0.2);
-  text-decoration: none;
-}
-
-.sidebar-nav li a:active,
-.sidebar-nav li a:focus {
-  text-decoration: none;
-}
-
-.sidebar-nav > .sidebar-brand {
-  height: 80px;
-  line-height: 60px;
-  font-size: 18px;
-}
-
-.sidebar-nav > .sidebar-brand a {
-  color: #3498DB;
-}
-
-.sidebar-nav > .sidebar-brand a:hover {
-  color: #3498DB;
-  background: none;
-}
-
-#main_icon
-{
-    float:right;
-   padding-right: 65px;
-   padding-top:20px;
-}
-.sub_icon
-{
-    float:right;
-   padding-right: 65px;
-   padding-top:10px;
-}
-.content-header {
-  height: 65px;
-  line-height: 65px;
-}
-
-.content-header h1 {
-  margin: 0;
-  margin-left: 20px;
-  line-height: 65px;
-  display: inline-block;
-}
-
-@media (max-width:767px) {
-    #wrapper {
-    padding-left: 70px;
-    transition: all .4s ease 0s;
-}
-#sidebar-wrapper {
-    left: 70px;
-}
-#wrapper.active {
-    padding-left: 150px;
-}
-#wrapper.active #sidebar-wrapper {
-    left: 150px;
-    width: 150px;
-    transition: all .4s ease 0s;
-}
-}
-
-</style>
-<style type="text/css">
-  .header {
+    margin-top: -20px;
     padding:7px 15px ;
   padding-left: 10px;
     border-bottom:1px solid #eee;
-  background-color:#616D7E;
-     font-size:25px;
-     color: white;
-     font-style: bold;
-    
+    background-color:#616D7E;
+     font-size:20px;
+    color: white;
+    margin-left: -50px;
 
-margin-right: -55px;
+
 }
-.topnav-right {
-  float: right;
-  margin-right:70px; 
-  padding-top:   
- }
 </style>
-<style>
-
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #f1f1f1;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
-}
-
-.dropdown-content a {
-  color: black;
-  padding: 16px 16px;
-  text-decoration: none;
-  display: block;
-  font-size: 15px;
-}
-
-.dropdown-content a:hover {background-color: #ddd;}
-
-.dropdown:hover .dropdown-content {display: block;}
-
-.dropdown:hover .dropbtn {background-color: #3e8e41;}</style>
-</head>
 <body>
-      <div class="header">
-          <h4><b>Help Desk App</b>
-        <div class="topnav-right">
-        
 
-   
-      <div class="dropdown">
-  <a class="dropbtn" style="color:white"> {{user.associated_user_account}}</a>
-  <div class="dropdown-content">
-    <a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Log out
-        </a>    
+<!-- Navbar -->
+<div class="w3-top">
+  <div class="w3-bar w3-top w3-left-align w3-large" style="background-color: #C7C3C3; padding-top: 2px;">
+
+ <a href="#" class="w3-bar-item w3-button w3-hide-small "><b>HelpdeskApp</b></a>
+  
+    <div style=" padding-left: 900px;" class="w3-bar-item w3-hide-small ">  <span class="glyphicon glyphicon-user"></span>{{user.associated_user_account}}</div>
+    <a href="/logout" class="w3-bar-item w3-button w3-hide-small"><span class="glyphicon glyphicon-log-out"></span> Log out</a>     
+  
   </div>
 </div>
-          
-  </div></h4></div>
 
-<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
-<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-<!------ Include the above in your HEAD tag ---------->
+<!-- Sidebar -->
+<nav class="w3-sidebar w3-bar-block  w3-large" id="mySidebar" style="background-color: #0073c6; color:white;width: 200px; "><br>
+  
+  <h4 class="w3-bar-item"><span class="glyphicon glyphicon-th-list"></span><b> Menu</b></h4><br>
 
-<div id="wrapper" class="active">
-      
-      <!-- Sidebar -->
-            <!-- Sidebar -->
-      <div id="sidebar-wrapper">
-      <ul id="sidebar_menu" class="sidebar-nav">
-      <!-- <li class="sidebar-brand"><a id="menu-toggle" href="#">Menu<span id="main_icon" class="glyphicon glyphicon-align-justify"></span></a></li> -->
-    
-      <li class="sidebar-brand"><a href="/raiseTicket">Raise Ticket</a></li>
-      <li class="sidebar-brand"><a href="/pending">My Requests</b></a></li>
+  <a href="/raiseTicket" class="w3-bar-item w3-button w3-hover-black"><span class="glyphicon glyphicon-hand-up"></span> Raise Ticket</a><br>
+     <a class="w3-bar-item w3-button w3-hover-black" href="/pending"><span class="glyphicon glyphicon-question-sign"></span> My Requests</a><br>
       {%if FirstApprover%}
-        <li class="sidebar-brand"><a href="/approval">First Approval</a></li>
+        <a class="w3-bar-item w3-button w3-hover-black" href="/approval"><span class="glyphicon glyphicon-ok-sign"></span> First Approval</a><br>
       {%endif%}
       {%if ApproverHead%}
-    <li class="sidebar-brand"><a href="/HelpdeskApprover">Approver Head</a></li>
+    <a class="w3-bar-item w3-button w3-hover-black" href="/HelpdeskApprover"><span class="glyphicon glyphicon-check"></span> Approver Head</a><br>
     {% endif %}
     {% if FulfillerHead%}
-    <li class="sidebar-brand"><a href="/HelpdeskFulfillerHead">Fulfiller Head</a></li>
+    <a class="w3-bar-item w3-button w3-hover-black" href="/HelpdeskFulfillerHead"> <span class="glyphicon glyphicon-link"></span> Fulfiller Head</a><br>
     {% endif %}
     {% if Fulfiller %}
-    <li class="sidebar-brand"><a href="/AssignedTickets">Assigned</a></li>
+    <a class="w3-bar-item w3-button w3-hover-black" href="/AssignedTickets"><span class="glyphicon glyphicon-tasks"></span> Assigned Tasks</a><br>
     {% endif %}
     {%if SLAFulfillerHead%}
-     <li class="sidebar-brand"> <a href="/sla?page=1">SLA's</a></li>
-     <li class="sidebar-brand"> </li>
-    {%else %}
-    <li class="sidebar-brand"> </li>
-    <li class="sidebar-brand"> </li>
+      <a class="w3-bar-item w3-button w3-hover-black" href="/sla?page=1"><span class="glyphicon glyphicon-dashboard"></span> SLA's</a><br>
+      </b>
+
+
+
+     
+     
     {%endif%}
-          
-      </div>
-          
-      <!-- Page content -->
-      <div id="page-content-wrapper">
-        <!-- Keep all page content within the page-content inset div! -->
-        <div class="page-content inset">
-          <div class="row">
-              <div class="col-md-12">
-              {%block content %}
+     
+      
+     
+</nav>
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- Main content: shift it to the right by 250 pixels when the sidebar is visible -->
+<div class="w3-main" style="margin-left:250px">
+
+  <div class="w3-row w3-padding-64">
+
+      {%block content %}
         
   
 
-{%endblock%}
-            </div>
-          </div>
-        </div>
-      </div>
-      
+      {%endblock%}
     </div>
- 
-</div>
-</div>
-<script>
-$("#menu-toggle").click(function(e) {
-        e.preventDefault();
-        $("#wrapper").toggleClass("active");
-});
+    
+  </div>
 
-</script>
+  
    
+
+  <!-- Pagination -->
+ 
+
+
+<!-- END MAIN -->
+</div>
+
+<script>
+// Get the Sidebar
+var mySidebar = document.getElementById("mySidebar");
+
+// Get the DIV with overlay effect
+var overlayBg = document.getElementById("myOverlay");
+
+// Toggle between showing and hiding the sidebar, and add overlay effect
+function w3_open() {
+  if (mySidebar.style.display === 'block') {
+    mySidebar.style.display = 'none';
+    overlayBg.style.display = "none";
+  } else {
+    mySidebar.style.display = 'block';
+    overlayBg.style.display = "block";
+  }
+}
+
+// Close the sidebar with the close button
+function w3_close() {
+  mySidebar.style.display = "none";
+  overlayBg.style.display = "none";
+}
+</script>
+
 </body>
-</html> 
+</html>
