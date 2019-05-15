@@ -21,6 +21,13 @@
 	    margin-left: -40px;
 }
 </style>
+<script>
+  {% if messages %}
+    {% for message in messages%}
+      alert("{{message}}")
+    {%endfor%}
+  {% endif %}
+</script>
 	<title>Help desk</title>
  <meta charset="utf-8">
 	 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -115,7 +122,7 @@ function yesnoCheck() {
 					
 				<td ><label><b>Request Type</b></label>&nbsp;&nbsp;
 				<input type="radio" name="RequestType" value="Request" checked>Request&nbsp;&nbsp;&nbsp;
-				<input type="radio" name="RequestType" value="Issue">Issue
+				<input type="radio" name="RequestType" value="Issue" disabled>Issue
 				</td>
 				
 				</tr>
@@ -128,7 +135,7 @@ function yesnoCheck() {
 				
 				 <input type="radio" checked onclick="javascript:yesnoCheck();" value="Self" name="yesno" id="noCheck"> Self &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				 {% if item %}
-				 <td></td>
+				 <input type="radio" value="OnBehalf" onclick="javascript:yesnoCheck();" name="yesno" id="yesCheck" disabled>On Behalf Of<br>
 				 {% else %}
 				 <input type="radio" value="OnBehalf" onclick="javascript:yesnoCheck();" name="yesno" id="yesCheck">On Behalf Of<br>
 				{%endif%}
@@ -221,15 +228,15 @@ function yesnoCheck() {
 					<label><b>Priority <font color="red">*</font></b></label><br>
 					<select name="priority" style="width:280px;" class="form-control" required>
 						<option value=""disabled selected>-- Please Select --</option>
-						{% if item.Priority == "Low" %}
+						{% if item.priority == "Low" %}
 							<option value="Low" selected>Low</option>
 							<option value="Medium">Medium</option>
 							<option value="High">High</option>
-						{% elif item.Priority == "Medium"%}
+						{% elif item.priority == "Medium"%}
 							<option value="Low">Low</option>
 							<option value="Medium" selected>Medium</option>
 							<option value="High">High</option>
-						{% elif item.Priority == "High"%}
+						{% elif item.priority == "High"%}
 							<option value="Low">Low</option>
 							<option value="Medium">Medium</option>
 							<option value="High" selected>High</option>
@@ -245,7 +252,7 @@ function yesnoCheck() {
 				
 				 	<tr><td colspan="2">
 					<label><b>Description <font color="red">*</font></b></label>
-					<textarea name="Description" style="width:560px;" class="form-control" value="{{item.description}}"rows="4" cols="10" required></textarea></td><td>
+					<textarea name="Description" style="width:560px;" class="form-control" rows="4" cols="10" required>{{item.description}}</textarea></td><td>
 					<label><b>Office Location <font color="red">*</font></b></label><br>
 					<select name="officeLocation" style="width:280px;" class="form-control"  required>
 						<option value=""disabled selected>-- Please Select --</option>

@@ -4,140 +4,99 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="one.css">
-
 <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
 
 <style>
-
-html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif;}
-.w3-sidebar {
-  z-index: 3;
-  width: 250px;
-  top: 43px;
-  bottom: 0;
-  height: inherit;
-}
+  html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif;}
+  .w3-sidebar {
+    z-index: 3;
+    width: 250px;
+    top: 43px;
+    bottom: 0;
+    height: inherit;
+  } 
 .header {
 
-    margin-top: -20px;
-    padding:7px 15px ;
+  margin-top: -20px;
+  padding:7px 15px ;
   padding-left: 10px;
-    border-bottom:1px solid #eee;
-    background-color:#616D7E;
-     font-size:20px;
-    color: white;
-    margin-left: -50px;
-
-
-}
+  border-bottom:1px solid #eee;
+  background-color:#616D7E;
+  font-size:20px;
+  color: white;
+  margin-left: -50px;
+  }
 </style>
 <body>
 
-<!-- Navbar -->
-<div class="w3-top">
-  <div class="w3-bar w3-top w3-left-align w3-large" style="background-color: #C7C3C3; padding-top: 2px;">
-
- <a href="#" class="w3-bar-item w3-button w3-hide-small "><b>HelpdeskApp</b></a>
+  <!-- Navbar -->
+  <div class="w3-top">
+    <div class="w3-bar w3-top w3-left-align w3-large" style="background-color: #C7C3C3; padding-top: 2px;">
+      <a href="#" class="w3-bar-item w3-button w3-hide-small "><b>HelpdeskApp</b></a>
   
-    <div style=" padding-left: 900px;" class="w3-bar-item w3-hide-small ">  <span class="glyphicon glyphicon-user"></span>{{user.associated_user_account}}</div>
-    <a href="/logout" class="w3-bar-item w3-button w3-hide-small"><span class="glyphicon glyphicon-log-out"></span> Log out</a>     
-  
-  </div>
-</div>
-
-<!-- Sidebar -->
-<nav class="w3-sidebar w3-bar-block  w3-large" id="mySidebar" style="background-color: #0073c6; color:white;width: 200px; "><br>
-  
-  <h4 class="w3-bar-item"><span class="glyphicon glyphicon-th-list"></span><b> Menu</b></h4><br>
-
-  <a href="/raiseTicket" class="w3-bar-item w3-button w3-hover-black"><span class="glyphicon glyphicon-hand-up"></span> Raise Ticket</a><br>
-     <a class="w3-bar-item w3-button w3-hover-black" href="/pending"><span class="glyphicon glyphicon-question-sign"></span> My Requests</a><br>
+      <div style=" padding-left: 800px;" class="w3-bar-item w3-hide-small ">  <span class="glyphicon glyphicon-user"></span>{{user.associated_user_account}}</div>
+        <a href="/logout" class="w3-bar-item w3-button w3-hide-small"><span class="glyphicon glyphicon-log-out"></span> Log out</a>
+       </div>
+    </div>
+    <!-- Sidebar -->
+    <nav class="w3-sidebar w3-bar-block  w3-large" id="mySidebar" style="background-color: #0073c6; color:white;width: 200px; "><br>
+      <h4 class="w3-bar-item"><span class="glyphicon glyphicon-th-list"></span><b> Menu</b></h4><br>
+      <a href="/raiseTicket" class="w3-bar-item w3-button w3-hover-black"><span class="glyphicon glyphicon-hand-up"></span> Raise Ticket</a><br>
+      <a class="w3-bar-item w3-button w3-hover-black" href="/pending"><span class="glyphicon glyphicon-question-sign"></span> My Requests</a><br>
       {%if FirstApprover%}
         <a class="w3-bar-item w3-button w3-hover-black" href="/approval"><span class="glyphicon glyphicon-ok-sign"></span> First Approval</a><br>
       {%endif%}
       {%if ApproverHead%}
-    <a class="w3-bar-item w3-button w3-hover-black" href="/HelpdeskApprover"><span class="glyphicon glyphicon-check"></span> Approver Head</a><br>
-    {% endif %}
-    {% if FulfillerHead%}
-    <a class="w3-bar-item w3-button w3-hover-black" href="/HelpdeskFulfillerHead"> <span class="glyphicon glyphicon-link"></span> Fulfiller Head</a><br>
-    {% endif %}
-    {% if Fulfiller %}
-    <a class="w3-bar-item w3-button w3-hover-black" href="/AssignedTickets"><span class="glyphicon glyphicon-tasks"></span> Assigned Tasks</a><br>
-    {% endif %}
-    {%if SLAFulfillerHead%}
-      <a class="w3-bar-item w3-button w3-hover-black" href="/sla?page=1"><span class="glyphicon glyphicon-dashboard"></span> SLA's</a><br>
-      </b>
-
-
-
-     
-     
-    {%endif%}
-     
-      
-     
-</nav>
-
-<!-- Overlay effect when opening sidebar on small screens -->
-<div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
-
-<!-- Main content: shift it to the right by 250 pixels when the sidebar is visible -->
-<div class="w3-main" style="margin-left:250px">
-
-  <div class="w3-row w3-padding-64">
-
-      {%block content %}
-        
-  
-
-      {%endblock%}
+       <a class="w3-bar-item w3-button w3-hover-black" href="/HelpdeskApprover"><span class="glyphicon glyphicon-check"></span> Approver Head</a><br>
+      {% endif %}
+      {% if FulfillerHead%}
+        <a class="w3-bar-item w3-button w3-hover-black" href="/HelpdeskFulfillerHead"> <span class="glyphicon glyphicon-link"></span> Fulfiller Head</a><br>
+      {% endif %}
+      {% if Fulfiller %}
+        <a class="w3-bar-item w3-button w3-hover-black" href="/AssignedTickets"><span class="glyphicon glyphicon-tasks"></span> Assigned Tasks</a><br>
+      {% endif %}
+      {%if SLAFulfillerHead%}
+        <a class="w3-bar-item w3-button w3-hover-black" href="/sla?page=1"><span class="glyphicon glyphicon-dashboard"></span> SLA's</a><br>
+        </b>
+      {%endif%}
+    </nav>
+    <!-- Main content: shift it to the right by 250 pixels when the sidebar is visible -->
+    <div class="w3-main" style="margin-left:250px">
+      <div class="w3-row w3-padding-64">
+        {%block content %}
+        {%endblock%}
+      </div>
     </div>
-    
   </div>
-
-  
-   
-
-  <!-- Pagination -->
- 
-
-
-<!-- END MAIN -->
-</div>
-
-<script>
-// Get the Sidebar
-var mySidebar = document.getElementById("mySidebar");
-
-// Get the DIV with overlay effect
-var overlayBg = document.getElementById("myOverlay");
-
-// Toggle between showing and hiding the sidebar, and add overlay effect
-function w3_open() {
-  if (mySidebar.style.display === 'block') {
-    mySidebar.style.display = 'none';
-    overlayBg.style.display = "none";
-  } else {
-    mySidebar.style.display = 'block';
-    overlayBg.style.display = "block";
+  <script>
+  // Get the Sidebar
+  var mySidebar = document.getElementById("mySidebar");
+  // Get the DIV with overlay effect
+  var overlayBg = document.getElementById("myOverlay");
+  // Toggle between showing and hiding the sidebar, and add overlay effect
+  function w3_open() {
+    if (mySidebar.style.display === 'block') {
+      mySidebar.style.display = 'none';
+      overlayBg.style.display = "none";
+    }
+    else {
+      mySidebar.style.display = 'block';
+      overlayBg.style.display = "block";
+    }
   }
-}
-
-// Close the sidebar with the close button
-function w3_close() {
-  mySidebar.style.display = "none";
-  overlayBg.style.display = "none";
-}
-</script>
-
+  // Close the sidebar with the close button
+  function w3_close() {
+    mySidebar.style.display = "none";
+    overlayBg.style.display = "none";
+  }
+  </script>
 </body>
 </html>

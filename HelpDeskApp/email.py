@@ -1,3 +1,4 @@
+"""Email threading  """
 import threading
 from django.core.mail import EmailMessage,EmailMultiAlternatives
 from os.path import basename
@@ -12,7 +13,7 @@ class EmailThread(threading.Thread):
         self.recipient_list = recipient_list
         self.html_content = html_content
         self.sender = sender
-        self.files=files
+        self.files = files
         print("*"*100)
         threading.Thread.__init__(self)
 
