@@ -2,26 +2,7 @@
 {%block content %}
 <html>
 <head>
-	<style type="text/css">
-	
-
-    
-
-   #t1 td{
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: left;
-
- padding-left: 2px;
- padding-right: 2px;
-    margin-left: -50px;
-
-}
-#t1{
-	    margin-left: -40px;
-}
-</style>
-<script>
+<script type="text/javascript">
   {% if messages %}
     {% for message in messages%}
       alert("{{message}}")
@@ -85,6 +66,7 @@ function select_subcategory(array_list)
 
 </script>
 
+
 <script type="text/javascript">
 
 function yesnoCheck() {
@@ -104,73 +86,72 @@ function yesnoCheck() {
 
 
         	
-        		  <div class="header">
-        		  	<span class="glyphicon glyphicon-hand-up"></span> Raise Request
-        		  </div>
-        
+        		  <div class="row" style=" margin-left: 20px; width: 100%;">
+		
+			<div class="navbar" style="margin-left: -20px; background-color: #616D7E;color: white; 	 margin-top: 10px;  ">
+				 
+                     
+				<h4><b><span class="glyphicon glyphicon-hand-up" style="margin-left: 20px;"></span> Raise Request</b></h4><div style="float: right;">  
+				 	 
+				 
+</div></div>
+        		  	
+   <div class="col-12">   		 
+        <div class="container" >
         	
-        		<table style="width:100%"id="t1" >
+        	
          		{% if item %}	
          		<form action="updateTicket"  method="POST" enctype="multipart/form-data">
          		{%else%}
          		<form action="addTicket/"   method="POST" enctype="multipart/form-data">
          		{%endif%}
 				{% csrf_token %}
+			 <div class="row">
+			 	<div class="col-sm-2">				
+					<label><b>Request Type</b></label>
+				</div>
+				<div class="col-sm-1">
+					<input type="radio" name="RequestType" value="Request" checked>Request
+				</div>
 
-<div class="input-group mb-3">
-				<tr >
-					
-				<td ><label><b>Request Type</b></label>&nbsp;&nbsp;
-				<input type="radio" name="RequestType" value="Request" checked>Request&nbsp;&nbsp;&nbsp;
-				<input type="radio" name="RequestType" value="Issue" disabled>Issue
-				</td>
+				<div class="col-sm-1">
+					<input type="radio" name="RequestType" value="Issue" disabled>Issue
+				</div>
+			</div>
+			<br>
+			<div class="row">
+				<div class="col-sm-2">
+					<label><b>Request For</b></label>
+				</div>
+				<div class="col-sm-1">
+					<input type="radio" checked onclick="javascript:yesnoCheck();" value="Self" name="yesno" id="noCheck"> Self 
+				</div>
+				<div class="col-sm-2">
+					{% if item %}
+					<input type="radio" value="OnBehalf" onclick="javascript:yesnoCheck();" name="yesno" id="yesCheck" disabled>On Behalf Of<br>
+					{% else %}
+					<input type="radio" value="OnBehalf" onclick="javascript:yesnoCheck();" name="yesno" id="yesCheck">On Behalf Of<br>
+					{%endif%}
+				</div>
+				<div class="col-sm-1">
+					<div id="ifYes" style="visibility:hidden">
+						<input type="test" name="onBehalfOf" placeholder="People Picker" id="default" list="languages">
+					</div>
+				</div>
+			</div>
+			<div id="page-wrapper">
+				<datalist id="languages">
+					{% for emp in employee%}
+					<option value="{{emp.associated_user_account}}">
+					{%endfor%}
+				</datalist>
+			</div>
+			<br>
+			<div class="row">
+				<div class="col-sm-3">
+					<label><b>Department <font color="red">*</font></b></label>
 				
-				</tr>
-				
-				<tr>
-					<td width="20%">
-				<label><b>Request For</b></label>
-				
-					&nbsp;&nbsp;&nbsp;
-				
-				 <input type="radio" checked onclick="javascript:yesnoCheck();" value="Self" name="yesno" id="noCheck"> Self &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				 {% if item %}
-				 <input type="radio" value="OnBehalf" onclick="javascript:yesnoCheck();" name="yesno" id="yesCheck" disabled>On Behalf Of<br>
-				 {% else %}
-				 <input type="radio" value="OnBehalf" onclick="javascript:yesnoCheck();" name="yesno" id="yesCheck">On Behalf Of<br>
-				{%endif%}
-				</td><td>
-
-
-    <div id="ifYes" style="visibility:hidden">
-    	
-    	<input type="test" name="onBehalfOf" placeholder="People Picker" id="default" list="languages">
-       
-    </div>
-        
-   <div id="page-wrapper">
- 
-
-  
-  <datalist id="languages">
-
-   
-    	{% for emp in employee%}
-  	<option value="{{emp.associated_user_account}}">
-  		{%endfor%}
-  </datalist>
-  
-  
-
-
-</div>
-			
-			</td></tr>
-				
-				<tr><td style="margin-left: 500px;">
-				<label><b>Department <font color="red">*</font></b></label><br>
-				
-					<select name="department" data-size="5" class="form-control" style="width:280px;" id="department_selection" required >
+					<select name="department" data-size="5" class="form-control " id="department_selection" required >
 						<option value=""disabled selected>-- Please Select --</option>
 						{% for dept in departments %}
 							{% if dept.department == item.department%}
@@ -181,9 +162,11 @@ function yesnoCheck() {
 								<option value={{dept.id}}>{{dept.department}}</option>
 							{%endif%}
 						{%endfor%}
-					</select></td><td width="20%">
-					<label><b>Category <font color="red">*</font></b></label><br>
-					<select  style="width:280px;"  class="form-control" name="category" id="category_selection" required>
+						
+					</select>
+				</div>
+				<div class="col-sm-3"> 					<label><b>Category <font color="red">*</font></b></label>
+					<select    class="form-control" name="category" id="category_selection" required>
 						<option value=""disabled selected>-- Please Select --</option>
 						{% for dept in departments %}
 							{% if dept.department == item.department%}
@@ -193,19 +176,20 @@ function yesnoCheck() {
 									<option value={{cat.id}} selected>{{cat.title}}
 									</option>
 									{%else%}
-									<option value={{cat.id}} >{{cat.title}}
+									<option value={{cat.id}} >{{cat.title}}</option>s
 									{%endif%}
 								
 								{%endif%}
 								{%endfor%}
 							{%endif%}
 						{%endfor%}
-					</select></td>
-					<td width="20%">
-
-						<label><b>Sub Category <font color="red">*</font></b></label><br>
-						<select name="sub_category"  style="width:280px;" class="form-control"  id="sub_Category">
-							<option value=""disabled selected>-- Please Select --</option>{% for cat in category %}
+					</select>		
+				</div>
+				<div class="col-sm-3">
+					<label><b>Sub Category <font color="red">*</font></b></label><br>
+				
+					<select name="sub_category"   class="form-control"  id="sub_Category">
+						<option value=""disabled selected>-- Please Select --</option>{% for cat in category %}
 
 							{% if cat.title == item.category%}
 							
@@ -223,10 +207,12 @@ function yesnoCheck() {
 							{%endif%}
 						{%endfor%}
 						</select>
-				</td><td width="30%">
+				</div>
+				<div class="col-sm-3">
 			
-					<label><b>Priority <font color="red">*</font></b></label><br>
-					<select name="priority" style="width:280px;" class="form-control" required>
+					<label><b>Priority <font color="red">*</font></b></label>
+				
+					<select name="priority"  class="form-control" required>
 						<option value=""disabled selected>-- Please Select --</option>
 						{% if item.priority == "Low" %}
 							<option value="Low" selected>Low</option>
@@ -246,15 +232,17 @@ function yesnoCheck() {
 							<option value="High">High</option>
 						{% endif %}
 					</select>
-					 </td></tr>
-					
-				 	
-				
-				 	<tr><td colspan="2">
+				</div>
+			</div>
+			<br>
+			<div class="row">
+				<div class="col-sm-6">
 					<label><b>Description <font color="red">*</font></b></label>
-					<textarea name="Description" style="width:560px;" class="form-control" rows="4" cols="10" required>{{item.description}}</textarea></td><td>
-					<label><b>Office Location <font color="red">*</font></b></label><br>
-					<select name="officeLocation" style="width:280px;" class="form-control"  required>
+					<textarea name="Description" rows="4" style="resize: none;" class="form-control"required>{{item.description}}</textarea>
+				</div>
+				<div class="col-sm-3">
+					<label><b>Office Location <font color="red">*</font></b></label>
+					<select name="officeLocation" class="form-control"  required>
 						<option value=""disabled selected>-- Please Select --</option>
 
 						{% for office in officelocation %}
@@ -266,36 +254,48 @@ function yesnoCheck() {
 								<option value={{office.id}}>{{office.title}}</option>
 							{%endif%}
 						{%endfor%}
-					</select></td><td>
-			<label><b>Desk Location <font color="red">*</font></b></label><br>
-					<input style="width:280px;" class="form-control"  type="text" name="deskLocation" value="{{item.DeskLocation}}" required>
-					</td>
-			
-				</tr>
-				<tr><td colspan="4">
-	<label><b>Upload supporting document:</b></label><br>
-	
-		<label for="files"  class="btn btn-primary"><span class="glyphicon glyphicon-folder-open"></span>  Browse</label>
-	
-	
+					</select>
+				</div>
+				<div class="col-sm-3">
 
+					<label><b>Desk Location <font color="red">*</font></b></label><br>
+					<input  class="form-control"  type="text" name="deskLocation" value="{{item.DeskLocation}}" required>
+				</div>
+			</div><br>
+			<div class="row">
+				<div class="col-sm-4">
+
+					<label><b>Upload supporting document:</b></label><br>
+	
+					<label for="files"  class="btn btn-primary"><span class="glyphicon glyphicon-folder-open"></span>  Browse</label>
 
 					<input type="file" style="visibility:hidden;" id="files" name="documents">
-					
-</td></tr><tr>
-<td>					<label><b>First Approver:{{firstApprover}}</b></label>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4">
+					<label><b>First Approver:{{firstApprover}}</b></label>
+				</div>
+			</div><br>
+			<div class="row">
+				<div class="col-sm-5">
 
-					</td>
-</tr><tr><td>
+				
+					<input type="checkbox" name="email_notification" checked> Receive Email Notifications
+				</div>
+			</div><br>
+			<div class="row">
+				<div class="col-sm-3">
 					{%if item %}
 					<button class="btn btn-primary" type="Submit"> <span class="glyphicon glyphicon-pencil"></span> Update</button>
 					{% else %}
 					<button class="btn btn-primary" type="Submit"><span class="glyphicon glyphicon-ok-sign"></span> Submit</button>
 					{%endif%}
-				</td>
-				</tr>
+				</div>
+			</div>
+				
 				</form>
-        	</div>
+        </div></option></div>
 
         	{%endblock%}
         	

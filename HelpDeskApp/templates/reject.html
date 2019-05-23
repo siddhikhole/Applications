@@ -17,10 +17,32 @@
 
 </head>
 <body>
-	<div class="header">
-        	
-        	<span class="glyphicon glyphicon-question-sign"></span> My Requests
-        	</div>
+	<div class="row" style="margin-left: 20px; width: 100%;">
+		
+			<div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
+				 
+                     
+				<h4><b>Rejected Tickets</b></h4><div style="float: right;">  
+				 	 
+				 
+</div></div>
+<nav class="navbar" >
+  
+	<ul class="nav nav-tabs ">
+		<li class="nav-item"><a href="/pending">Pending</a></li>
+		<li class="nav-item"><a href="/approved">Approved</a></li>
+		<li class="nav-item"><a href="/completed">Completed</a></li>
+		<li class="nav-item "><a href="/reopened">Reopened</a></li>
+		<li class="nav-item"><a href="/raisedQ">Raised Query</a></li>
+		<li class="nav-item"><a href="/closed">Closed</a></li>
+		<li class="nav-item"><a href="/cancelled">Cancelled</a></li>
+		
+		<li class="nav-item active"><a href="/rejected">Rejected</a></li>
+		
+	</ul>
+	
+</nav>
+
 	{% if messages %}
 	{% for message in messages %}
 		<div class="alert alert-warning alert-dismissable" role="alert"> 
@@ -31,26 +53,13 @@
 	{%endfor%}
 	{%endif%}
 	
-	 
 
-<nav class="navbar" style="margin-left: -50px;">
-  
-	<ul class="nav nav-tabs ">
-		<li class="nav-item"><a href="/pending">Pending</a></li>
-		<li class="nav-item"><a href="/approved">Approved</a></li>
-		<li class="nav-item"><a href="/completed">Completed</a></li>
-		<li class="nav-item"><a href="/reopened">Reopened</a></li>
-		<li class="nav-item"><a href="/raisedQ">Raised Query</a></li>
-		<li class="nav-item"><a href="/closed">Closed</a></li>
-		<li class="nav-item"><a href="/cancelled">Cancelled</a></li>
-	
-		<li class="nav-item active"><a href="/rejected">Rejected</a></li>
-		
-	</ul>
-	
-</nav>
+
+<div class="col-10">
  {% if all_items %}
-	<table class="table"> 
+ <div class="table-responsive"> 
+
+	<table class="table""> 
 	<thead>
 	     <tr>
 	    <th>Request ID</th>
@@ -102,7 +111,7 @@
 </table>
 	</table>
 {% else %}
-<div class="alert alert-warning alert-dismissable" role="alert" style="margin-left: -50px;">  
+<div class="alert alert-warning alert-dismissable" role="alert" style="width:100%">  
       <h4>No tickets found!</h4>
  </div>
 

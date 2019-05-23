@@ -19,14 +19,14 @@ body {
 
 /* Add padding to containers */
 .container {
-  padding: 16px;
+  
   background-color: white;
 }
 
 table {
   font-family: arial, sans-serif;
   border-collapse: collapse;
-  width:80%;
+  width:100%;
 }
 
 td{
@@ -43,29 +43,29 @@ th {
 
 
 </style>
- <style type="text/css">
-  .header {
-    padding:7px 15px ;
-  padding-left: 10px;
-    border-bottom:1px solid #eee;
-    background-color:#616D7E;
-     font-size:18px;
-    color: white;
 
-margin-right: -55px;
-}</style> 
 </head>
 <body>
-<div class="header">
-       <span class="glyphicon glyphicon-eye-open"></span>
-           View Request Details
-          </div>
+
+
+           <div class="row" style="margin-left: 20px; width: 100%;">
+    
+      <div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
+         
+                     
+        <h4><b>  <span class="glyphicon glyphicon-eye-open"></span>
+           View Request Details</b></h4><div style="float: right;">  
+           
+         
+</div></div>
 <form action="/action_page.php">
   <div class="container">
  
-   
+  <div class="col-10">
+ {% if item %}
+ <div class="table-responsive">  
     
-  {%if item %}
+
   <table>
     <tr>
       <td>
@@ -108,7 +108,12 @@ margin-right: -55px;
       <td>
         <b>Description:</b><i>{{item.description}}</i>
       </td>
-      <td></td>
+      <td>
+        {% if item.Files %}
+          <a href="/view_document/{{item.Files}}">View Supporting Document</a>
+        {% endif %}
+      </td>
+      
     </tr>
     <tr>
       <td>

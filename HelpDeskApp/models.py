@@ -166,7 +166,7 @@ class HelpRequest(models.Model):
     WorkflowOverallStatus=models.CharField(max_length=100,null=True)
     WorkflowCurrentActor=models.CharField(max_length=100,null=True)
     WorkflowModifiedOn=models.DateTimeField(default=None,null=True)
-    InActive=models.BooleanField(default=True,null=True)
+    InActive=models.CharField(max_length=20,default=True,null=True)
     Files=models.FileField(upload_to="Documents",default="media/Documents/no-image.jpg",null=True)
     FulfillmentCompletedDate=models.DateTimeField(default=None,null=True)
     #"EscalationCount" : NumberInt(0), 

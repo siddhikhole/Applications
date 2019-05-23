@@ -2,133 +2,142 @@
 {%block content %}<!DOCTYPE html>
 <html>
 <head>
-<style type="text/css">
+	<style type="text/css">
 	.header {
 		margin-top: -20px;
-    padding:7px 15px ;
-	padding-left: 10px;
-    border-bottom:1px solid #eee;
-    background-color:#616D7E;
-     font-size:20px;
-    color: white;
+		padding:7px 15px ;
+		padding-left: 10px;
+		border-bottom:1px solid #eee;
+		background-color:#616D7E;
+		font-size:20px;
+		color: white;
 
-margin-right: -55px;
-}
+		margin-right: -55px;
+	}
 </style>
 
-	<title>Help desk</title>
-	 <meta charset="utf-8">
-	 <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-   
+<title>Help desk</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+
 <script language="javascript" type="text/javascript">  
 
 </script>
 
 </head>
-<body>
-	<div class="header">
-        	
-        	<span class="glyphicon glyphicon-question-sign"></span> My Requests
-        	</div>
-	{% if messages %}
-	{% for message in messages %}
-		<div class="alert alert-warning alert-dismissable" role="alert"> 
-	 	
-			{{message}}
-	 		<button class="close" data-dismiss="alert">x</button>
-		</div>
-	{%endfor%}
-	{%endif%}
+<div class="row" style="margin-left: 20px; width: 100%;">
 	
-	 
-<nav class="navbar" style="margin-left: -50px;">
-  
-	<ul class="nav nav-tabs ">
-		<li class="nav-item"><a href="/pending">Pending</a></li>
-		<li class="nav-item"><a href="/approved">Approved</a></li>
-		<li class="nav-item"><a href="/completed">Completed</a></li>
-		<li class="nav-item"><a href="/reopened">Reopened</a></li>
-		<li class="nav-item"><a href="/raisedQ">Raised Query</a></li>
-		<li class="nav-item active"><a href="/closed">Closed</a></li>
-		<li class="nav-item"><a href="/cancelled">Cancelled</a></li>
+	<div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
 		
-		<li class="nav-item"><a href="/rejected">Rejected</a></li>
+		
+		<h4><b>Closed Tickets</b></h4><div style="float: right;">  
+			
+			
+		</div></div>
+		<nav class="navbar" >
+			
+			<ul class="nav nav-tabs ">
+				<li class="nav-item"><a href="/pending">Pending</a></li>
+				<li class="nav-item"><a href="/approved">Approved</a></li>
+				<li class="nav-item"><a href="/completed">Completed</a></li>
+				<li class="nav-item"><a href="/reopened">Reopened</a></li>
+				<li class="nav-item"><a href="/raisedQ">Raised Query</a></li>
+				<li class="nav-item active"><a href="/closed">Closed</a></li>
+				<li class="nav-item"><a href="/cancelled">Cancelled</a></li>
+				
+				<li class="nav-item"><a href="/rejected">Rejected</a></li>
+				
+			</ul>
+			
+		</nav>
 
-	</ul>
-	
-</nav>
- {% if all_items %}
-	<table class="table"style="margin-left: -50px;"> 
-	<thead>
-	     <tr>
-	    <th>Request ID</th>
-	    <th>Raised By</th>
-	    <th>Raised Date</th>
-	    <th>Department</th>
-	    <th>Category</th> 
-	    <th>Sub-Category</th>
-	    <th>Status</th> 
-	    
-	    <th>History</th>
-		</tr>
-	</thead>
-	<div class="modal fade" id="myModal" role="dialog">
-    <div class="modal-dialog modal-lg">
-    
-      <!-- Modal content-->
-      <div class="modal-content">
-           <div class="modal-body">
-          
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-      
-    </div>
-  </div> 
-	{%for key,things in all_items.items%}
-    
-      <tr>
-        <td><a href="/display/{{key}}">2018-2019/Helpdesk/Request/{{things.id}}</a></td>
-        <td>{{things.EmployeeName}}</td>
-        <td>{{things.created_at}}</td>
-        <td>{{things.department}}</td>
-        <td>{{things.category}}</td>
-        <td>{{things.sub_category}}</td>
-        <td>{{things.WorkflowCurrentStatus}}</td>
-        
-    
-        
-        
-        <td><center><a href="/workflow/{{things.id}}"  data-toggle="modal" data-target="#myModal" ><span class="glyphicon glyphicon-eye-open" ></span></a>
-        
-        </center>
-        </td>
-      </tr>
-    {%endfor%}
-</table>
-	</table>
-{% else %}
-<div class="alert alert-warning alert-dismissable" role="alert" style="margin-left: -50px;">  
-      <h4>No tickets found!</h4>
- </div>
+		{% if messages %}
+		{% for message in messages %}
+		<div class="alert alert-warning alert-dismissable" role="alert"> 
+			
+			{{message}}
+			<button class="close" data-dismiss="alert">x</button>
+		</div>
+		{%endfor%}
+		{%endif%}
+		
 
-{% endif %}
 
-<script>
-$(document).ready(function(){
+		<div class="col-10">
+			{% if all_items %}
+			<div class="table-responsive"> 
 
-  $("#myModal").on('hidden.bs.modal', function(){
-     console.log("Hello world!");
-    location.reload();
-  });
-});
-</script>
-</body>
-</html>
-{%endblock%}
+				<table class="table"> 
+					<thead>
+						<tr>
+							<th>Request ID</th>
+							<th>Raised By</th>
+							<th>Raised Date</th>
+							<th>Department</th>
+							<th>Category</th> 
+							<th>Sub-Category</th>
+							<th>Status</th> 
+							
+							<th>History</th>
+						</tr>
+					</thead>
+					<div class="modal fade" id="myModal" role="dialog">
+						<div class="modal-dialog modal-lg">
+							
+							<!-- Modal content-->
+							<div class="modal-content">
+								<div class="modal-body">
+									
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+								</div>
+							</div>
+							
+						</div>
+					</div> 
+					{%for key,things in all_items.items%}
+					
+					<tr>
+						<td><a href="/display/{{key}}">2018-2019/Helpdesk/Request/{{things.id}}</a></td>
+						<td>{{things.EmployeeName}}</td>
+						<td>{{things.created_at}}</td>
+						<td>{{things.department}}</td>
+						<td>{{things.category}}</td>
+						<td>{{things.sub_category}}</td>
+						<td>{{things.WorkflowCurrentStatus}}</td>
+						
+						
+						
+						
+						<td><center><a href="/workflow/{{things.id}}"  data-toggle="modal" data-target="#myModal" ><span class="glyphicon glyphicon-eye-open" ></span></a>
+							
+						</center>
+					</td>
+				</tr>
+				{%endfor%}
+			</table>
+		</table>
+		{% else %}
+		<div class="alert alert-warning alert-dismissable" role="alert" style="width: 100%;">  
+			<h4>No tickets found!</h4>
+		</div>
+
+		{% endif %}
+
+		<script>
+			$(document).ready(function(){
+
+				$("#myModal").on('hidden.bs.modal', function(){
+					console.log("Hello world!");
+					location.reload();
+				});
+			});
+		</script>
+	</body>
+	</html>
+	{%endblock%}

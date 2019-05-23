@@ -1,102 +1,337 @@
 <!DOCTYPE html>
-<html lang="en">
-<title>HelpdeskApp</title>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<html>
+<head>
+	<meta charset="utf-8">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+	<title>HelpDeskApp</title>
+
+	<!-- Bootstrap CSS CDN -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<!-- Our Custom CSS -->
+	<link rel="stylesheet" href="style.css">
+	<style type="text/css">
+
+        	/*
+    DEMO STYLE
+    */
+    @import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
 
 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    body {
+    	font-family: 'Poppins', sans-serif;
+    	background: #fafafa;
+    }
 
-<style>
-  html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif;}
-  .w3-sidebar {
-    z-index: 3;
-    width: 250px;
-    top: 43px;
-    bottom: 0;
-    height: inherit;
-  } 
-.header {
+    p {
+    	font-family: 'Poppins', sans-serif;
+    	font-size: 1.1em;
+    	font-weight: 300;
+    	line-height: 1.7em;
+    	color: #999;
+    }
 
-  margin-top: -20px;
-  padding:7px 15px ;
-  padding-left: 10px;
-  border-bottom:1px solid #eee;
-  background-color:#616D7E;
-  font-size:20px;
-  color: white;
-  margin-left: -50px;
-  }
+    a, a:hover, a:focus {
+    	color: inherit;
+    	text-decoration: none;
+    	transition: all 0.3s;
+    }
+
+
+    .line {
+    	width: 100%;
+    	height: 1px;
+    	border-bottom: 1px dashed #ddd;
+    	margin: 40px 0;
+    }
+
+/* ---------------------------------------------------
+    SIDEBAR STYLE
+    ----------------------------------------------------- */
+    .wrapper {
+    	display: flex;
+    	align-items: stretch;
+    }
+
+    #sidebar {
+    	min-width: 230px;
+    	max-width: 230px;
+    	background: #7386D5;
+    	color: #fff;
+    	transition: all 0.3s;
+    }
+
+    #sidebar.active {
+    	margin-left: -250px;
+    }
+
+    #sidebar .sidebar-header {
+    	padding: 20px;
+    	background: #6d7fcc;
+    }
+
+    #sidebar ul.components {
+    	padding: 20px 0;
+    	border-bottom: 1px solid #47748b;
+    }
+
+    #sidebar ul p {
+    	color: #fff;
+    	padding: 10px;
+    }
+
+    #sidebar ul li a {
+    	padding: 10px;
+    	font-size: 1.1em;
+    	display: block;
+    }
+    #sidebar ul li a:hover {
+    	color: black;
+    	background: black;
+    }
+
+    #sidebar ul li.active > a, a[aria-expanded="true"] {
+    	color: #fff;
+    	background: #6d7fcc;
+    }
+
+
+    a[data-toggle="collapse"] {
+    	position: relative;
+    }
+
+    a[aria-expanded="false"]::before, a[aria-expanded="true"]::before {
+    	content: '\e259';
+    	display: block;
+    	position: absolute;
+    	right: 20px;
+    	font-family: 'Glyphicons Halflings';
+    	font-size: 0.6em;
+    }
+    a[aria-expanded="true"]::before {
+    	content: '\e260';
+    }
+
+
+    ul ul a {
+    	font-size: 0.9em !important;
+    	padding-left: 30px !important;
+    	background: #6d7fcc;
+    }
+
+    ul.CTAs {
+    	padding: 20px;
+    }
+
+    ul.CTAs a {
+    	text-align: center;
+    	font-size: 0.9em !important;
+    	display: block;
+    	border-radius: 5px;
+    	margin-bottom: 5px;
+    }
+
+    a.download {
+    	background:black;
+    	color: #7386D5;
+    }
+
+    a.article, a.article:hover {
+    	background: black !important;
+    	color: #fff !important;
+    }
+
+
+
+/* ---------------------------------------------------
+    CONTENT STYLE
+    ----------------------------------------------------- */
+    #content {
+    	padding:-20px;
+    	min-height: 100vh;
+    	transition: all 0.3s;
+    }
+
+/* ---------------------------------------------------
+    MEDIAQUERIES
+    ----------------------------------------------------- */
+    @media (max-width: 768px) {
+    	#sidebar {
+    		margin-left: -250px;
+    	}
+    	#sidebar.active {
+    		margin-left: 0;
+    	}
+    	#sidebarCollapse span {
+    		display: none;
+    	}
+
+    }
+
 </style>
-<body>
+<script>
+	{% if messages %}
+	{% for message in messages%}
+	alert("{{message}}")
+	{%endfor%}
+	{% endif %}
+</script>
 
-  <!-- Navbar -->
-  <div class="w3-top">
-    <div class="w3-bar w3-top w3-left-align w3-large" style="background-color: #C7C3C3; padding-top: 2px;">
-      <a href="#" class="w3-bar-item w3-button w3-hide-small "><b>HelpdeskApp</b></a>
-  
-      <div style=" padding-left: 800px;" class="w3-bar-item w3-hide-small ">  <span class="glyphicon glyphicon-user"></span>{{user.associated_user_account}}</div>
-        <a href="/logout" class="w3-bar-item w3-button w3-hide-small"><span class="glyphicon glyphicon-log-out"></span> Log out</a>
-       </div>
-    </div>
-    <!-- Sidebar -->
-    <nav class="w3-sidebar w3-bar-block  w3-large" id="mySidebar" style="background-color: #0073c6; color:white;width: 200px; "><br>
-      <h4 class="w3-bar-item"><span class="glyphicon glyphicon-th-list"></span><b> Menu</b></h4><br>
-      <a href="/raiseTicket" class="w3-bar-item w3-button w3-hover-black"><span class="glyphicon glyphicon-hand-up"></span> Raise Ticket</a><br>
-      <a class="w3-bar-item w3-button w3-hover-black" href="/pending"><span class="glyphicon glyphicon-question-sign"></span> My Requests</a><br>
-      {%if FirstApprover%}
-        <a class="w3-bar-item w3-button w3-hover-black" href="/approval"><span class="glyphicon glyphicon-ok-sign"></span> First Approval</a><br>
-      {%endif%}
-      {%if ApproverHead%}
-       <a class="w3-bar-item w3-button w3-hover-black" href="/HelpdeskApprover"><span class="glyphicon glyphicon-check"></span> Approver Head</a><br>
-      {% endif %}
-      {% if FulfillerHead%}
-        <a class="w3-bar-item w3-button w3-hover-black" href="/HelpdeskFulfillerHead"> <span class="glyphicon glyphicon-link"></span> Fulfiller Head</a><br>
-      {% endif %}
-      {% if Fulfiller %}
-        <a class="w3-bar-item w3-button w3-hover-black" href="/AssignedTickets"><span class="glyphicon glyphicon-tasks"></span> Assigned Tasks</a><br>
-      {% endif %}
-      {%if SLAFulfillerHead%}
-        <a class="w3-bar-item w3-button w3-hover-black" href="/sla?page=1"><span class="glyphicon glyphicon-dashboard"></span> SLA's</a><br>
-        </b>
-      {%endif%}
-    </nav>
-    <!-- Main content: shift it to the right by 250 pixels when the sidebar is visible -->
-    <div class="w3-main" style="margin-left:250px">
-      <div class="w3-row w3-padding-64">
-        {%block content %}
-        {%endblock%}
-      </div>
-    </div>
-  </div>
-  <script>
-  // Get the Sidebar
-  var mySidebar = document.getElementById("mySidebar");
-  // Get the DIV with overlay effect
-  var overlayBg = document.getElementById("myOverlay");
-  // Toggle between showing and hiding the sidebar, and add overlay effect
-  function w3_open() {
-    if (mySidebar.style.display === 'block') {
-      mySidebar.style.display = 'none';
-      overlayBg.style.display = "none";
-    }
-    else {
-      mySidebar.style.display = 'block';
-      overlayBg.style.display = "block";
-    }
-  }
-  // Close the sidebar with the close button
-  function w3_close() {
-    mySidebar.style.display = "none";
-    overlayBg.style.display = "none";
-  }
-  </script>
-</body>
-</html>
+</head>
+<body>
+	<body>
+		
+		<div class="row">
+			<div class="col-sm-12">
+				
+				<!-- <div class="navbar"style="background-color: #C7C3C3;padding-left: 10px;margin-bottom: -10px;"> -->
+
+					<nav class="navbar navbar-default" style="background-color: #C7C3C3;margin-bottom: -10px; padding-top:3px;font-size: 20px;"><b>
+						<div class="container-fluid">
+							<div class="navbar-header">
+								<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+									<span class="sr-only">Toggle navigation</span>
+									<span class="icon-bar"></span>
+									<span class="icon-bar"></span>
+									<span class="icon-bar"></span>
+								</button>
+								<a style="color: black" id="sidebarCollapse" >
+									<i class="glyphicon glyphicon-align-left"></i>
+								</a>
+								<a style="color: black">HelpDeskApp</a>
+								
+								
+							</div>
+							<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+								<ul class="nav navbar-nav navbar-right">
+									
+									<li><a style="color: black"><span class="glyphicon glyphicon-user"></span>{{user.associated_user_account}} </a></li>
+									<li>
+										<a href="/logout" style="color: black"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
+										
+									</ul>
+
+								</div>						
+							</div></b></nav>			
+						</div>
+						<div class="col-sm-12">
+							<div class="wrapper">
+								<!-- Sidebar Holder -->
+
+								<nav id="sidebar" style="margin-top: 10px;">
+
+
+
+									<ul class="list-unstyled components">
+
+										<li>
+											<a href="/raiseTicket" style="color: white"><span class="glyphicon glyphicon-hand-up"></span> Raise Ticket</a>
+										</li>
+										<br>
+										<li>
+											<a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle" style="color: white"><span class="glyphicon glyphicon-question-sign"></span> My Request</a>
+											<ul class="collapse list-unstyled" id="pageSubmenu" >
+												<li>
+													<a href="/pending" style="color: white">Pending</a>
+												</li>
+												<li>
+													<a href="/approved" style="color: white">Approved</a>
+												</li>
+												<li>
+													<a href="/completed" style="color: white">Completed</a>
+												</li>
+												<li>
+													<a href="/reopened" style="color: white">Reopened</a>
+												</li>
+												<li>
+													<a href="/raisedQ" style="color: white">Raised Query</a>
+												</li>
+												<li>
+													<a href="/closed" style="color: white">Closed</a>
+												</li>
+												<li>
+													<a href="/cancelled" style="color: white">Cancelled</a>
+												</li>
+												<li>
+													<a href="/rejected" style="color: white">Rejected</a>
+												</li>
+											</ul>
+										</li>
+										<br>
+										{%if FirstApprover%}
+										<li>
+											<a  href="/approval" style="color: white"><span class="glyphicon glyphicon-ok-sign"></span> First Approval</a>
+										</li>
+
+										{%endif%}
+										<br>
+										{%if ApproverHead%}
+										<li class="nav-item">
+											<a  href="/HelpdeskApprover" style="color: white;"><span class="glyphicon glyphicon-check"></span> Approver Head</a>
+										</li>
+										<br><br>
+										{% endif %}
+										{% if FulfillerHead%}
+										<li class="nav-item">
+											<a  href="/HelpdeskFulfillerHead" style="color: white;"> <span class="glyphicon glyphicon-link"></span> Fulfiller Head</a>
+										</li>
+										<br><br>
+										{% endif %}
+										{% if Fulfiller %}
+										<li class="nav-item">
+											<a  href="/AssignedTickets" style="color: white;"><span class="glyphicon glyphicon-tasks"></span> Assigned Tasks</a>
+										</li>
+										<br><br>
+										{% endif %}
+										{%if SLAFulfillerHead%}
+										<li >
+											<a href="/sla?page=1" style="color: white;"><span class="glyphicon glyphicon-dashboard"></span> SLA's</a>
+										</li><br><br><br><br><br>
+									</b>
+									{%endif%}
+
+
+								</nav>
+
+								<!-- Page Content Holder -->
+
+
+
+								{%block content %}
+
+
+								{%endblock%}
+
+							</div>
+
+
+						</div>
+
+
+					</div>
+				</div>
+
+
+
+
+
+
+
+
+
+				<!-- jQuery CDN -->
+				<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+				<!-- Bootstrap Js CDN -->
+				<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+				<script type="text/javascript">
+					$(document).ready(function () {
+						$('#sidebarCollapse').on('click', function () {
+							$('#sidebar').toggleClass('active');
+						});
+					});
+				</script>
+			</body>
+			</html>

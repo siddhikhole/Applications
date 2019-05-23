@@ -17,13 +17,36 @@
 
 </script>
 
+</style>
+
 </head>
 <body>
-	<div class="header">
-        	
-        	 <span class="glyphicon glyphicon-question-sign"></span> My Requests
-        	</div>
-        	
+
+	<div class="row" style="margin-left: 20px; width: 100%;">
+		
+			<div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
+				 
+                     
+				<h4><b>Pending Tickets</b></h4><div style="float: right;">  
+				 	 
+				 
+</div></div>
+<nav class="navbar" >
+  
+	<ul class="nav nav-tabs ">
+		<li class="nav-item  active"><a href="/pending">Pending</a></li>
+		<li class="nav-item"><a href="/approved">Approved</a></li>
+		<li class="nav-item"><a href="/completed">Completed</a></li>
+		<li class="nav-item"><a href="/reopened">Reopened</a></li>
+		<li class="nav-item"><a href="/raisedQ">Raised Query</a></li>
+		<li class="nav-item"><a href="/closed">Closed</a></li>
+		<li class="nav-item"><a href="/cancelled">Cancelled</a></li>
+		
+		<li class="nav-item"><a href="/rejected">Rejected</a></li>
+		
+	</ul>
+	
+</nav>
 	{% if messages %}
 	{% for message in messages %}
 		<div class="alert alert-warning alert-dismissable" role="alert"> 
@@ -35,30 +58,22 @@
 	{%endif%}
 	
 
-<nav class="navbar" style="margin-left: -50px;">
-  
-	<ul class="nav nav-tabs ">
-		<li class="nav-item active"><a href="/pending">Pending</a></li>
-		<li class="nav-item"><a href="/approved">Approved</a></li>
-		<li class="nav-item"><a href="/completed">Completed</a></li>
-		<li class="nav-item"><a href="/reopened">Reopened</a></li>
-		<li class="nav-item"><a href="/raisedQ">Raised Query</a></li>
-		<li class="nav-item"><a href="/closed">Closed</a></li>
-		<li class="nav-item"><a href="/cancelled">Cancelled</a></li>
-	
-		<li class="nav-item"><a href="/rejected">Rejected</a></li>
-		
-	</ul>
-	
-</nav>
+<div class="col-10">
  {% if all_items %}
-	<table class="table" style=" padding-left: 70px;margin-left: -50px;"> 
+  <div class="table-responsive"> 
+	<table class="table" style=" padding-left: 70px;"> 
 	<thead>
 	     <tr>
-	    <th>Request ID</th>
-	    <th>Raised By</th>
-	    <th>Raised Date</th>
-	    <th>Department</th>
+	     	
+	    		<th>Request ID</th>
+			
+			
+				<th>Raised By</th>
+			
+				<th>Raised Date</th>
+			
+				<th>Department</th>
+			
 	    <th>Category</th> 
 	    <th>Sub-Category</th>
 	    <th>Status</th> 
@@ -85,18 +100,26 @@
 	{%for key,things in all_items.items%}
     
       <tr>
-        <td><a href="/display/{{key}}">Helpdesk/Request/{{things.id}}</a></td>
-        <td>{{things.EmployeeName}}</td>
-        <td>{{things.created_at}}</td>
-        <td>{{things.department}}</td>
-        <td>{{things.category}}</td>
-        <td>{{things.sub_category}}</td>
-        <td>{{things.WorkflowCurrentStatus}}</td>
+      	
+      		<td><a href="/display/{{key}}">Helpdesk/Request/{{things.id}}</a></td>
+      
+        	<td>{{things.EmployeeName}}</td>
         
-    
-        <td><a href="/update/{{things.id}}" class="btn btn-info">Update</a></td>
-        <td><a href="/cancel/{{things.id}}" class="btn btn-danger ">Cancel</a></td>
-
+        
+        	<td>{{things.created_at}}</td>
+        
+        	<td>{{things.department}}</td>
+       
+        	<td>{{things.category}}</td>
+        
+        	<td>{{things.sub_category}}</td>
+        
+        	<td>{{things.WorkflowCurrentStatus}}</td>
+        
+        	<td><a href="/update/{{things.id}}" class="btn btn-info">Update</a></td>
+      
+        	<td><a href="/cancel/{{things.id}}" class="btn btn-danger ">Cancel</a></td>
+	
        
        
         
@@ -107,14 +130,14 @@
       </tr>
     {%endfor%}
 </table>
-	</table>
+	 </div>
 {% else %}
-<div class="alert alert-warning alert-dismissable" style="margin-left: -50px;" role="alert">  
+<div class="alert alert-warning alert-dismissable" style=" width: 100%" role="alert">  
       <h4>No tickets found!</h4>
- </div>
+</div>
 
 {% endif %}
-
+</div>
 <script>
 $(document).ready(function(){
    console.log("Hello world!");

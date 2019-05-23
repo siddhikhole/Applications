@@ -1,5 +1,6 @@
 {%extends 'index.html' %}
-{%block content %}<!DOCTYPE html>
+{%block content %}
+<!DOCTYPE html>
 <html>
 <head>
 
@@ -11,29 +12,24 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-    
+   
+   
 <script language="javascript" type="text/javascript">  
 
 </script>
 
 </head>
 <body>
-	<div class="header">
-        	
-        	<span class="glyphicon glyphicon-question-sign"></span> My Requests
-        	</div>
-	{% if messages %}
-	{% for message in messages %}
-		<div class="alert alert-warning alert-dismissable" role="alert"> 
-	 	
-			{{message}}
-	 		<button class="close" data-dismiss="alert">x</button>
-		</div>
-	{%endfor%}
-	{%endif%}
-	
-	
-<nav class="navbar" style="margin-left: -50px;">
+	<div class="row" style="margin-left: 20px; width: 100%;">
+		
+			<div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
+				 
+                     
+				<h4><b>Completed Tickets</b></h4><div style="float: right;">  
+				 	 
+				 
+</div></div>
+<nav class="navbar" >
   
 	<ul class="nav nav-tabs ">
 		<li class="nav-item"><a href="/pending">Pending</a></li>
@@ -49,8 +45,24 @@
 	</ul>
 	
 </nav>
+
+	{% if messages %}
+	{% for message in messages %}
+		<div class="alert alert-warning alert-dismissable" role="alert"> 
+	 	
+			{{message}}
+	 		<button class="close" data-dismiss="alert">x</button>
+		</div>
+	{%endfor%}
+	{%endif%}
+	
+
+
+<div class="col-10">
  {% if all_items %}
-	<table class="table" style="margin-left: -50px;"> 
+ <div class="table-responsive"> 
+
+	<table class="table""> 
 	<thead>
 	     <tr>
 	    <th>Request ID</th>
@@ -106,9 +118,9 @@
       </tr>
     {%endfor%}
 </table>
-	</table>
+	</div>	
 {% else %}
-<div class="alert alert-warning alert-dismissable" role="alert" style="margin-left: -50px;">  
+<div class="alert alert-warning alert-dismissable" role="alert" style=" width: 100%">  
       <h4>No tickets found!</h4>
  </div>
 

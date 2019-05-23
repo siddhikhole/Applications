@@ -13,26 +13,9 @@
    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
    <style type="text/css">
 	
- .footer{
-    padding:5px 15px ;
-  padding-left: 10px;
-    border-bottom:1px solid #eee;
-    background-color:   #D3D3D3;
-     font-size:20px;
-    color: white;
-margin-left: -50px;
-margin-right: -55px;
+ </style>
 
-
-}</style>
-
- <script>
-  {% if messages %}
-    {% for message in messages%}
-      alert("{{message}}")
-    {%endfor%}
-  {% endif %}
-</script>
+ 
    
 <script language="javascript" type="text/javascript">  
 
@@ -43,25 +26,47 @@ margin-right: -55px;
  
 
 	<body>
-  <div class="header">
-          
-         <span class="glyphicon glyphicon-dashboard"></span> SLA's
-          </div>
-           <div class="footer" style="padding-right: 5px;">
+ 
 
+           <div class="row" style="margin-left: 20px; width: 100%;">
+    
+      <div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
+         
+                     
+        <h4><b>  <span class="glyphicon glyphicon-dashboard"></span> SLA's</b></h4>
+        <div style="float: right; padding-right: 100px; margin-top:-40px;">
+          <a  data-toggle="modal" data-target="#myModal" href="/slas/0"   class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add</a>     
+           
+         
+</div></div>
+
+         
+         <div class="row" style="">
+                     
+        
+          </div>
+         
+<br>
+ 
+                     
+     
+           
+         
+   
   
 
-<a  data-toggle="modal" data-target="#myModal" href="/slas/0"   style="margin-left: 1000px;" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add</a>
-</div>
+
+
 <center>
 
 
           
 
 
-{% if all_items %}
-  
-  <table class="table" style=" padding-left: 70px;margin-left: -50px;"> 
+<div class="col-10">
+ {% if all_items %}
+ <div class="table-responsive"> 
+  <table class="table" > 
   <thead>
        <tr>
         

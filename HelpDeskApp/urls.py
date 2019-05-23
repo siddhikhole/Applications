@@ -10,6 +10,7 @@ urlpatterns = [
   url(r'^home/$', views.home, name='home'),
   # Redirect to get token ('/tutorial/gettoken/')
   url(r'^HelpDeskApp/gettoken/$', views.gettoken, name='gettoken'),
+ path('view_document/Documents/<name>',views.view_document,name="view_document"),
 path('add_sla',views.add_sla,name="add_sla"),
 path('delete_sla/<ticket_id>',views.delete_sla,name="delete_sla"),
 path('edit_sla/<ticket_id>',views.edit_sla,name="edit_sla"),

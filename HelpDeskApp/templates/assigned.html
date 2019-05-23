@@ -19,10 +19,16 @@
 
 </head>
 <body>
-		<div class="header">
-        	<span class="glyphicon glyphicon-tasks"></span> Assigned Tasks
-        	</div>
-        	<br>
+	
+        	 <div class="row" style="margin-left: 20px; width: 100%;">
+    
+      <div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
+         
+                     
+        <h4><b> <span class="glyphicon glyphicon-tasks"></span> Assigned Tasks</b></h4><div style="float: right;">  
+           
+         
+</div></div>
 	{% if messages %}
 	{% for message in messages %}
 		<div class="alert alert-warning alert-dismissable" role="alert"> 
@@ -34,10 +40,10 @@
 	{%endif%}
 	
 	
-
-
+<div class="col-10">
  {% if all_items %}
-	<table class="table" style="margin-left: -50px;"> 
+ <div class="table-responsive"> 
+	<table class="table" > 
 	<thead>
 	     <tr>
 	    <th>Request ID</th>
@@ -92,7 +98,7 @@
 </table>
 	</table>
 {% else %}
-<div class="alert alert-warning alert-dismissable" style="margin-left: -50px;" role="alert">  
+<div class="alert alert-warning alert-dismissable" style="width: 100%" role="alert">  
       <h4>No tickets found!</h4>
  </div>
 
