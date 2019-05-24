@@ -53,12 +53,14 @@
     .wrapper {
     	display: flex;
     	align-items: stretch;
+    	height: 100%
     }
 
     #sidebar {
     	min-width: 230px;
-    	max-width: 230px;
+    	max-width: 230px;		
     	background: #7386D5;
+
     	color: #fff;
     	transition: all 0.3s;
     }
@@ -181,157 +183,146 @@
 
 </head>
 <body>
-	<body>
-		
-		<div class="row">
-			<div class="col-sm-12">
-				
-				<!-- <div class="navbar"style="background-color: #C7C3C3;padding-left: 10px;margin-bottom: -10px;"> -->
+	
+<div class="row">
+	<div class="col-sm-12">
 
-					<nav class="navbar navbar-default" style="background-color: #C7C3C3;margin-bottom: -10px; padding-top:3px;font-size: 20px;"><b>
-						<div class="container-fluid">
-							<div class="navbar-header">
-								<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-									<span class="sr-only">Toggle navigation</span>
-									<span class="icon-bar"></span>
-									<span class="icon-bar"></span>
-									<span class="icon-bar"></span>
-								</button>
-								<a style="color: black" id="sidebarCollapse" >
-									<i class="glyphicon glyphicon-align-left"></i>
-								</a>
-								<a style="color: black">HelpDeskApp</a>
-								
-								
-							</div>
-							<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-								<ul class="nav navbar-nav navbar-right">
-									
-									<li><a style="color: black"><span class="glyphicon glyphicon-user"></span>{{user.associated_user_account}} </a></li>
-									<li>
-										<a href="/logout" style="color: black"><span class="glyphicon glyphicon-log-out"></span> Log out</a></li>
-										
-									</ul>
+			<!-- <div class="navbar"style="background-color: #C7C3C3;padding-left: 10px;margin-bottom: -10px;"> -->
 
-								</div>						
-							</div></b></nav>			
-						</div>
-						<div class="col-sm-12">
-							<div class="wrapper">
-								<!-- Sidebar Holder -->
-
-								<nav id="sidebar" style="margin-top: 10px;">
-
-
-
-									<ul class="list-unstyled components">
-
-										<li>
-											<a href="/raiseTicket" style="color: white"><span class="glyphicon glyphicon-hand-up"></span> Raise Ticket</a>
-										</li>
-										<br>
-										<li>
-											<a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle" style="color: white"><span class="glyphicon glyphicon-question-sign"></span> My Request</a>
-											<ul class="collapse list-unstyled" id="pageSubmenu" >
-												<li>
-													<a href="/pending" style="color: white">Pending</a>
-												</li>
-												<li>
-													<a href="/approved" style="color: white">Approved</a>
-												</li>
-												<li>
-													<a href="/completed" style="color: white">Completed</a>
-												</li>
-												<li>
-													<a href="/reopened" style="color: white">Reopened</a>
-												</li>
-												<li>
-													<a href="/raisedQ" style="color: white">Raised Query</a>
-												</li>
-												<li>
-													<a href="/closed" style="color: white">Closed</a>
-												</li>
-												<li>
-													<a href="/cancelled" style="color: white">Cancelled</a>
-												</li>
-												<li>
-													<a href="/rejected" style="color: white">Rejected</a>
-												</li>
-											</ul>
-										</li>
-										<br>
-										{%if FirstApprover%}
-										<li>
-											<a  href="/approval" style="color: white"><span class="glyphicon glyphicon-ok-sign"></span> First Approval</a>
-										</li>
-
-										{%endif%}
-										<br>
-										{%if ApproverHead%}
-										<li class="nav-item">
-											<a  href="/HelpdeskApprover" style="color: white;"><span class="glyphicon glyphicon-check"></span> Approver Head</a>
-										</li>
-										<br><br>
-										{% endif %}
-										{% if FulfillerHead%}
-										<li class="nav-item">
-											<a  href="/HelpdeskFulfillerHead" style="color: white;"> <span class="glyphicon glyphicon-link"></span> Fulfiller Head</a>
-										</li>
-										<br><br>
-										{% endif %}
-										{% if Fulfiller %}
-										<li class="nav-item">
-											<a  href="/AssignedTickets" style="color: white;"><span class="glyphicon glyphicon-tasks"></span> Assigned Tasks</a>
-										</li>
-										<br><br>
-										{% endif %}
-										{%if SLAFulfillerHead%}
-										<li >
-											<a href="/sla?page=1" style="color: white;"><span class="glyphicon glyphicon-dashboard"></span> SLA's</a>
-										</li><br><br><br><br><br>
-									</b>
-									{%endif%}
-
-
-								</nav>
-
-								<!-- Page Content Holder -->
-
-
-
-								{%block content %}
-
-
-								{%endblock%}
-
-							</div>
-
-
+				<nav class="navbar navbar-default" style="background-color: #C7C3C3;margin-bottom: -10px; padding-top:3px;font-size: 20px; "><b>
+					<div class="container-fluid">
+						<div class="navbar-header">
+							<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+								<span class="sr-only">Toggle navigation</span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+							</button>
+							<a style="color: black" id="sidebarCollapse" >
+								<i class="glyphicon glyphicon-align-left"></i>
+							</a>
+							<a style="color: black">HelpDeskApp</a>
 						</div>
 
+						<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+							<ul class="nav navbar-nav navbar-right">
+
+								<li><a style="color: black"><span class="glyphicon glyphicon-user"></span>      {{user.associated_user_account}} </a>
+								</li>
+								<li>
+									<a href="/logout" style="color: black"><span class="glyphicon glyphicon-log-out"></span> Log out</a>
+								</li>
+							</ul>
+                        </div>
 
 					</div>
+				</nav>	
+	</div>
+</div>		
+
+				
+<div class="row">
+	<div class="col-sm-12">
+						
+				<div class="wrapper" style="height: 100%">
+							<!-- Sidebar Holder -->							
+							<nav id="sidebar" style="margin-top: 10px;">
+                             	<ul class="list-unstyled components">
+									<li>
+										<a href="/raiseTicket" style="color: white"><span class="glyphicon glyphicon-hand-up"></span> Raise Ticket</a>
+									</li>
+									<br>
+									<li>
+										<a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle" style="color: white"><span class="glyphicon glyphicon-question-sign"></span> My Request</a>
+										<ul class="collapse list-unstyled" id="pageSubmenu" >
+											<li>
+												<a href="/pending" style="color: white">Pending</a>
+											</li>
+											<li>
+												<a href="/approved" style="color: white">Approved</a>
+											</li>
+											<li>
+												<a href="/completed" style="color: white">Completed</a>
+											</li>
+											<li>
+												<a href="/reopened" style="color: white">Reopened</a>
+											</li>
+											<li>
+												<a href="/raisedQ" style="color: white">Raised Query</a>
+											</li>
+											<li>
+												<a href="/closed" style="color: white">Closed</a>
+											</li>
+											<li>
+												<a href="/cancelled" style="color: white">Cancelled</a>
+											</li>
+											<li>
+												<a href="/rejected" style="color: white">Rejected</a>
+											</li>
+										</ul>
+									</li>
+
+									<br><br>
+									{%if FirstApprover%}
+									<li>
+										<a  href="/approval" style="color: white"><span class="glyphicon glyphicon-ok-sign"></span> First Approval</a>
+									</li>
+
+									{%endif%}
+									<br>
+
+									{%if ApproverHead%}
+									<li class="nav-item">
+										<a  href="/HelpdeskApprover" style="color: white;"><span class="glyphicon glyphicon-check"></span> Approver Head</a>
+									</li>
+									<br><br>
+
+									{% endif %}
+									{% if FulfillerHead%}
+									<li class="nav-item">
+										<a  href="/HelpdeskFulfillerHead" style="color: white;"> <span class="glyphicon glyphicon-link"></span> Fulfiller Head</a>
+									</li>
+									<br><br>
+
+									{% endif %}
+									{% if Fulfiller %}
+									<li class="nav-item">
+										<a  href="/AssignedTickets" style="color: white;"><span class="glyphicon glyphicon-tasks"></span> Assigned Tasks</a>
+									</li>
+									<br><br>
+
+									{% endif %}
+									{%if SLAFulfillerHead%}
+									<li >
+										<a href="/sla?page=1" style="color: white;"><span class="glyphicon glyphicon-dashboard"></span> SLA's</a>
+									</li>
+							    	<br><br>
+								   {%endif%}
+                            </ul>
+
+							</nav>
+
+							<!-- Page Content Holder -->
+							{%block content %}
+
+							{%endblock%}
 				</div>
 
+	</div>
+</div>
 
 
+<!-- jQuery CDN -->
+<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+			<!-- Bootstrap Js CDN -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-
-
-
-
-
-				<!-- jQuery CDN -->
-				<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
-				<!-- Bootstrap Js CDN -->
-				<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-				<script type="text/javascript">
-					$(document).ready(function () {
-						$('#sidebarCollapse').on('click', function () {
-							$('#sidebar').toggleClass('active');
-						});
+<script type="text/javascript">
+				$(document).ready(function () {
+					$('#sidebarCollapse').on('click', function () {
+						$('#sidebar').toggleClass('active');
 					});
-				</script>
-			</body>
-			</html>
+				});
+</script>
+</body>
+</html>

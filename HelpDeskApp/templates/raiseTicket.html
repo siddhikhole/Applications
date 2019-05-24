@@ -2,29 +2,27 @@
 {%block content %}
 <html>
 <head>
-<script type="text/javascript">
-  {% if messages %}
-    {% for message in messages%}
-      alert("{{message}}")
-    {%endfor%}
-  {% endif %}
-</script>
+	<script type="text/javascript">
+		{% if messages %}
+		{% for message in messages%}
+		alert("{{message}}")
+		{%endfor%}
+		{% endif %}
+	</script>
 	<title>Help desk</title>
- <meta charset="utf-8">
-	 <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-<script language="javascript" type="text/javascript">  
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+	<script language="javascript" type="text/javascript">  
 
-$(document).ready(function(){
- 
-
+		$(document).ready(function(){
 //If parent option is changed
 $("#department_selection").change(function() {
 	var parent = $(this).val(); //get option value from parent 
-		select_category(parent);
+	select_category(parent);
 });
 
 //function to populate child select box
@@ -33,34 +31,34 @@ function select_category(array_list)
 	$("#category_selection").html(""); //reset child options
 	$("#category_selection").append("<option value=\"\"disabled selected>--Please Select--</option>");
 	//$(array_list).each(function (i) { //populate child options
-	
-	{%for i in category%}
- 	var count ={{i.department_id_id}}
-	if(count == array_list){		
-		$("#category_selection").append("<option value={{i.id}}>{{i.title}}</option>");
-	}
-	{%endfor%}	
-}
 
-$("#category_selection").change(function() {
+		{%for i in category%}
+		var count ={{i.department_id_id}}
+		if(count == array_list){		
+			$("#category_selection").append("<option value={{i.id}}>{{i.title}}</option>");
+		}
+		{%endfor%}	
+	}
+
+	$("#category_selection").change(function() {
 	var parent = $(this).val(); //get option value from parent 
-		select_subcategory(parent);
+	select_subcategory(parent);
 });
 
-function select_subcategory(array_list)
-{
+	function select_subcategory(array_list)
+	{
 	$("#sub_Category").html(""); //reset child options
 	$("#sub_Category").append("<option value=\"\"disabled selected>--Please Select--</option>");
 	//$(array_list).each(function (i) { //populate child options
-	
-	{%for i in subCategory%}
- 	var count ={{i.department_id_id}}
- 	
-	if(count == array_list){		
-		$("#sub_Category").append("<option value={{i.id}}>{{i.title}}</option>");
+
+		{%for i in subCategory%}
+		var count ={{i.department_id_id}}
+
+		if(count == array_list){		
+			$("#sub_Category").append("<option value={{i.id}}>{{i.title}}</option>");
+		}
+		{%endfor%}	
 	}
-	{%endfor%}	
-}
 
 });
 
@@ -69,233 +67,222 @@ function select_subcategory(array_list)
 
 <script type="text/javascript">
 
-function yesnoCheck() {
-    if (document.getElementById('yesCheck').checked) {
-        document.getElementById('ifYes').style.visibility = 'visible';
-    }
-    else document.getElementById('ifYes').style.visibility = 'hidden';
+	function yesnoCheck() {
+		if (document.getElementById('yesCheck').checked) {
+			document.getElementById('ifYes').style.visibility = 'visible';
+		}
+		else document.getElementById('ifYes').style.visibility = 'hidden';
 
-}
+	}
 
 </script>
-</SCRIPT>
 <style>
 </style>
 </head>
 <body>
-
-
-        	
-        		  <div class="row" style=" margin-left: 20px; width: 100%;">
-		
-			<div class="navbar" style="margin-left: -20px; background-color: #616D7E;color: white; 	 margin-top: 10px;  ">
-				 
-                     
-				<h4><b><span class="glyphicon glyphicon-hand-up" style="margin-left: 20px;"></span> Raise Request</b></h4><div style="float: right;">  
-				 	 
-				 
-</div></div>
-        		  	
-   <div class="col-12">   		 
-        <div class="container" >
-        	
-        	
-         		{% if item %}	
-         		<form action="updateTicket"  method="POST" enctype="multipart/form-data">
-         		{%else%}
-         		<form action="addTicket/"   method="POST" enctype="multipart/form-data">
-         		{%endif%}
-				{% csrf_token %}
-			 <div class="row">
-			 	<div class="col-sm-2">				
-					<label><b>Request Type</b></label>
-				</div>
-				<div class="col-sm-1">
-					<input type="radio" name="RequestType" value="Request" checked>Request
-				</div>
-
-				<div class="col-sm-1">
-					<input type="radio" name="RequestType" value="Issue" disabled>Issue
-				</div>
+	<div class="row" style=" margin-left: 20px; width: 100%;">
+		<div class="navbar" style="margin-left: -20px; background-color: #616D7E;color: white; 	 margin-top: 10px;  ">
+			<h4><b><span class="glyphicon glyphicon-hand-up" style="margin-left: 20px;"></span> Raise Request</b></h4>
+			<div style="float: right;">  
 			</div>
-			<br>
-			<div class="row">
-				<div class="col-sm-2">
-					<label><b>Request For</b></label>
-				</div>
-				<div class="col-sm-1">
-					<input type="radio" checked onclick="javascript:yesnoCheck();" value="Self" name="yesno" id="noCheck"> Self 
-				</div>
-				<div class="col-sm-2">
-					{% if item %}
-					<input type="radio" value="OnBehalf" onclick="javascript:yesnoCheck();" name="yesno" id="yesCheck" disabled>On Behalf Of<br>
-					{% else %}
-					<input type="radio" value="OnBehalf" onclick="javascript:yesnoCheck();" name="yesno" id="yesCheck">On Behalf Of<br>
-					{%endif%}
-				</div>
-				<div class="col-sm-1">
-					<div id="ifYes" style="visibility:hidden">
-						<input type="test" name="onBehalfOf" placeholder="People Picker" id="default" list="languages">
-					</div>
-				</div>
-			</div>
-			<div id="page-wrapper">
-				<datalist id="languages">
-					{% for emp in employee%}
-					<option value="{{emp.associated_user_account}}">
-					{%endfor%}
-				</datalist>
-			</div>
-			<br>
-			<div class="row">
-				<div class="col-sm-3">
-					<label><b>Department <font color="red">*</font></b></label>
-				
-					<select name="department" data-size="5" class="form-control " id="department_selection" required >
-						<option value=""disabled selected>-- Please Select --</option>
-						{% for dept in departments %}
-							{% if dept.department == item.department%}
-								<option value={{dept.id}} selected >{{dept.department}}
-								
-								</option>
-							{%else%}
-								<option value={{dept.id}}>{{dept.department}}</option>
-							{%endif%}
-						{%endfor%}
+		</div>
+		<div class="col-12">
+			<div class="container" >
+				{% if item %}
+				<form action="updateTicket"  method="POST" enctype="multipart/form-data">
+					{%else%}
+					<form action="addTicket/"   method="POST" enctype="multipart/form-data">
+						{%endif%}
+						{% csrf_token %}
+
+						<div class="row">
+							<div class="col-sm-2">				
+								<label><b>Request Type</b></label>
+							</div>
+							<div class="col-sm-1">
+								<input type="radio" name="RequestType" value="Request" checked>Request
+							</div>
+							<div class="col-sm-1">
+								<input type="radio" name="RequestType" value="Issue" disabled>Issue
+							</div>
+						</div>
+						<br>
+
+						<div class="row">
+							<div class="col-sm-2">
+								<label><b>Request For</b></label>
+							</div>
+							<div class="col-sm-1">
+								<input type="radio" checked onclick="javascript:yesnoCheck();" value="Self" name="yesno" id="noCheck"> Self
+							</div>
+							<div class="col-sm-2">
+								{% if item %}
+								<input type="radio" value="OnBehalf" onclick="javascript:yesnoCheck();" name="yesno" id="yesCheck" disabled>On Behalf Of<br>
+								{% else %}
+								<input type="radio" value="OnBehalf" onclick="javascript:yesnoCheck();" name="yesno" id="yesCheck">On Behalf Of<br>
+								{%endif%}
+							</div>
+							<div class="col-sm-1">
+								<div id="ifYes" style="visibility:hidden">
+									<input type="test" name="onBehalfOf" placeholder="People Picker" id="default" list="languages">
+								</div>
+							</div>
+						</div>
 						
-					</select>
-				</div>
-				<div class="col-sm-3"> 					<label><b>Category <font color="red">*</font></b></label>
-					<select    class="form-control" name="category" id="category_selection" required>
-						<option value=""disabled selected>-- Please Select --</option>
-						{% for dept in departments %}
-							{% if dept.department == item.department%}
-								{%for cat in category%}
-									{%if cat.department_id_id == dept.id%}
-									{%if cat.title == item.category%}
-									<option value={{cat.id}} selected>{{cat.title}}
-									</option>
-									{%else%}
-									<option value={{cat.id}} >{{cat.title}}</option>s
-									{%endif%}
-								
-								{%endif%}
+						<div id="page-wrapper">
+							<datalist id="languages">
+								{% for emp in employee%}
+								<option value="{{emp.associated_user_account}}">
 								{%endfor%}
-							{%endif%}
-						{%endfor%}
-					</select>		
-				</div>
-				<div class="col-sm-3">
-					<label><b>Sub Category <font color="red">*</font></b></label><br>
-				
-					<select name="sub_category"   class="form-control"  id="sub_Category">
-						<option value=""disabled selected>-- Please Select --</option>{% for cat in category %}
-
-							{% if cat.title == item.category%}
+							</datalist>
+						</div>
+						
+						<br>
+						
+						<div class="row">
+							<div class="col-sm-3">
+								<label><b>Department <font color="red">*</font></b></label>
+								<select name="department" data-size="5" class="form-control " id="department_selection" required >
+									<option value=""disabled selected>-- Please Select --</option>
+										{% for dept in departments %}
+											{% if dept.department == item.department%}
+												<option value={{dept.id}} selected >{{dept.department}}</option>
+											{%else%}
+												<option value={{dept.id}}>{{dept.department}}</option>
+											{%endif%}
+										{%endfor%}
+								</select>
+							</div>
 							
-								{%for sub in subCategory%}
-									{%if sub.department_id_id == cat.id%}
-									{%if sub.title == item.sub_category%}
-									<option value={{sub.id}} selected>{{sub.title}}
-									</option>
-									{%else%}
-									<option value={{sub.id}}>{{sub.title}}</option>
+							<div class="col-sm-3">
+								<label><b>Category <font color="red">*</font></b></label>
+								<select    class="form-control" name="category" id="category_selection" required>
+									<option value=""disabled selected>-- Please Select --</option>
+									{% for dept in departments %}
+										{% if dept.department == item.department%}
+											{%for cat in category%}
+												{%if cat.department_id_id == dept.id%}
+													{%if cat.title == item.category%}
+														<option value={{cat.id}} selected>{{cat.title}}</option>
+													{%else%}
+														<option value={{cat.id}} >{{cat.title}}</option>s
+													{%endif%}
+												{%endif%}
+											{%endfor%}
+										{%endif%}
+									{%endfor%}
+									</select>		
+								</div>
+								<div class="col-sm-3">
+									<label><b>Sub Category <font color="red">*</font></b></label><br>
+
+									<select name="sub_category"   class="form-control"  id="sub_Category">
+										<option value=""disabled selected>-- Please Select --</option>{% for cat in category %}
+
+										{% if cat.title == item.category%}
+
+										{%for sub in subCategory%}
+										{%if sub.department_id_id == cat.id%}
+										{%if sub.title == item.sub_category%}
+										<option value={{sub.id}} selected>{{sub.title}}
+										</option>
+										{%else%}
+										<option value={{sub.id}}>{{sub.title}}</option>
+										{%endif%}
+
+										{%endif%}
+										{%endfor%}
+										{%endif%}
+										{%endfor%}
+									</select>
+								</div>
+								<div class="col-sm-3">
+
+									<label><b>Priority <font color="red">*</font></b></label>
+
+									<select name="priority"  class="form-control" required>
+										<option value=""disabled selected>-- Please Select --</option>
+										{% if item.priority == "Low" %}
+										<option value="Low" selected>Low</option>
+										<option value="Medium">Medium</option>
+										<option value="High">High</option>
+										{% elif item.priority == "Medium"%}
+										<option value="Low">Low</option>
+										<option value="Medium" selected>Medium</option>
+										<option value="High">High</option>
+										{% elif item.priority == "High"%}
+										<option value="Low">Low</option>
+										<option value="Medium">Medium</option>
+										<option value="High" selected>High</option>
+										{% else %}
+										<option value="Low">Low</option>
+										<option value="Medium">Medium</option>
+										<option value="High">High</option>
+										{% endif %}
+									</select>
+								</div>
+							</div>
+							<br>
+							<div class="row">
+								<div class="col-sm-6">
+									<label><b>Description <font color="red">*</font></b></label>
+									<textarea name="Description" rows="4" style="resize: none;" class="form-control"required>{{item.description}}</textarea>
+								</div>
+								<div class="col-sm-3">
+									<label><b>Office Location <font color="red">*</font></b></label>
+									<select name="officeLocation" class="form-control"  required>
+										<option value=""disabled selected>-- Please Select --</option>
+
+										{% for office in officelocation %}
+										{% if office.title == item.HelpdeskOffice%}
+										<option value={{office.id}} selected >{{office.title}}
+
+										</option>
+										{%else%}
+										<option value={{office.id}}>{{office.title}}</option>
+										{%endif%}
+										{%endfor%}
+									</select>
+								</div>
+								<div class="col-sm-3">
+
+									<label><b>Desk Location <font color="red">*</font></b></label><br>
+									<input  class="form-control"  type="text" name="deskLocation" value="{{item.DeskLocation}}" required>
+								</div>
+							</div><br>
+							<div class="row">
+								<div class="col-sm-4">
+
+									<label><b>Upload supporting document:</b></label><br>
+
+									<label for="files"  class="btn btn-primary"><span class="glyphicon glyphicon-folder-open"></span>  Browse</label>
+
+									<input type="file" style="visibility:hidden;" id="files" name="documents">
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-sm-4">
+									<label><b>First Approver:{{firstApprover}}</b></label>
+								</div>
+							</div><br>
+							<div class="row">
+								<div class="col-sm-5">
+
+
+									<input type="checkbox" name="email_notification" checked> Receive Email Notifications
+								</div>
+							</div><br>
+							<div class="row">
+								<div class="col-sm-3">
+									{%if item %}
+									<button class="btn btn-primary" type="Submit"> <span class="glyphicon glyphicon-pencil"></span> Update</button>
+									{% else %}
+									<button class="btn btn-primary" type="Submit"><span class="glyphicon glyphicon-ok-sign"></span> Submit</button>
 									{%endif%}
-								
-								{%endif%}
-								{%endfor%}
-							{%endif%}
-						{%endfor%}
-						</select>
-				</div>
-				<div class="col-sm-3">
-			
-					<label><b>Priority <font color="red">*</font></b></label>
-				
-					<select name="priority"  class="form-control" required>
-						<option value=""disabled selected>-- Please Select --</option>
-						{% if item.priority == "Low" %}
-							<option value="Low" selected>Low</option>
-							<option value="Medium">Medium</option>
-							<option value="High">High</option>
-						{% elif item.priority == "Medium"%}
-							<option value="Low">Low</option>
-							<option value="Medium" selected>Medium</option>
-							<option value="High">High</option>
-						{% elif item.priority == "High"%}
-							<option value="Low">Low</option>
-							<option value="Medium">Medium</option>
-							<option value="High" selected>High</option>
-						{% else %}
-							<option value="Low">Low</option>
-							<option value="Medium">Medium</option>
-							<option value="High">High</option>
-						{% endif %}
-					</select>
-				</div>
-			</div>
-			<br>
-			<div class="row">
-				<div class="col-sm-6">
-					<label><b>Description <font color="red">*</font></b></label>
-					<textarea name="Description" rows="4" style="resize: none;" class="form-control"required>{{item.description}}</textarea>
-				</div>
-				<div class="col-sm-3">
-					<label><b>Office Location <font color="red">*</font></b></label>
-					<select name="officeLocation" class="form-control"  required>
-						<option value=""disabled selected>-- Please Select --</option>
+								</div>
+							</div>
 
-						{% for office in officelocation %}
-							{% if office.title == item.HelpdeskOffice%}
-								<option value={{office.id}} selected >{{office.title}}
-								
-								</option>
-							{%else%}
-								<option value={{office.id}}>{{office.title}}</option>
-							{%endif%}
-						{%endfor%}
-					</select>
-				</div>
-				<div class="col-sm-3">
+						</form>
+					</div></option></div>
 
-					<label><b>Desk Location <font color="red">*</font></b></label><br>
-					<input  class="form-control"  type="text" name="deskLocation" value="{{item.DeskLocation}}" required>
-				</div>
-			</div><br>
-			<div class="row">
-				<div class="col-sm-4">
-
-					<label><b>Upload supporting document:</b></label><br>
-	
-					<label for="files"  class="btn btn-primary"><span class="glyphicon glyphicon-folder-open"></span>  Browse</label>
-
-					<input type="file" style="visibility:hidden;" id="files" name="documents">
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-4">
-					<label><b>First Approver:{{firstApprover}}</b></label>
-				</div>
-			</div><br>
-			<div class="row">
-				<div class="col-sm-5">
-
-				
-					<input type="checkbox" name="email_notification" checked> Receive Email Notifications
-				</div>
-			</div><br>
-			<div class="row">
-				<div class="col-sm-3">
-					{%if item %}
-					<button class="btn btn-primary" type="Submit"> <span class="glyphicon glyphicon-pencil"></span> Update</button>
-					{% else %}
-					<button class="btn btn-primary" type="Submit"><span class="glyphicon glyphicon-ok-sign"></span> Submit</button>
-					{%endif%}
-				</div>
-			</div>
-				
-				</form>
-        </div></option></div>
-
-        	{%endblock%}
-        	
+					{%endblock%}
