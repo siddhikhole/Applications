@@ -1,7 +1,22 @@
-{%extends 'index.html' %}
-{%block content %}
-<html>
-<head>
+	{%extends 'index.html' %}
+	{%block content %}<!DOCTYPE html>
+	<html>
+	<head>
+		<meta charset="utf-8">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+		<title>HelpDeskApp</title>
+
+		<!-- Bootstrap CSS CDN -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<!-- Our Custom CSS -->
+		
+	  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+
 	<script type="text/javascript">
 		{% if messages %}
 		{% for message in messages%}
@@ -11,23 +26,7 @@
 	</script>
 	
 
-	<meta charset="utf-8">
-
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-
-	<title>HelpDeskApp</title>
-
-	<!-- Bootstrap CSS CDN -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-	<!-- Our Custom CSS -->
-	<link rel="stylesheet" href="style.css">
-	<style type="text/css">
-
-
-</style>
-
-
+	
 	<script language="javascript" type="text/javascript">  
 
 		$(document).ready(function(){
@@ -92,14 +91,18 @@ function select_category(array_list)
 </style>
 </head>
 <body>
-	<div class="row" style=" margin-left: 20px; width: 100%;">
-		<div class="navbar" style="margin-left: -20px; background-color: #616D7E;color: white; 	 margin-top: 10px;  ">
-			<h4><b><span class="glyphicon glyphicon-hand-up" style="margin-left: 20px;"></span> Raise Request</b></h4>
-			<div style="float: right;">  
+	<div class="row" style="margin-left: 20px; width: 100%;">
+			<div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
+				<h4><b><span class="glyphicon glyphicon-hand-up" style="margin-left: 20px;"></span> Raise Request</b></h4>
+		
 			</div>
-		</div>
+
+
+			<div class="container"style="margin-left:-15px; width: 100%;">
+	
+	<div class="row"style=" margin-left: 5px;">
 		<div class="col-12">
-			<div class="container" >
+		
 				{% if item %}
 				<form action="updateTicket"  method="POST" enctype="multipart/form-data">
 					{%else%}

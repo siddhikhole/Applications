@@ -3,118 +3,115 @@
 <!DOCTYPE html>
 <html>
 <head>
-
-
-	 <meta charset="utf-8">
-	 <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-   
-<script language="javascript" type="text/javascript">  
-
-</script>
-
 </head>
 <body>
-
-	{% if messages %}
-	{% for message in messages %}
-		<div class="alert alert-warning alert-dismissable" role="alert"> 
-	 	
-			{{message}}
-	 		<button class="close" data-dismiss="alert">x</button>
-		</div>
-	{%endfor%}
-	{%endif%}
-    
-	<div class="row" style="margin-left: 20px; width: 100%;">
-    
-      <div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
-         
-                     
-        <h4><b> <span class="glyphicon glyphicon-ok-sign"></span> For First Approval</b></h4><div style="float: right;">  
-           
-         
-</div></div>
-<div class="col-10">
- {% if all_items %}
- <div class="table-responsive"> 
-	<table class="table table-striped" id="t1" > 
-	<thead>
-	     <tr>
-	    <th>Request ID</th>
-	    <th>Raised By</th>
-	    <th>Raised Date</th>
-	    <th>Department</th>
-	    <th>Category</th> 
-	    <th>Sub-Category</th>
-	    <th>Status</th> 
-	    <th>Approve</th>
-   		<th>Reject</th>
-	    <th>History</th>
-		</tr>
-	</thead>
-	<div class="modal fade" id="myModal" role="dialog">
-    <div class="modal-dialog modal-lg">
-    
-      <!-- Modal content-->
-      <div class="modal-content">
-           <div class="modal-body">
-          
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-      
+  <div class="row" style="margin-left: 20px; width: 100%;">
+    <div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
+      <h4>
+        <b>
+          <span class="glyphicon glyphicon-ok-sign" style="margin-left: 20px;"></span>
+          For First Approval
+        </b>
+      </h4>
     </div>
-  </div> 
+    <div class="container"style="margin-left:-15px; width: 100%;">
+      <div class="row">
+        <div class="col-12">
+          {% if all_items %}
+          <div class="table-responsive">
+            <table class="table table-striped" id="t1" >
+              <thead>
+                <tr>
+                  <th>Request ID</th>
+                  <th>Raised By</th>
+                  <th>Raised Date</th>
+                  <th>Department</th>
+                  <th>Category</th>
+                  <th>Sub-Category</th>
+                  <th>Status</th>
+                  <th>Approve</th>
+                  <th>Reject</th>
+                  <th>History</th>
+                </tr>
+              </thead>
+              <div class="modal fade" id="myModal" role="dialog">
+                <div class="modal-dialog modal-lg">
+                  <div class="modal-content">
+                    <div class="modal-body">
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">
+                          Close
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <br>
+              {%for key,things in all_items.items%}
+              <tr>
+                <td>
+                  <a href="/display/{{key}}">Helpdesk/Request/{{things.id}}</a>
+                </td>
+                <td>
+                    {{things.EmployeeName}}
+                </td>
+                <td>
+                  {{things.created_at}}
+                </td>
+                <td>
+                  {{things.department}}
+                </td>
+                <td>
+                  {{things.category}}
+                </td>
+                <td>
+                  {{things.sub_category}}
+                </td>
+                <td>
+                  {{things.WorkflowCurrentStatus}}
+                </td>
+                <td>
+                  <a href="/approve/{{things.id}}" class="btn btn-primary" >
+                    <span class="glyphicon glyphicon-ok" ></span> Approve
+                  </a>
+                </td>
+                <td>
+                  <a href="/reject/{{things.id}}" class="btn btn-warning">Reject</a>
+                </td>
+                <td>
+                  <center>
+                    <a href="/workflow/{{things.id}}"  data-toggle="modal" data-target="#myModal" ><span class="glyphicon glyphicon-eye-open" ></span></a>
+                  </center>
+                </td>
+              </tr>
+            {%endfor%}
+          </table>
+        </div>
+        {% else %}
+        <div class="alert alert-warning alert-dismissable" role="alert" style="width: 100%">
+          <h4>No tickets found!</h4>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
 
-<br>
-        	
-	{%for key,things in all_items.items%}
-    
-      <tr>
-        <td><a href="/display/{{key}}">Helpdesk/Request/{{things.id}}</a></td>
-        <td>{{things.EmployeeName}}</td>
-        <td>{{things.created_at}}</td>
-        <td>{{things.department}}</td>
-        <td>{{things.category}}</td>
-        <td>{{things.sub_category}}</td>
-        <td>{{things.WorkflowCurrentStatus}}</td>
-        <td><a href="/approve/{{things.id}}" class="btn btn-primary" ><span class="glyphicon glyphicon-ok" ></span> Approve</a>
-        </td>
-        <td><a href="/reject/{{things.id}}" class="btn btn-warning">Reject</a>
-        </td>
-    
-        
-        
-        <td><center><a href="/workflow/{{things.id}}"  data-toggle="modal" data-target="#myModal" ><span class="glyphicon glyphicon-eye-open" ></span></a>
-        
-        </center>
-        </td>
-      </tr>
-    {%endfor%}
-</table>
-	</table>
-{% else %}
-<div class="alert alert-warning alert-dismissable" role="alert" style="width: 100%">  
-      <h4>No tickets found!</h4>
- </div>
+        <script>
+          $(document).ready(function(){
+            $("#myModal").on('hidden.bs.modal', function(){
+              console.log("Hello world!");
+              location.reload();
+            });
+          });
+        </script>
 
-{% endif %}
-
-<script>
-$(document).ready(function(){
-
-  $("#myModal").on('hidden.bs.modal', function(){
-     console.log("Hello world!");
-    location.reload();
-  });
-});
-</script>
-</body>
-</html>
+      </body>
+    </html>
 {%endblock%}

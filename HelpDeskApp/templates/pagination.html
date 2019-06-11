@@ -1,0 +1,260 @@
+{% extends 'index.html' %}
+{%block content %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+ 
+
+ <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+  <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
+
+<script>
+$(document).ready(function(){
+    $('#myTable').dataTable();
+});
+</script>
+<style type="text/css">
+ label {
+    display: inline-block;
+    max-width: 100%;
+    margin-bottom: 5px;
+    font-weight: 700;
+    float: right;
+    margin-right: 50px;
+    margin-bottom: 50px
+    padding-bottom:20px;
+}
+#myTable_info,#myTable_paginate{
+  text-align: center;
+  padding-bottom: 30px;
+}
+#myTable_wrapper
+{
+  padding-bottom: 50px
+}
+#myTable_previous,#myTable_next
+{
+ background-color: red;
+  color: white;
+  margin-top: 20px;
+  padding: 1em 1.5em;
+  text-decoration: none;
+  text-transform: uppercase;
+  border:1px solid #444;
+  
+
+}
+.paginate_button
+{
+  margin-right: 4px;
+  margin-left: 4px;
+
+
+
+}
+.current 
+{
+   margin-right: 4px;
+  margin-left: 4px;
+   background-color: yellow;
+   padding-right: 5px;
+   padding-left: 5px;
+
+}
+a, a:hover, a:focus {
+     color:   #0645AD; 
+    text-decoration: none;
+    transition: all 0.3s;
+}
+</style>
+
+</head>
+<body>
+  </head> 
+<body>
+   <div class="row" style="margin-left: 20px; width: 100%;">
+    <div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
+      <h4><b>  <span class="glyphicon glyphicon-dashboard" style="margin-left: 20px;"></span> SLA's</b></h4>
+      <div style="float: right; padding-right: 100px; margin-top:-40px;">
+       
+        <a  data-toggle="modal" data-target="#myModal" href="/slas/0"   class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add</a>
+      </div>
+    </div>
+
+
+<div class="container"style="margin-left:-15px; width: 100%;">
+
+
+  
+  <div class="row"style=" margin-left: 5px;">
+    <div class="col-12">
+        {% if all_items %}
+        <div class="table-responsive">
+          <table class="table" id="myTable" >
+            <thead>
+              <tr>
+                <th>Location</th>
+                <th>Department</th>
+                <th>Category</th>
+                <th>Sub-Category</th>
+                <th>Priority</th>
+                <th>Select</th>
+              </tr>
+            </thead>
+            {% for item in all_items %}
+            <tr style="font-size: 14px;">
+              <td>{{item.HelpdeskLocation}}</td>
+              <td>{{item.HelpdeskDepartment}}</td>
+              <td>{{item.HelpdeskCategory}}</td>
+              <td>{{item.HelpdeskSubCategory}}</td>
+              <td>{{item.HelpdeskPriority}}</td>
+              <td>  <a  data-toggle="modal" data-target="#myModal" href="/slas/{{item.id}}" > <span class="glyphicon glyphicon-pencil"></span> Edit</a> </td>
+            </tr>
+            {%endfor%}
+          </table>
+        </div>
+        {%endif%}
+      </div>
+ 
+    <!-- <div class="pagination">
+      <nav>
+        <ul class="pagination">
+      </nav>
+    </div> -->
+   <!--  <ul class="pager" style="margin-left: 700px;">
+      <li class="page-link"><a href="?page=1"><span class="glyphicon glyphicon-fast-backward"></span></a></li>
+      {% if all_items.has_previous %}
+      <li class="page-link"><a href="?page={{ all_items.previous_page_number }}"><span class="glyphicon glyphicon-step-backward"></a></li>
+      {% else %}
+      <li class="page-link"><a href="?page=1"><span class="glyphicon glyphicon-step-backward"></a></li>{% endif %}
+        <li> Page {{ all_items.number }} of {{ all_items.paginator.num_pages }}</li>
+        {% if all_items.has_next %}
+        <li> <a href="?page={{ all_items.next_page_number }}"><span class="glyphicon glyphicon-step-forward"></span></a></li>
+        {% else %}
+        <li> <a href="?page={{ all_items.paginator.num_pages }}"><span class="glyphicon glyphicon-step-forward"></span></a></li>
+        {% endif %}
+        <li class="page-link"><a href="?page={{ all_items.paginator.num_pages }}"><span class="glyphicon glyphicon-fast-forward"></span></a></li>
+    </ul> -->
+
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+           <div class="modal-body">
+          
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div> 
+
+
+
+</form>
+
+</body>
+
+ </html>
+
+{% endblock %}
+
+
+
+
+<!--<table id="myTable" class="table table-striped" >-->
+        <!--<thead>-->
+          <!--<tr>-->
+            <!--<th>ENO</th>-->
+            <!--<th>EMPName</th>-->
+            <!--<th>Country</th>-->
+            <!--<th>Salary</th>-->
+          <!--</tr>-->
+        <!--</thead>-->
+        <!--<tbody>-->
+          <!--<tr>-->
+            <!--<td>001</td>-->
+            <!--<td>Anusha</td>-->
+            <!--<td>India</td>-->
+            <!--<td>10000</td>-->
+          <!--</tr>-->
+          <!--<tr>-->
+            <!--<td>002</td>-->
+            <!--<td>Charles</td>-->
+            <!--<td>United Kingdom</td>-->
+            <!--<td>28000</td>-->
+          <!--</tr>-->
+          <!--<tr>-->
+            <!--<td>003</td>-->
+            <!--<td>Sravani</td>-->
+            <!--<td>Australia</td>-->
+            <!--<td>7000</td>-->
+          <!--</tr>-->
+		   <!--<tr>-->
+            <!--<td>004</td>-->
+            <!--<td>Amar</td>-->
+            <!--<td>India</td>-->
+            <!--<td>18000</td>-->
+          <!--</tr>-->
+          <!--<tr>-->
+            <!--<td>005</td>-->
+            <!--<td>Lakshmi</td>-->
+            <!--<td>India</td>-->
+            <!--<td>12000</td>-->
+          <!--</tr>-->
+          <!--<tr>-->
+            <!--<td>006</td>-->
+            <!--<td>James</td>-->
+            <!--<td>Canada</td>-->
+            <!--<td>50000</td>-->
+          <!--</tr>-->
+
+		   <!--<tr>-->
+            <!--<td>007</td>-->
+            <!--<td>Ronald</td>-->
+            <!--<td>US</td>-->
+            <!--<td>75000</td>-->
+          <!--</tr>-->
+          <!--<tr>-->
+            <!--<td>008</td>-->
+            <!--<td>Mike</td>-->
+            <!--<td>Belgium</td>-->
+            <!--<td>100000</td>-->
+          <!--</tr>-->
+          <!--<tr>-->
+            <!--<td>009</td>-->
+            <!--<td>Andrew</td>-->
+            <!--<td>Argentina</td>-->
+            <!--<td>45000</td>-->
+          <!--</tr>-->
+
+		    <!--<tr>-->
+            <!--<td>010</td>-->
+            <!--<td>Stephen</td>-->
+            <!--<td>Austria</td>-->
+            <!--<td>30000</td>-->
+          <!--</tr>-->
+          <!--<tr>-->
+            <!--<td>011</td>-->
+            <!--<td>Sara</td>-->
+            <!--<td>China</td>-->
+            <!--<td>750000</td>-->
+          <!--</tr>-->
+          <!--<tr>-->
+            <!--<td>012</td>-->
+            <!--<td>JonRoot</td>-->
+            <!--<td>Argentina</td>-->
+            <!--<td>65000</td>-->
+          <!--</tr>-->
+        <!--</tbody>-->
+      <!--</table>-->
+	  <!--</div>-->

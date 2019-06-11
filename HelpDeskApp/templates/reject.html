@@ -2,45 +2,60 @@
 {%block content %}<!DOCTYPE html>
 <html>
 <head>
+	<meta charset="utf-8">
 
-	<title>Help desk</title>
-	 <meta charset="utf-8">
-	 <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+	<title>HelpDeskApp</title>
+
+	<!-- Bootstrap CSS CDN -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<!-- Our Custom CSS -->
+	
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-   
-<script language="javascript" type="text/javascript">  
 
-</script>
+
+
 
 </head>
 <body>
+
 	<div class="row" style="margin-left: 20px; width: 100%;">
+		<div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
+			<h4><b><span class="glyphicon glyphicon-question-sign"></span> My Request</b></h4><div style="float: right;">		
+			</div>
+		</div>
+
+
+<div class="container"style="margin-left:-15px; width: 100%;">
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#" style="color: #0073c6">Rejected</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+      
 		
-			<div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
-				 
-                     
-				<h4><b>Rejected Tickets</b></h4><div style="float: right;">  
-				 	 
-				 
-</div></div>
-<nav class="navbar" >
-  
-	<ul class="nav nav-tabs ">
 		<li class="nav-item"><a href="/pending">Pending</a></li>
 		<li class="nav-item"><a href="/approved">Approved</a></li>
 		<li class="nav-item"><a href="/completed">Completed</a></li>
-		<li class="nav-item "><a href="/reopened">Reopened</a></li>
+		<li class="nav-item"><a href="/reopened">Reopened</a></li>
 		<li class="nav-item"><a href="/raisedQ">Raised Query</a></li>
 		<li class="nav-item"><a href="/closed">Closed</a></li>
+		
 		<li class="nav-item"><a href="/cancelled">Cancelled</a></li>
-		
-		<li class="nav-item active"><a href="/rejected">Rejected</a></li>
-		
-	</ul>
-	
+        
+      </ul>
+      
+    </div>
+  </div>
 </nav>
 
 	{% if messages %}

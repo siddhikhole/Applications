@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'HelpDeskApp',
+    'background_task',
     
     
 ]
@@ -142,6 +143,7 @@ STATIC_URL = '/static/'
 
 MEDIA_URL='/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+#MEDIA_ROOT = '/var/www/media'
 
 
 EMAIL_USE_TLS = True

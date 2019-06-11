@@ -1,23 +1,35 @@
-{%extends 'index.html' %}
+
+ {%extends 'index.html' %}
 {%block content %}<!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8">
 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-	<title>Help desk</title>
-	 <meta charset="utf-8">
-	 <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <title>HelpDeskApp</title>
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <!-- Our Custom CSS -->
+  
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-   
-<script language="javascript" type="text/javascript">  
 
-</script>
- 
+
+
+
 </head>
 <body>
+
+  <div class="row" style="margin-left: 20px; width: 100%;">
+    <div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
+            <h4><b> <span class="glyphicon glyphicon-check" style="margin-left: 20px;"></span> For Helpdesk Approver</b></h4>
+
+      </div>
+
+
+<div class="container"style="margin-left:-15px; width: 100%;">
 	{% if messages %}
 	{% for message in messages %}
 		<div class="alert alert-warning alert-dismissable" role="alert"> 
@@ -28,18 +40,9 @@
 	{%endfor%}
 	{%endif%}
 
-        	
-        	
-        <div class="row" style="margin-left: 20px; width: 100%;">
-    
-      <div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
-         
-                     
-        <h4><b> <span class="glyphicon glyphicon-check"></span> For Helpdesk Approver</b></h4><div style="float: right;">  
-           
-         
-</div></div>
-	<div class="col-10">
+
+  <div class="row"style=" margin-left: 5px;">
+    <div class="col-12">  
  {% if all_items %}
  <div class="table-responsive"> 
 	<table class="table"> 

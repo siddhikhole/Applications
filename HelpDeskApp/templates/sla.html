@@ -1,124 +1,101 @@
-{%extends 'index.html' %}
-{%block content %}<!DOCTYPE html>
+{% extends 'index.html' %}
+{%block content %}
+<!DOCTYPE html>
 <html>
 <head>
-
-
-	<title>Help desk</title>
-	 <meta charset="utf-8">
-	 <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Help desk</title>
+  <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-   <style type="text/css">
-	
- </style>
-
- 
-   
-<script language="javascript" type="text/javascript">  
-
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="bootstrap.min.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+   <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
+ <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+<script>
+$(document).ready(function(){
+    $('#myTable').dataTable();
+});
 </script>
 
-</head>
+</head> 
 <body>
- 
+  <div class="row" style="margin-left: 20px; width: 100%;">
+    <div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
+          <h4><b> <span class="glyphicon glyphicon-tasks" style="margin-left: 20px;"></span> Assigned Tasks</b></h4>
+      </div>
 
-	<body>
- 
 
-           <div class="row" style="margin-left: 20px; width: 100%;">
+<div class="container"style="margin-left:-15px; width: 100%;">
+
+
+  <div class="row" style="margin-left: 20px; width: 100%;">
     
       <div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
          
                      
-        <h4><b>  <span class="glyphicon glyphicon-dashboard"></span> SLA's</b></h4>
-        <div style="float: right; padding-right: 100px; margin-top:-40px;">
-          <a  data-toggle="modal" data-target="#myModal" href="/slas/0"   class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add</a>     
-           
-         
-</div></div>
+        <h4><b>  <span class="glyphicon glyphicon-dashboard" style="margin-left: 20px;"></span> SLA's</b></h4>
+      <div style="float: right;">
+        <a> <input type="text" id="myInput" onkeydown ="myFunction()" placeholder= "Search for categories.." title="Type in a name"></a>
+        <a  data-toggle="modal" data-target="#myModal" href="/slas/0"   class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span> Add</a>
+      </div>
+</div>
+</div>
 
-         
-         <div class="row" style="">
-                     
-        
-          </div>
-         
-<br>
- 
-                     
-     
-           
-         
-   
-  
-
-
-
-<center>
-
-
-          
-
-
-<div class="col-10">
- {% if all_items %}
- <div class="table-responsive"> 
-  <table class="table" > 
-  <thead>
-       <tr>
-        
-      <th>Location</th>
-      <th>Department</th>
-      
-      <th>Category</th> 
-      <th>Sub-Category</th>
-      
-      <th>Priority</th>
-      <th>Select</th>
-    </tr>
-  </thead><center>
-  {% for item in all_items %}
-  <tr style="font-size: 14px;">
-    
-    <td>{{item.HelpdeskLocation}}</td>
-    <td>{{item.HelpdeskDepartment}}</td>
-    <td>{{item.HelpdeskCategory}}</td>
-    <td>{{item.HelpdeskSubCategory}}</td>
-    <td>{{item.HelpdeskPriority}}</td>
-    <td>   <a  data-toggle="modal" data-target="#myModal" href="/slas/{{item.id}}" > <span class="glyphicon glyphicon-pencil"></span> Edit</a> </td>
-  </tr>
-  {%endfor%}</center>
-  </table>
-{%endif%}
-</center>
- <ul class="pager" style="margin-left: 700px;">
-  <li class="page-link"><a href="?page=1"><span class="glyphicon glyphicon-fast-backward"></span></a></li>
-
-   
-     
-        {% if all_items.has_previous %}
-
-           <li class="page-link"><a href="?page={{ all_items.previous_page_number }}"><span class="glyphicon glyphicon-step-backward"></a></li>
-        {% else %}
-          <li class="page-link"><a href="?page=1"><span class="glyphicon glyphicon-step-backward"></a></li>       
-        {% endif %}
-
-        
-          <li> Page {{ all_items.number }} of {{ all_items.paginator.num_pages }}</li>
-
-       
-
+  <div class="row"style=" margin-left: 5px;">
+    <div class="col-12">
+        {% if all_items %}
+        <div class="table-responsive">
+          <table class="table" id="myTable" >
+            <thead>
+              <tr>
+                <th>Location</th>
+                <th>Department</th>
+                <th>Category</th>
+                <th>Sub-Category</th>
+                <th>Priority</th>
+                <th>Select</th>
+              </tr>
+            </thead>
+            {% for item in all_items %}
+            <tr style="font-size: 14px;">
+              <td>{{item.HelpdeskLocation}}</td>
+              <td>{{item.HelpdeskDepartment}}</td>
+              <td>{{item.HelpdeskCategory}}</td>
+              <td>{{item.HelpdeskSubCategory}}</td>
+              <td>{{item.HelpdeskPriority}}</td>
+              <td>  <a  data-toggle="modal" data-target="#myModal" href="/slas/{{item.id}}" > <span class="glyphicon glyphicon-pencil"></span> Edit</a> </td>
+            </tr>
+            {%endfor%}
+          </table>
+        </div>
+        {%endif%}
+      </div>
+      <!-- <div class="pagination">
+      <nav>
+        <ul class="pagination">
+      </nav>
+    </div> -->
+   <!--  <ul class="pager" style="margin-left: 700px;">
+      <li class="page-link"><a href="?page=1"><span class="glyphicon glyphicon-fast-backward"></span></a></li>
+      {% if all_items.has_previous %}
+      <li class="page-link"><a href="?page={{ all_items.previous_page_number }}"><span class="glyphicon glyphicon-step-backward"></a></li>
+      {% else %}
+      <li class="page-link"><a href="?page=1"><span class="glyphicon glyphicon-step-backward"></a></li>{% endif %}
+        <li> Page {{ all_items.number }} of {{ all_items.paginator.num_pages }}</li>
         {% if all_items.has_next %}
-          
-           <li> <a href="?page={{ all_items.next_page_number }}"><span class="glyphicon glyphicon-step-forward"></span></a></li>
+        <li> <a href="?page={{ all_items.next_page_number }}"><span class="glyphicon glyphicon-step-forward"></span></a></li>
         {% else %}
-          <li> <a href="?page={{ all_items.paginator.num_pages }}"><span class="glyphicon glyphicon-step-forward"></span></a></li>
+        <li> <a href="?page={{ all_items.paginator.num_pages }}"><span class="glyphicon glyphicon-step-forward"></span></a></li>
         {% endif %}
         <li class="page-link"><a href="?page={{ all_items.paginator.num_pages }}"><span class="glyphicon glyphicon-fast-forward"></span></a></li>
-  </ul>
+    </ul> -->
+
   <div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog modal-lg">
     
@@ -140,9 +117,11 @@
 </form>
 
 </body>
+<script>
+   var $y = jQuery.noConflict();
+</script>
 
 </html>
 
 
-
-{%endblock%}
+{%endblock%}  

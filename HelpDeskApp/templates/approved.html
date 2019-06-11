@@ -1,137 +1,113 @@
 {%extends 'index.html' %}
-{%block content %}
-<!DOCTYPE html>
+{%block content %}<!DOCTYPE html>
 <html>
 <head>
-
-
-	<title>Help desk</title>
-	 <meta charset="utf-8">
-	 <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-   
-   
-<script language="javascript" type="text/javascript">  
-
-</script>
-
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 <body>
 	<div class="row" style="margin-left: 20px; width: 100%;">
-		
-			<div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
-				 
-                     
-				<h4><b>Approved Tickets</b></h4><div style="float: right;">  
-				 	 
-				 
-</div></div>
-<nav class="navbar" >
-  
-	<ul class="nav nav-tabs ">
-		<li class="nav-item"><a href="/pending">Pending</a></li>
-		<li class="nav-item active"><a href="/approved">Approved</a></li>
-		<li class="nav-item"><a href="/completed">Completed</a></li>
-		<li class="nav-item"><a href="/reopened">Reopened</a></li>
-		<li class="nav-item"><a href="/raisedQ">Raised Query</a></li>
-		<li class="nav-item"><a href="/closed">Closed</a></li>
-		<li class="nav-item"><a href="/cancelled">Cancelled</a></li>
-		
-		<li class="nav-item"><a href="/rejected">Rejected</a></li>
-		
-	</ul>
-	
-</nav>
-
-	{% if messages %}
-	{% for message in messages %}
-		<div class="alert alert-warning alert-dismissable" role="alert"> 
-	 	
-			{{message}}
-	 		<button class="close" data-dismiss="alert">x</button>
+		<div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
+			<h4><b><span class="glyphicon glyphicon-question-sign"></span> My Request</b></h4><div style="float: right;">		
 		</div>
-	{%endfor%}
-	{%endif%}
-	
-
-
-<div class="col-10">
- {% if all_items %}
- <div class="table-responsive"> 
-	<table class="table"  style=" padding-left: 70px;" > 
-	<thead>
-	     <tr>
-	    <th>Request ID</th>
-	    <th>Raised By</th>
-	    <th>Raised Date</th>
-	    <th>Department</th>
-	    <th>Category</th> 
-	    <th>Sub-Category</th>
-	    <th>Status</th> 
-	    <th>Cancel</th>
-	    <th>History</th>
-		</tr>
-	</thead>
-	<div class="modal fade" id="myModal" role="dialog">
-    <div class="modal-dialog modal-lg">
-    
-      <!-- Modal content-->
-      <div class="modal-content">
-           <div class="modal-body">
-          
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-      
-    </div>
-  </div> 
-	{%for key,things in all_items.items%}
-    
-      <tr>
-        <td><a href="/display/{{key}}">Helpdesk/Request/{{things.id}}</a></td>
-        <td>{{things.EmployeeName}}</td>
-        <td>{{things.created_at}}</td>
-        <td>{{things.department}}</td>
-        <td>{{things.category}}</td>
-        <td>{{things.sub_category}}</td>
-        <td>{{things.WorkflowCurrentStatus}}</td>
-        
-    
-        
-        <td><a href="/cancel/{{things.id}}" class="btn btn-danger ">Cancel</a></td>
-
-       
-       
-        
-        <td><center><a href="/workflow/{{things.id}}"  data-toggle="modal" data-target="#myModal" ><span class="glyphicon glyphicon-eye-open" ></span></a>
-        
-        </center>
-        </td>
-      </tr>
-    {%endfor%}
-</table>
-</div>
-{% else %}
-<div class="alert alert-warning alert-dismissable"  style=" width: 100%"  role="alert">  
-      <h4>No tickets found!</h4>
- </div>
-
-{% endif %}
-
-<script>
-$(document).ready(function(){
-
-  $("#myModal").on('hidden.bs.modal', function(){
-     console.log("Hello world!");
-    location.reload();
-  });
-});
-</script>
+	</div>
+	<div class="container"style="margin-left:-15px; width: 100%;">
+		<nav class="navbar navbar-default">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        				<span class="icon-bar"></span>
+        				<span class="icon-bar"></span>
+        				<span class="icon-bar"></span>                        
+      				</button>
+      				<a class="navbar-brand" href="#" style="color: #0073c6">Approved</a>
+    			</div>
+    			<div class="collapse navbar-collapse" id="myNavbar">
+    				<ul class="nav navbar-nav">
+    					<li class="nav-item"><a href="/pending">Pending</a></li>
+    					<li class="nav-item"><a href="/completed">Completed</a></li>
+    					<li class="nav-item"><a href="/reopened">Reopened</a></li>
+						<li class="nav-item"><a href="/raisedQ">Raised Query</a></li>
+						<li class="nav-item"><a href="/closed">Closed</a></li>
+						<li class="nav-item"><a href="/cancelled">Cancelled</a></li>
+						<li class="nav-item"><a href="/rejected">Rejected</a></li>
+    				</ul>
+    			</div>
+    		</div>
+    	</nav>
+    	{% if messages %}
+    	{% for message in messages %}
+		<div class="alert alert-warning alert-dismissable" role="alert">
+			{{message}}
+			<button class="close" data-dismiss="alert">x</button>
+		</div>
+		{%endfor%}
+		{%endif%}
+		<div class="col-10">
+			{% if all_items %}
+			<div class="table-responsive">
+				<table class="table"  style=" padding-left: 70px;" >
+					<thead>
+						<tr>
+							<th>Request ID</th>
+							<th>Raised By</th>
+							<th>Raised Date</th>
+							<th>Department</th>
+							<th>Category</th>
+							<th>Sub-Category</th>
+							<th>Status</th>
+							<th>Cancel</th>
+							<th>History</th>
+						</tr>
+					</thead>
+					<div class="modal fade" id="myModal" role="dialog">
+						<div class="modal-dialog modal-lg">
+							<div class="modal-content">
+								<div class="modal-body">
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					{%for key,things in all_items.items%}
+					<tr>
+						<td><a href="/display/{{key}}">Helpdesk/Request/{{things.id}}</a></td>
+						<td>{{things.EmployeeName}}</td>
+						<td>{{things.created_at}}</td>
+						<td>{{things.department}}</td>
+						<td>{{things.category}}</td>
+						<td>{{things.sub_category}}</td>
+						<td>{{things.WorkflowCurrentStatus}}</td>
+						<td><a href="/cancel/{{things.id}}" class="btn btn-danger ">Cancel</a></td>
+						<td>
+							<center>
+								<a href="/workflow/{{things.id}}"  data-toggle="modal" data-target="#myModal" ><span class="glyphicon glyphicon-eye-open" ></span></a>
+							</center>
+						</td>
+					</tr>
+					{%endfor%}
+				</table>
+			</div>
+			{% else %}
+			<div class="alert alert-warning alert-dismissable"  style=" width: 100%"  role="alert">
+				<h4>No tickets found!</h4>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+	<script>
+		$(document).ready(function(){
+			$("#myModal").on('hidden.bs.modal', function(){
+				console.log("Hello world!");
+				location.reload();
+			});
+		});
+	</script>
 </body>
 </html>
 {%endblock%}

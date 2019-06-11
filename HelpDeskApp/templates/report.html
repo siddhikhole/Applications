@@ -1,0 +1,57 @@
+{%extends 'index.html' %}
+{%block content %}<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <title>HelpDeskApp</title>
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <!-- Our Custom CSS -->
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+
+
+</head>
+<body>
+	<div class="row" style="margin-left: 20px; width: 100%;">
+    	<div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
+         	<h4><b><span class="glyphicon glyphicon-question-sign" style="margin-left: 20px;"></span> Report</b></h4>
+      	</div>
+    	<div class="container">
+    		{% if files %}
+			<div class="table-responsive"> 
+				<table class="table" > 
+
+    			<tr>
+    				<td>
+    					<div class="col-sm-6">
+    						<img src="{{media_url}}{{filess}}"height="430"   style="padding: 0px;">
+    					</div>
+    					<div class="col-sm-5">
+    					<img src="{{media_url}}{{files3}}"height="430" style="padding: 0px;">
+    					</div>
+    				</td>
+    			</tr>
+    			<tr>
+    				<td>
+    					<img src="{{media_url}}{{files}}" height="400"  style="padding: 0px;">
+    				</td>
+    		
+    		{% else %}
+    		<div class="alert alert-warning alert-dismissable" style=" width: 100%" role="alert">
+    			<h4>No Tickets generated!</h4>
+    		</div>
+    		{% endif %}
+    	</div>
+	</div>
+
+</body>
+</html>
+{% endblock %}

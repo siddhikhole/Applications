@@ -2,96 +2,96 @@
 <html>
 <head>
 	<title></title>
-<style type="text/css">
-	.modal-header {
-    padding:9px 15px;
-    border-bottom:1px solid #eee;
-    background-color:#616D7E;
-     font-size: 16px;
-    color: white;
-    -webkit-border-top-left-radius: 5px;
-    -webkit-border-top-right-radius: 5px;
-    -moz-border-radius-topleft: 5px;
-    -moz-border-radius-topright: 5px;
-     border-top-left-radius: 5px;
-     border-top-right-radius: 5px;
+	<style type="text/css">
+		.modal-header {
+	    padding:9px 15px;
+	    border-bottom:1px solid #eee;
+	    background-color:#616D7E;
+	     font-size: 16px;
+	    color: white;
+	    -webkit-border-top-left-radius: 5px;
+	    -webkit-border-top-right-radius: 5px;
+	    -moz-border-radius-topleft: 5px;
+	    -moz-border-radius-topright: 5px;
+	     border-top-left-radius: 5px;
+	     border-top-right-radius: 5px;
 
- }
- #t1 th {
- 	padding-top: 15px;
-  padding-bottom: 1px;
-    border-bottom: 2px solid #D3D3D3;
-}
-   #t1 td{
-  padding-top: 5px;
-  padding-bottom: 1px;
-  text-align: left;
-
- padding-left: 20px;
- padding-right: 20px;
-
-
-}
-
-#t1 {
-  border-collapse: separate;
-  border-spacing: -50px;
-   padding-left: 10px;
-   padding-right: 10px;
-}
-
-</style>
-<script language="javascript" type="text/javascript">  
-
-$(document).ready(function(){
- 
-
-//If parent option is changed
-$("#department_selection").change(function() {
-	var parent = $(this).val(); //get option value from parent 
-		select_category(parent);
-});
-
-//function to populate child select box
-function select_category(array_list)
-{
-	$("#category_selection").html(""); //reset child options
-	$("#category_selection").append("<option value=\"\"disabled selected>--Please Select--</option>");
-	//$(array_list).each(function (i) { //populate child options
-	$("#sub_Category").html(""); //reset child options
-	$("#sub_Category").append("<option value=\"\"disabled selected>--Please Select--</option>");
-	
-	{%for i in category%}
- 	var count ={{i.department_id_id}}
-	if(count == array_list){		
-		$("#category_selection").append("<option value={{i.id}}>{{i.title}}</option>");
+	 }
+	 #t1 th {
+	 	padding-top: 15px;
+	  padding-bottom: 1px;
+	    border-bottom: 2px solid #D3D3D3;
 	}
-	{%endfor%}	
-}
+	   #t1 td{
+	  padding-top: 5px;
+	  padding-bottom: 1px;
+	  text-align: left;
 
-$("#category_selection").change(function() {
-	var parent = $(this).val(); //get option value from parent 
-		select_subcategory(parent);
-});
+	 padding-left: 20px;
+	 padding-right: 20px;
 
-function select_subcategory(array_list)
-{
-	$("#sub_Category").html(""); //reset child options
-	$("#sub_Category").append("<option value=\"\"disabled selected>--Please Select--</option>");
-	//$(array_list).each(function (i) { //populate child options
-	
-	{%for i in subCategory%}
- 	var count ={{i.department_id_id}}
- 	
-	if(count == array_list){		
-		$("#sub_Category").append("<option value={{i.id}}>{{i.title}}</option>");
+
 	}
-	{%endfor%}	
-}
 
-});
+	#t1 {
+	  border-collapse: separate;
+	  border-spacing: -50px;
+	   padding-left: 10px;
+	   padding-right: 10px;
+	}
 
-</script>
+	</style>
+	<script language="javascript" type="text/javascript">  
+
+	$(document).ready(function(){
+	 
+
+	//If parent option is changed
+	$("#department_selection").change(function() {
+		var parent = $(this).val(); //get option value from parent 
+			select_category(parent);
+	});
+
+	//function to populate child select box
+	function select_category(array_list)
+	{
+		$("#category_selection").html(""); //reset child options
+		$("#category_selection").append("<option value=\"\"disabled selected>--Please Select--</option>");
+		//$(array_list).each(function (i) { //populate child options
+		$("#sub_Category").html(""); //reset child options
+		$("#sub_Category").append("<option value=\"\"disabled selected>--Please Select--</option>");
+		
+		{%for i in category%}
+	 	var count ={{i.department_id_id}}
+		if(count == array_list){		
+			$("#category_selection").append("<option value={{i.id}}>{{i.title}}</option>");
+		}
+		{%endfor%}	
+	}
+
+	$("#category_selection").change(function() {
+		var parent = $(this).val(); //get option value from parent 
+			select_subcategory(parent);
+	});
+
+	function select_subcategory(array_list)
+	{
+		$("#sub_Category").html(""); //reset child options
+		$("#sub_Category").append("<option value=\"\"disabled selected>--Please Select--</option>");
+		//$(array_list).each(function (i) { //populate child options
+		
+		{%for i in subCategory%}
+	 	var count ={{i.department_id_id}}
+	 	
+		if(count == array_list){		
+			$("#sub_Category").append("<option value={{i.id}}>{{i.title}}</option>");
+		}
+		{%endfor%}	
+	}
+
+	});
+
+	</script>
 
  
 </head>
@@ -106,182 +106,183 @@ function select_subcategory(array_list)
     <form  method="POST">
     	{%csrf_token%}
 
- <div class="table-responsive"> 
-		<table style="width:100%"id="t1" >
+ 		<div class="table-responsive"> 
+			<table style="width:100%"id="t1" >
 
-			<th>Ticket Details</th>
-			<th></th><th></th>
-			<tr>
-				<td>Ticket Type<font color="red">*</font></td>
-				<td>Location<font color="red">*</font></td>
-				<td>Department<font color="red">*</font></td>
-			</tr>
-			<tr>
-				<td>
-				{%if ticket %}
-					<select class="form-control" name="type" data-size="5" class="form-control" disabled style="width:250px;" >
-				{%else%}
-					<select class="form-control" name="type" data-size="5" class="form-control" style="width:250px;" required >
-				{%endif%}
-						<option value=""disabled selected>-- Please Select --</option>
-						<option value="Request" selected >Request</option>							
-					</select>
-				</td>
-				<td>
-				{%if ticket %}
-					<select class="form-control" name="location" style="width:250px;" disabled>
-						<option value="All" selected >All</option>
-				{%else%}
-					<select class="form-control" name="location" style="width:250px;"required>
-						<option value=""disabled selected>-- Please Select --</option>
-						<option value="All" selected >All</option>
-				{%endif%}
-						
-					</select>
-				</td>
-				<td>
-				{%if ticket %}
-					<select class="form-control" disabled name="department" data-size="5" class="form-control" style="width:250px;" id="department_selection">
-				{%else%}
-					<select class="form-control" name="department" data-size="5" class="form-control" style="width:250px;" id="department_selection" required >
-				{%endif%}
-						<option value=""disabled selected>-- Please Select --</option>
-						{% for dept in departments %}
-							{% if dept.department == ticket.HelpdeskDepartment%}
-								<option value={{dept.id}} selected >{{dept.department}}
-								
-								</option>
-							{%else%}
-								<option value={{dept.id}}>{{dept.department}}</option>
-							{%endif%}
-						{%endfor%}
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<td>Category<font color="red">*</font></td>
-				<td>Sub Category<font color="red">*</font></td>
-				<td>Priority<font color="red">*</font></td>
-			</tr>
-			<tr>
-				<td>
-				{%if ticket %}
-					<select class="form-control" disabled name="category" style="width:250px;"id="category_selection" required>
-				{%else%}
-					<select class="form-control" name="category" style="width:250px;"id="category_selection" required>
-				{%endif%}
-
-						<option value=""disabled selected>-- Please Select --</option>
+				<th>Ticket Details</th>
+				<th></th><th></th>
+				<tr>
+					<td>Ticket Type<font color="red">*</font></td>
+					<td>Location<font color="red">*</font></td>
+					<td>Department<font color="red">*</font></td>
+				</tr>
+				<tr>
+					<td>
+					{%if ticket %}
+						<select class="form-control" name="type" data-size="5" class="form-control" disabled style="width:250px;" >
+					{%else%}
+						<select class="form-control" name="type" data-size="5" class="form-control" style="width:250px;" required >
+					{%endif%}
+							<option value=""disabled selected>-- Please Select --</option>
+							<option value="Request" selected >Request</option>							
+						</select>
+					</td>
+					<td>
+					{%if ticket %}
+						<select class="form-control" name="location" style="width:250px;" disabled>
+							<option value="All" selected >All</option>
+					{%else%}
+						<select class="form-control" name="location" style="width:250px;"required>
+							<option value=""disabled selected>-- Please Select --</option>
+							<option value="All" selected >All</option>
+					{%endif%}
+							
+						</select>
+					</td>
+					<td>
+					{%if ticket %}
+						<select class="form-control" disabled name="department" data-size="5" class="form-control" style="width:250px;" id="department_selection">
+					{%else%}
+						<select class="form-control" name="department" data-size="5" class="form-control" style="width:250px;" id="department_selection" required >
+					{%endif%}
+							<option value=""disabled selected>-- Please Select --</option>
 							{% for dept in departments %}
 								{% if dept.department == ticket.HelpdeskDepartment%}
-									{%for cat in category%}
-										{%if cat.department_id_id == dept.id%}
-											{%if cat.title == ticket.HelpdeskCategory%}
-												<option value={{cat.id}} selected>{{cat.title}}</option>
-											{%else%}
-												<option value={{cat.id}} >{{cat.title}}</option>
+									<option value={{dept.id}} selected >{{dept.department}}
+									
+									</option>
+								{%else%}
+									<option value={{dept.id}}>{{dept.department}}</option>
+								{%endif%}
+							{%endfor%}
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td>Category<font color="red">*</font></td>
+					<td>Sub Category<font color="red">*</font></td>
+					<td>Priority<font color="red">*</font></td>
+				</tr>
+				<tr>
+					<td>
+					{%if ticket %}
+						<select class="form-control" disabled name="category" style="width:250px;"id="category_selection" required>
+					{%else%}
+						<select class="form-control" name="category" style="width:250px;"id="category_selection" required>
+					{%endif%}
+
+							<option value=""disabled selected>-- Please Select --</option>
+								{% for dept in departments %}
+									{% if dept.department == ticket.HelpdeskDepartment%}
+										{%for cat in category%}
+											{%if cat.department_id_id == dept.id%}
+												{%if cat.title == ticket.HelpdeskCategory%}
+													<option value={{cat.id}} selected>{{cat.title}}</option>
+												{%else%}
+													<option value={{cat.id}} >{{cat.title}}</option>
+												{%endif%}
+									
 											{%endif%}
-								
+										{%endfor%}
+									{%endif%}
+								{%endfor%}
+						</select>
+					</td>
+					<td>
+					{%if ticket %}
+						<select class="form-control"  disabled name="sub_category"  style="width:250px;" class="form-control"  id="sub_Category">
+					{%else%}
+						<select class="form-control" name="sub_category"  style="width:250px;" class="form-control"  id="sub_Category">
+					{%endif%}
+							<option value=""disabled selected>-- Please Select --</option>
+							{% for cat in category %}
+								{% if cat.title == ticket.HelpdeskCategory%}
+									{%for sub in subCategory%}
+										{%if sub.department_id_id == cat.id%}
+											{%if sub.title == ticket.HelpdeskSubCategory%}
+												<option value={{sub.id}} selected>{{sub.title}}</option>
+											{%else%}
+												<option value={{sub.id}}>{{sub.title}}</option>
+											{%endif%}
 										{%endif%}
 									{%endfor%}
 								{%endif%}
 							{%endfor%}
-					</select>
-				</td>
-				<td>
-				{%if ticket %}
-					<select class="form-control"  disabled name="sub_category"  style="width:250px;" class="form-control"  id="sub_Category">
-				{%else%}
-					<select class="form-control" name="sub_category"  style="width:250px;" class="form-control"  id="sub_Category">
-				{%endif%}
-						<option value=""disabled selected>-- Please Select --</option>
-						{% for cat in category %}
-							{% if cat.title == ticket.HelpdeskCategory%}
-								{%for sub in subCategory%}
-									{%if sub.department_id_id == cat.id%}
-										{%if sub.title == ticket.HelpdeskSubCategory%}
-											<option value={{sub.id}} selected>{{sub.title}}</option>
-										{%else%}
-											<option value={{sub.id}}>{{sub.title}}</option>
-										{%endif%}
-									{%endif%}
-								{%endfor%}
-							{%endif%}
-						{%endfor%}
-					</select>
-				</td>
-				<td>
-				{%if ticket %}
-					<select class="form-control" disabled name="priority" required>
-				{%else%}
-					<select class="form-control" name="priority" required>
-				{%endif%}
-						<option value=""disabled selected>-- Please Select --</option>
-						{% if ticket.HelpdeskPriority == "Low" %}
-							<option value="Low" selected>Low</option>
-							<option value="Medium">Medium</option>
-							<option value="High">High</option>
-						{% elif ticket.HelpdeskPriority == "Medium"%}
-							<option value="Low">Low</option>
-							<option value="Medium" selected>Medium</option>
-							<option value="High">High</option>
-						{% elif ticket.HelpdeskPriority == "High"%}
-							<option value="Low">Low</option>
-							<option value="Medium">Medium</option>
-							<option value="High" selected>High</option>
-						{% else %}
-							<option value="Low">Low</option>
-							<option value="Medium">Medium</option>
-							<option value="High">High</option>
-						{% endif %}
-					</select>
-				</td>
-			</tr>
-			<tr></tr>
-			<th>TAT</th>
-			<th></th><th></th>
-			<tr>
-				<td colspan="2">
-					Request matching the above rules should be resolved within <font color="red">*</font>
-				</td>
-			</tr>
-			<tr>
-				<td colspan="2"><input type="number" name="TATHrs" value={{ticket.TATHrs}}>
-				 <input type="number" name="TATMins" value={{ticket.TATMins}} name=""></td>
-			</tr>
-			<tr></tr>
-			<th>Escalation Matrix</th>
-			<tr>
-				<td colspan="2">
-					If resolution time is elapsed then Escalate
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<b>Escalate</b> After <input type="number" name="EM_0_AfterHrs" value="{{ticket.EM_0_AfterHrs}}" style="width:60px;" >  
-					<input style="width:60px;"  type="number" name="EM_0_AfterMin" value={{ticket.EM_0_AfterMin}}>
-				</td>
-				<td>
-					<b>To</b> <input type="text" name="EM_0_Name" value="{{ticket.EM_0_Name}}" id="default" list="languages">
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<b>Escalate</b> After <input type="number" name="EM_1_AfterHrs" value="{{ticket.EM_1_AfterHrs}}" style="width:60px;" >  <input type="number" style="width:60px;" name="EM_1_AfterMin" value="{{ticket.EM_1_AfterMin}}" >
-				</td>
-				<td>
-					<b>To</b> <input type="text" name="EM_1_Name" value="{{ticket.EM_1_Name}}" id="default" list="languages">
-				</td>
-			</tr>
-		</table>
-	<div class="modal-footer">
-		{% if ticket %}
-          <button type="submit" class="btn btn-primary" formaction="/edit_sla/{{ticket.id}}"><span class="glyphicon glyphicon-check"></span> Update</button>
-           <button type="submit" class="btn btn-primary" formaction="/delete_sla/{{ticket.id}}"><span class="glyphicon glyphicon-trash"></span> Delete</button>
-        {% else %}
-        	 <button type="submit" class="btn btn-primary" formaction="/add_sla"><span class="glyphicon glyphicon-plus-sign"></span> Add</button>
-        {% endif %}
-    </div>
+						</select>
+					</td>
+					<td>
+					{%if ticket %}
+						<select class="form-control" disabled name="priority" required>
+					{%else%}
+						<select class="form-control" name="priority" required>
+					{%endif%}
+							<option value=""disabled selected>-- Please Select --</option>
+							{% if ticket.HelpdeskPriority == "Low" %}
+								<option value="Low" selected>Low</option>
+								<option value="Medium">Medium</option>
+								<option value="High">High</option>
+							{% elif ticket.HelpdeskPriority == "Medium"%}
+								<option value="Low">Low</option>
+								<option value="Medium" selected>Medium</option>
+								<option value="High">High</option>
+							{% elif ticket.HelpdeskPriority == "High"%}
+								<option value="Low">Low</option>
+								<option value="Medium">Medium</option>
+								<option value="High" selected>High</option>
+							{% else %}
+								<option value="Low">Low</option>
+								<option value="Medium">Medium</option>
+								<option value="High">High</option>
+							{% endif %}
+						</select>
+					</td>
+				</tr>
+				<tr></tr>
+				<th>TAT</th>
+				<th></th><th></th>
+				<tr>
+					<td colspan="2">
+						Request matching the above rules should be resolved within <font color="red">*</font>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2"><input type="number" name="TATHrs" value={{ticket.TATHrs}}>
+					 <input type="number" name="TATMins" value={{ticket.TATMins}} name=""></td>
+				</tr>
+				<tr></tr>
+				<th>Escalation Matrix</th>
+				<tr>
+					<td colspan="2">
+						If resolution time is elapsed then Escalate
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<b>Escalate</b> After <input type="number" name="EM_0_AfterHrs" value="{{ticket.EM_0_AfterHrs}}" style="width:60px;" >  
+						<input style="width:60px;"  type="number" name="EM_0_AfterMin" value={{ticket.EM_0_AfterMin}}>
+					</td>
+					<td>
+						<b>To</b> <input type="text" name="EM_0_Name" value="{{ticket.EM_0_Name}}" id="default" list="languages">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<b>Escalate</b> After <input type="number" name="EM_1_AfterHrs" value="{{ticket.EM_1_AfterHrs}}" style="width:60px;" >  <input type="number" style="width:60px;" name="EM_1_AfterMin" value="{{ticket.EM_1_AfterMin}}" >
+					</td>
+					<td>
+						<b>To</b> <input type="text" name="EM_1_Name" value="{{ticket.EM_1_Name}}" id="default" list="languages">
+					</td>
+				</tr>
+			</table>
+			<div class="modal-footer">
+				{% if ticket %}
+		          <button type="submit" class="btn btn-primary" formaction="/edit_sla/{{ticket.id}}"><span class="glyphicon glyphicon-check"></span> Update</button>
+		           <button type="submit" class="btn btn-primary" formaction="/delete_sla/{{ticket.id}}"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+		        {% else %}
+		        	 <button type="submit" class="btn btn-primary" formaction="/add_sla"><span class="glyphicon glyphicon-plus-sign"></span> Add</button>
+		        {% endif %}
+		    </div>
+		   
 	</form>
 	<script>
 		$(document).ready(function(){

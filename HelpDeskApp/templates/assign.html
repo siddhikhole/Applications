@@ -1,29 +1,27 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title></title>
-</head>
+
 <body>
 	<div class="modal-header"><b><span class="glyphicon glyphicon-link"></span> Assign Ticket</b>
-        		<button type="button" class="close" data-dismiss="modal">&times;</button>
-        		<h4 class="modal-title"></h4>
-        		</div>
-        		<form action="/assignTicket/{{ticket_id}}" method="POST" enctype="multipart/form-data">
-        			{% csrf_token %} 
-        		<label><b>Select Person:</b></label>
-        		<select name="assignTo" required> 
-					<option value=""disabled selected>-- Please Select --</option>
-					{% for i in all_items %}
-					<option value="{{i.employee_id}}">{{i.employee_name}}</option>
-					{% endfor %}
-        		</select><br>
-        		<label><b>Comment:</b></label>
-        		<textarea name="comments" rows="4" cols="20"></textarea><br>
-        		<button type="Submit">Assign</button>
-        	</form>
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h4 class="modal-title"></h4>
+  </div>
+  <form action="/assignTicket/{{ticket_id}}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %} 
+    <label><b>Select Person:</b></label>
+    <select name="assignTo" required> 
+        <option value=""disabled selected>-- Please Select --</option>
+        {% for i in all_items %}
+        <option value="{{i.employee_id}}">{{i.employee_name}}</option>
+       {% endfor %}
+    </select><br>
+    <label><b>Comment:</b></label>
+    <textarea name="comments" rows="4" cols="20"></textarea><br>
+    <button type="Submit">Assign</button>
+</form>
 
-        		<div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+</div>
 </body>
 </html>

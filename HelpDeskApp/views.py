@@ -12,13 +12,18 @@ from django.contrib.auth.models import AnonymousUser
 import numpy as np
 from HelpDeskApp.authhelper import get_signin_url,get_token_from_code   
 from HelpDeskApp.outlookservice import get_me
-from HelpDeskApp.email import send_html_mail 
+from HelpDeskApp.email import send_html_mail
+#from HelpDeskApp.autocancel import autocancel 
 from HelpDesk import settings
 from .models import WorkflowRequest,HelpdeskRequestSLAs,EmployeeMaster,AppList,HelpdeskOfficeLocation,HelpdeskDepartments,Categories,sub_categories,HelpdeskFulfillerGroups,HelpRequest,Workflow_email_templates
 from .service import get_users
- 
+import matplotlib
+matplotlib.use('Agg')
+from matplotlib import pyplot as plt
 
-
+import os
+import schedule
+import time
 
 
 
@@ -57,44 +62,37 @@ def email(key,t_id,emailid,msg):
     #sender = "siddhikhole@gmail.com"
     send_html_mail(subject, email_msg, to, sender,files)
 
-    
+from background_task import background
+
 
 def autocancel():
-    '''Auomatic close,cancel ticket and escalation matrix'''
-    
-    threading.Timer(60.0, autocancel).start()
-    
+    #threading.Timer(60.0, autocancel).start()
     total_hrs = 40
     seconds = 0
     days = total_hrs/8   
     while total_hrs >= 8:
         seconds = seconds + 86400
         total_hrs = total_hrs - 8
-        
     seconds = seconds + (total_hrs * 3600)
+    
+
     
     a = 0
     for i in range(int(days)):
-        
         dt1 = datetime.datetime.now() + timedelta(i+1)
         if(dt1.strftime("%A") == "Saturday"):
-            
+              
             a = a + 172800
-                
-                
-    
-                
+        
     dt = datetime.datetime.now() + timedelta(seconds = a  + seconds)
     
     date = datetime.datetime.strptime(str(datetime.datetime.now()), '%Y-%m-%d %H:%M:%S.%f')
     '''print(date.strftime("%Y-%m-%d %H:%M:%S"))
-    print("----"+str(datetime.datetime.now()))
-    print(str(dt))'''
+        print("----"+str(datetime.datetime.now()))
+        print(str(dt))'''
     
     
-
     item = HelpRequest.objects.all().filter(WorkflowStatus = "Workflow Initiated")
-
     for i in item:
         #print(datetime.datetime.strptime(str(i.created_at), '%Y-%m-%d %H:%M:%S.%f').date())
         date1 =  str(datetime.datetime.now())
@@ -103,50 +101,41 @@ def autocancel():
         date2 = datetime.datetime.strptime(date2, '%Y-%m-%d %H:%M:%S.%f+00:00')
         '''print(date1)
         print(date2)
-'''
-        
+''' 
+          
         diff = date1 - date2 
         days = diff.days
     #   print (str(days) + ' day(s)')
-
         days_to_hours = days * 24
         diff_btw_two_times = (diff.seconds) / 3600
         overall_hours = days_to_hours + diff_btw_two_times
-        
-        #print (str(overall_hours) + ' hours');
-
+          
+            #print (str(overall_hours) + ' hours');
         hours_to_minutes = overall_hours * 60
         diff_btw_two_times = (diff.seconds) / 60
         overall_minutes = hours_to_minutes + diff_btw_two_times
         #print (str(overall_minutes) + ' minutes');
     
-
         days = np.busday_count( date2.date(), date1.date())
-        #print(days) 
+            #print(days) 
         hour = 48
         for d in range(days + 1):
             d1 = date2 + timedelta(d)
         #   print(d1.strftime("%A"))
-
             if(d1.strftime("%A") == "Saturday"):
                 hour = hour + 48
-
         #print(d1.strftime("%A"))
-
-
         #print("Waiting for: "+str(hour))
-
         if(overall_hours > hour):
             item2 = HelpRequest.objects.get(id = i.id)
             item2.WorkflowStatus = "Cancel"
-            item2.WorkflowCurrentStatus = "Cancel"
+            item2.WorkflowCurrentStatus = "AutoCancel"
             item2.save()
             item1 = WorkflowRequest.objects.get(RequestID_id=i.id,RequestStatus="Pending")
             item1.RequestStatus = "Incomplete"
             item1.save()
             form = WorkflowRequest(Process="Cancel",ActedOn=str(datetime.datetime.now()),RequestStatus="Auto Cancelled",RequestID_id=i.id)
             form.save()
-
             key = "HelpdeskTemplate_AssignTask"
             msg = "Your attention is requested for following helpdesk ticket-"
             FirstApprover = EmployeeMaster.objects.values_list('email',flat=True).filter(associated_user_account=i.FirstLevelApproverEmployeeName)
@@ -155,163 +144,151 @@ def autocancel():
             employee = [employee[0],FirstApprover[0]]
             email(key,i.id,employee,msg)    
         print("_"*50)
-
-    ###############################################################################################
-                #####Auto Close#####
-    ###############################################################################################
-
-    item = HelpRequest.objects.all().filter(WorkflowStatus="Completed")
-    for i in item:
-        #print("#"*40)
-        item1 = WorkflowRequest.objects.get(Process="Complete",RequestStatus="Completed",RequestID_id=i.id)
-        date1 =  str(datetime.datetime.now())
-        date1 = datetime.datetime.strptime(date1, '%Y-%m-%d %H:%M:%S.%f')
-        date2 = str(item1.ActedOn)
-        date2 = datetime.datetime.strptime(date2, '%Y-%m-%d %H:%M:%S.%f+00:00')
-        diff = date1 - date2
-
-        days = diff.days
-        #print (str(days) + ' day(s)')
-
-        days_to_hours = days * 24
-        diff_btw_two_times = (diff.seconds) / 3600
-        overall_hours = days_to_hours + diff_btw_two_times
-        #print (str(overall_hours) + ' hours');
-
-        hours_to_minutes = overall_hours * 60
-        diff_btw_two_times = (diff.seconds) / 60
-        overall_minutes = hours_to_minutes + diff_btw_two_times
-        #print (str(overall_minutes) + ' minutes');
+        ###############################################################################################
+                    #####Auto Close#####
+        ###############################################################################################
+        item = HelpRequest.objects.all().filter(WorkflowStatus="Completed")
+        for i in item:
+            #print("#"*40)
+            item1 = WorkflowRequest.objects.get(Process="Complete",RequestStatus="Completed",RequestID_id=i.id)
+            date1 =  str(datetime.datetime.now())
+            date1 = datetime.datetime.strptime(date1, '%Y-%m-%d %H:%M:%S.%f')
+            date2 = str(item1.ActedOn)
+            date2 = datetime.datetime.strptime(date2, '%Y-%m-%d %H:%M:%S.%f+00:00')
+            diff = date1 - date2
+            days = diff.days
+            #print (str(days) + ' day(s)')
+            days_to_hours = days * 24
+            diff_btw_two_times = (diff.seconds) / 3600
+            overall_hours = days_to_hours + diff_btw_two_times
+            #print (str(overall_hours) + ' hours');
+            hours_to_minutes = overall_hours * 60
+            diff_btw_two_times = (diff.seconds) / 60
+            overall_minutes = hours_to_minutes + diff_btw_two_times
+            #print (str(overall_minutes) + ' minutes');
     
-
-        days = np.busday_count( date2.date(), date1.date())
-        #print(days) 
-        hour = 48
-        
-        
-        for d in range(days + 1):
-            d1 = date2 + timedelta(d)
-    #print(d1.strftime("%A"))
-
-            if(d1.strftime("%A") == "Saturday"):
-                hour = hour+48
-
-    #   print(d1.strftime("%A"))
-
-
-    #   print("Waiting for: "+str(hour))
-
-        if(overall_hours > hour):
-            i.WorkflowStatus = "Closed"
-            i.WorkflowCurrentStatus = "Closed"
-            i.save()
-
-            item1.Process = "Closed"
-            item1.save()
-
-            form1 = WorkflowRequest(Process = "Close" , ActedOn = str(datetime.datetime.now()) , RequestStatus = "Auto Closed",RequestID_id = i.id)
-            form1.save()
-
-            key = "HelpdeskTemplate_AssignTask"
-            msg = "Your attention is requested for following helpdesk ticket-"
-            
-            emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat = True).filter(id = i.id)
-            Employee = EmployeeMaster.objects.values_list('email',flat = True).filter(empid = emailid[0])
-            Employee = [Employee[0]]
-            email(key,i.id,Employee,msg)
-    #################################################################################
-    ############Escalation############
-    #################################################################################
-    item = HelpRequest.objects.all().filter((Q(RequestStatus = "1") | Q(RequestStatus = "2")),WorkflowStatus = "Activated")
-    for i in item:
-        item1 = HelpdeskRequestSLAs.objects.all().filter(HelpdeskCategory = i.category,HelpdeskDepartment = i.department,HelpdeskPriority = i.priority,HelpdeskSubCategory = i.sub_category)
-        print(i.WorkflowStatus)
-        print(i.id)
-        date1 =  str(datetime.datetime.now())
-        date1 = datetime.datetime.strptime(date1, '%Y-%m-%d %H:%M:%S.%f')
-        date2 = str(i.WorkflowModifiedOn)
-        date2 = datetime.datetime.strptime(date2, '%Y-%m-%d %H:%M:%S.%f+00:00')
-        diff = date1 - date2
-        
-        days = diff.days
+            days = np.busday_count( date2.date(), date1.date())
+            #print(days) 
+            hour = 48
+          
+          
+            for d in range(days + 1):
+                d1 = date2 + timedelta(d)
+        #print(d1.strftime("%A"))
+                if(d1.strftime("%A") == "Saturday"):
+                    hour = hour+48
+        #   print(d1.strftime("%A"))
+        #   print("Waiting for: "+str(hour))
+            if(overall_hours > hour):
+                i.WorkflowStatus = "Closed"
+                i.WorkflowCurrentStatus = "Closed"
+                i.save()
+                item1.Process = "Closed"
+                item1.save()
+                form1 = WorkflowRequest(Process = "Close" , ActedOn = str(datetime.datetime.now()) , RequestStatus = "Auto Closed",RequestID_id = i.id)
+                form1.save()
+                key = "HelpdeskTemplate_AssignTask"
+                msg = "Your attention is requested for following helpdesk ticket-"
+              
+                emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat = True).filter(id = i.id)
+                Employee = EmployeeMaster.objects.values_list('email',flat = True).filter(empid = emailid[0])
+                Employee = [Employee[0]]
+                email(key,i.id,Employee,msg)
+        #################################################################################
+        ############Escalation############
+        #################################################################################
+        item = HelpRequest.objects.all().filter((Q(RequestStatus = "1") | Q(RequestStatus = "2")),WorkflowStatus = "Activated")
+        print("#"*40)
+        print(item)
+        for i in item:
+            item1 = HelpdeskRequestSLAs.objects.all().filter(HelpdeskCategory = i.category,HelpdeskDepartment = i.department,HelpdeskPriority = i.priority,HelpdeskSubCategory = i.sub_category)
+            print("@"*40)
+            print(i.WorkflowStatus)
+            print(i.id)
+            date1 =  str(datetime.datetime.now())
+            date1 = datetime.datetime.strptime(date1, '%Y-%m-%d %H:%M:%S.%f')
+            date2 = str(i.WorkflowModifiedOn)
+            date2 = datetime.datetime.strptime(date2, '%Y-%m-%d %H:%M:%S.%f+00:00')
+            diff = date1 - date2
+          
+            days = diff.days
     
-        #print (str(days) + ' day(s)')
-
-        days_to_hours = days * 24
-        diff_btw_two_times = (diff.seconds) / 3600
-        overall_hours = days_to_hours + diff_btw_two_times
-        #print (str(overall_hours) + ' hours');
-
-        hours_to_minutes = overall_hours * 60
-        diff_btw_two_times = (diff.seconds) / 60
-        overall_minutes = hours_to_minutes + diff_btw_two_times
-        #print (str(overall_minutes) + ' minutes');
-        
-
-
-        days = np.busday_count( date2.date(), date1.date())
-        #print(days) 
-        for h in item1:
-            if(i.RequestStatus == "1"):   
-                receiver = h.EM_0_To
-                wait = h.EM_0_AfterHrs
-                #wait=0.0166667
-            elif(i.RequestStatus == "2"):
-                wait = h.EM_1_AfterHrs
-                #wait=0.0166667
-                receiver = h.EM_1_To
+            #print (str(days) + ' day(s)')
+            days_to_hours = days * 24
+            diff_btw_two_times = (diff.seconds) / 3600
+            overall_hours = days_to_hours + diff_btw_two_times
+            #print (str(overall_hours) + ' hours');
+            hours_to_minutes = overall_hours * 60
+            diff_btw_two_times = (diff.seconds) / 60
+            overall_minutes = hours_to_minutes + diff_btw_two_times
+            #print (str(overall_minutes) + ' minutes');
+          
+            days = np.busday_count( date2.date(), date1.date())
+            #print(days) 
+            for h in item1:
+                if(i.RequestStatus == "1"):   
+                    print("&"*40)
+                    receiver = h.EM_0_To
+                    wait = h.EM_0_AfterHrs
+                    #wait=0.0166667
+                elif(i.RequestStatus == "2"):
+                    wait = h.EM_1_AfterHrs
+                    #wait=0.0166667
+                    receiver = h.EM_1_To
+                  
+                else:
+                    wait = 0
+                hour = 0
+                hours = h.TATHrs + wait
+                #hours=0.0166667+wait
+                while hours >= 8:
+                    hour = hour + 24
+                    hours = hours - 8
+          
+          
+            for d in range(days + 1):
+                d1 = date2 + timedelta(d)
+        #print(d1.strftime("%A"))
+                if(d1.strftime("%A") == "Saturday"):
+                    hour = hour + 48
+        #   print(d1.strftime("%A"))
+            print("Waiting for: " + str(hour))
+            print(overall_hours)
+            #overall_hours=125
+            print(hour - overall_hours)
+            if(overall_hours > hour):
+                print("HO")
+              
+                for i1 in item1:
+                    print("----------------"+str(i.id))
+                    print(i1.EM_0_To)
+                    Email = EmployeeMaster.objects.values_list('email',flat = True).filter(empid = receiver)
+                    print(Email[0])
                 
-            else:
-                wait = 0
-            hour = 0
-            hours = h.TATHrs + wait
-            #hours=0.0166667+wait
-            while hours >= 8:
-                hour = hour + 24
-                hours = hours - 8
-
-        
-        
-        for d in range(days + 1):
-            d1 = date2 + timedelta(d)
-    #print(d1.strftime("%A"))
-
-            if(d1.strftime("%A") == "Saturday"):
-                hour = hour + 48
-
-    #   print(d1.strftime("%A"))
+                    Pending = WorkflowRequest.objects.values_list('WorkflowPendingWith',flat = True).filter(RequestStatus = "Pending",RequestID_id = i.id)
+                    print(Pending[0])
+                    key = "HelpdeskTemplate_AssignTask"
+                    msg = "Your attention is requested for following helpdesk ticket pending for " + Pending[0] + "-"
+                    Employee = [Email[0]]
+                    email(key,i.id,Employee,msg)
+                    if(i.RequestStatus == "1"):
+                        i.RequestStatus = 2
+                        i.save()
+                    elif(i.RequestStatus == "2"):
+                        i.RequestStatus = 3
+                        i.save()
 
 
-        print("Waiting for: " + str(hour))
-        print(overall_hours)
-        #overall_hours=125
-        print(hour - overall_hours)
-        if(overall_hours > hour):
-            print("HO")
-            
-            for i1 in item1:
-            	print("----------------"+str(i.id))
-            	print(i1.EM_0_To)
-            	Email = EmployeeMaster.objects.values_list('email',flat = True).filter(empid = receiver)
-            	print(Email[0])
-            	
-            	Pending = WorkflowRequest.objects.values_list('WorkflowPendingWith',flat = True).filter(RequestStatus = "Pending",RequestID_id = i.id)
-            	print(Pending[0])
-            	key = "HelpdeskTemplate_AssignTask"
-            	msg = "Your attention is requested for following helpdesk ticket pending for " + Pending[0] + "-"
-            	Employee = [Email[0]]
-            	email(key,i.id,Employee,msg)
-            	if(i.RequestStatus == "1"):
-            		i.RequestStatus = 2
-            		i.save()
-            	elif(i.RequestStatus == "2"):
-            		i.RequestStatus = 3
-            		i.save() 
-autocancel()
+
+
+autocancel()  
+
+
 
 def home(request):
     redirect_uri = request.build_absolute_uri(reverse('HelpDeskApp:gettoken'))
     sign_in_url = get_signin_url(redirect_uri)
+    print("HI")
     return render(request,"login.html",{'sign_in_url':sign_in_url})
 
 def gettoken(request):
@@ -333,6 +310,192 @@ def gettoken(request):
         return redirect('home')
     return HttpResponseRedirect('/main')
 
+def view_Report(request):
+    try:
+        user,SLAFullfillerHead,FirstApprover,ApproverHead,FulfillerHead,Fulfiller = fulfiller(request)
+    except:
+        return redirect('home')
+    return render(request, "view_Report.html",{'Fulfiller':Fulfiller,'user':user,'SLAFulfillerHead':SLAFullfillerHead,'FirstApprover':FirstApprover,'ApproverHead':ApproverHead,'FulfillerHead':FulfillerHead})
+
+import datetime, calendar
+def Report(request):
+    try:
+        user,SLAFullfillerHead,FirstApprover,ApproverHead,FulfillerHead,Fulfiller = fulfiller(request)
+    except:
+        return redirect('home')
+    if(request.method == "POST"):
+        if(request.POST.get('department') == "All"):
+            Pending = HelpRequest.objects.filter(WorkflowStatus ="Workflow Initiated")
+            Activated = HelpRequest.objects.filter(WorkflowStatus ="Activated")
+            completed = HelpRequest.objects.filter((Q(WorkflowStatus ="Completed") | (Q(WorkflowStatus ="Closed"))),RequestStatus = "1")
+            late_completed = HelpRequest.objects.filter(((Q(RequestStatus = "2"))|(Q(RequestStatus = "3"))))
+            cancelled = HelpRequest.objects.filter(WorkflowStatus ="Cancel",WorkflowCurrentStatus="Cancel")
+            auto_cancel = HelpRequest.objects.filter(WorkflowStatus ="Cancel",WorkflowCurrentStatus = "AutoCancel")
+            
+            title = plt.title(f"Overall Report ({calendar.month_name[int(request.POST.get('month'))]})")
+        else:
+            Pending = HelpRequest.objects.filter(WorkflowStatus ="Workflow Initiated",department = request.POST.get('department'))
+            Activated = HelpRequest.objects.filter(WorkflowStatus ="Activated",department = request.POST.get('department'))
+            completed = HelpRequest.objects.filter((Q(WorkflowStatus ="Completed") | (Q(WorkflowStatus ="Closed"))),RequestStatus = "1",department = request.POST.get('department'))
+            late_completed = HelpRequest.objects.filter(((Q(RequestStatus = "2"))|(Q(RequestStatus = "3"))),department = request.POST.get('department'))
+            cancelled = HelpRequest.objects.filter(WorkflowStatus ="Cancel",WorkflowCurrentStatus="Cancel",department = request.POST.get('department'))
+            #auto_cancel = WorkflowRequest.objects.filter(RequestStatus = "Auto Cancelled").count()
+            auto_cancel = HelpRequest.objects.filter(WorkflowStatus ="Cancel",WorkflowCurrentStatus = "AutoCancel",department = request.POST.get('department'))
+            title = plt.title(f"Report for {request.POST.get('department')} Department ({calendar.month_name[int(request.POST.get('month'))]})")
+            
+        ##################################################################
+        ##############PIE#################################################
+        ##################################################################
+        print(late_completed.count())
+        late_count = complete_count = activated_count = pending_count = cancel_count=autocancel_count = 0
+        for i in late_completed:
+            date_time_obj = datetime.datetime.strptime(i.expected_closure, '%Y-%m-%d %H:%M:%S.%f')
+            if(str(date_time_obj.month) == request.POST.get('month')):
+    
+                late_count += 1
+
+        for i in Pending:
+            date_time_obj = datetime.datetime.strptime(i.expected_closure, '%Y-%m-%d %H:%M:%S.%f')
+            if(str(date_time_obj.month) == request.POST.get('month')):
+                pending_count += 1
+        for i in Activated:
+            date_time_obj = datetime.datetime.strptime(i.expected_closure, '%Y-%m-%d %H:%M:%S.%f')
+            if(str(date_time_obj.month) == request.POST.get('month')):
+                activated_count += 1
+        for i in completed:
+            date_time_obj = datetime.datetime.strptime(i.expected_closure, '%Y-%m-%d %H:%M:%S.%f')
+            if(str(date_time_obj.month) == request.POST.get('month')):
+                complete_count += 1
+        for i in cancelled:
+            date_time_obj = datetime.datetime.strptime(i.expected_closure, '%Y-%m-%d %H:%M:%S.%f')
+            if(str(date_time_obj.month) == request.POST.get('month')):
+                cancel_count += 1
+        for i in auto_cancel:
+            date_time_obj = datetime.datetime.strptime(i.expected_closure, '%Y-%m-%d %H:%M:%S.%f')
+            if(str(date_time_obj.month) == request.POST.get('month')):
+                autocancel_count += 1
+        print("#"*50)
+
+        
+        total = [complete_count,late_count,activated_count,pending_count,cancel_count,autocancel_count]
+
+      
+
+
+        print(total)
+        if(sum(total) == 0):
+            return render(request, "report.html",{'Fulfiller':Fulfiller,'user':user,'SLAFulfillerHead':SLAFullfillerHead,'FirstApprover':FirstApprover,'ApproverHead':ApproverHead,'FulfillerHead':FulfillerHead})
+        else:
+    
+            labels=["Completed","Escalated","Activated","Pending","Cancelled","Auto-Cancelled"]
+            
+            title.set_ha("left")
+            plt.gca().axis("equal")
+            explode = (0.05,0.05,0.05,0.05,0.05,0.05)
+        
+            pie = plt.pie(total, startangle=0,pctdistance=0.85,autopct='%1.1f%%',explode = explode)
+                
+            centre_circle = plt.Circle((0,0),0.70,fc='white')
+            fig = plt.gcf()
+        
+            fig.gca().add_artist(centre_circle)
+        
+            res_list = [] 
+            for i in range(0, len(total)): 
+                res_list.append(labels[i] +" ( "+str(total[i]) + " )") 
+        
+            plt.legend(res_list, bbox_to_anchor=(1,0.5), loc="center right", fontsize=10, 
+                       bbox_transform=plt.gcf().transFigure)
+            plt.subplots_adjust(left=0.07, bottom=0.1, right=0.55)
+            
+            plt.savefig("media/report/pie.png")
+            plt.close()
+
+            ####################################
+            ##################################
+            labels=["Achived\nTickets","Violated\nTickets"]
+            total = [sum(total)-late_count,late_count]
+
+            plt.gca().axis("equal")
+            explode = (0.0,0.0)
+
+        
+            pie = plt.pie(total,labels=labels,startangle=90,pctdistance=0.85,autopct='%1.1f%%',explode = explode)
+            title = plt.title(f"Achived vs. Violated Tickets ({calendar.month_name[int(request.POST.get('month'))]})")  
+            centre_circle = plt.Circle((0,0),0.80,fc='white')
+            fig = plt.gcf()
+            title.set_ha("center")
+        
+            fig.gca().add_artist(centre_circle)
+        
+            res_list = [] 
+            for i in range(0, len(total)): 
+                res_list.append(labels[i] +" ( "+str(total[i]) + " )") 
+
+        
+            #plt.legend(res_list, bbox_to_anchor=(1,0.5), loc="center right", fontsize=10,bbox_transform=plt.gcf().transFigure)
+            plt.subplots_adjust(left=0.06, bottom=0.1, right=0.55)
+
+            plt.savefig("media/report/pie2.png")
+            plt.close()
+            #############################################################
+            #############Bar##############################
+
+
+            num_days = calendar.monthrange(2019,int(request.POST.get('month')))[1]
+            y = []
+            for day in range(1, num_days+1):
+                cnt=0
+                for i in late_completed:
+                    date_time_obj = datetime.datetime.strptime(i.expected_closure, '%Y-%m-%d %H:%M:%S.%f')
+                    
+                    date_time_obj = date_time_obj.strftime("%Y-%m-%d")
+
+                    date_time_obj1 = datetime.datetime(2019,int( request.POST.get('month')), day)
+                    date_time_obj1 = date_time_obj1.strftime("%Y-%m-%d")
+
+                    if(date_time_obj1 == date_time_obj ):
+                        
+                        cnt += 1
+                y.append(cnt)
+
+            print("^"*100)
+            
+
+            days = [datetime.date(2019, int(request.POST.get('month')), day) for day in range(1, num_days+1)]
+            x = days
+            a =[]
+            for i in days:
+                print(i.strftime("%d-%b"))
+                a.append(i.strftime("%d %b")) 
+         
+            print(len(x))
+            print(len(y))
+
+            print(a)
+            print(days)
+            
+            plt.figure(figsize=(14, 5))
+            plt.bar(a,y,width =0.5,label ='SLAs violated tickets\n\nTotal tickets '+str(sum(y)))
+            plt.xticks(a, rotation=320,ha='left')
+
+            plt.xlabel('Ticket Count')
+            plt.ylabel('Ticket Count')
+            plt.title('SLAs violated tickets',fontsize=20)
+            plt.legend()
+
+            plt.savefig("media/report/abcde.png")
+            plt.close()
+            files = "report/abcde.png"
+            filess = "report/pie.png"
+            files3 = "report/pie2.png"
+
+            print(f"{files}#######################################################")
+            return render(request, "report.html",{'files3':files3,'media_url':settings.MEDIA_URL,'files':files,'filess':filess,'Fulfiller':Fulfiller,'user':user,'SLAFulfillerHead':SLAFullfillerHead,'FirstApprover':FirstApprover,'ApproverHead':ApproverHead,'FulfillerHead':FulfillerHead})
+    else:
+        return render(request, "view_Report.html",{'Fulfiller':Fulfiller,'user':user,'SLAFulfillerHead':SLAFullfillerHead,'FirstApprover':FirstApprover,'ApproverHead':ApproverHead,'FulfillerHead':FulfillerHead})
+
+    
 def fulfiller(request):
     try:
         user = request.session['username']
@@ -353,6 +516,7 @@ def main(request):
         user,SLAFullfillerHead,FirstApprover,ApproverHead,FulfillerHead,Fulfiller = fulfiller(request)
     except:
         return redirect('home')
+    print("Hiiiiiiii")
     return render(request,"index.html",{'Fulfiller':Fulfiller,'user':user,'SLAFulfillerHead':SLAFullfillerHead,'FirstApprover':FirstApprover,'ApproverHead':ApproverHead,'FulfillerHead':FulfillerHead})
     
 
@@ -1218,13 +1382,13 @@ def sla(request):
     except:
         return redirect('home')
     all_items = HelpdeskRequestSLAs.objects.all().order_by('HelpdeskDepartment','HelpdeskCategory','HelpdeskSubCategory')
-    paginator = Paginator(all_items,10)
-    page = request.GET.get('page')
-    try:
-        contacts = paginator.page(page)
-    except:
-        contacts = paginator.page(1)  
-    return render(request,"sla.html",{'Fulfiller':Fulfiller,'user':user,'SLAFulfillerHead':SLAFullfillerHead,'FirstApprover':FirstApprover,'ApproverHead':ApproverHead,'FulfillerHead':FulfillerHead,'all_items':contacts})
+    # paginator = Paginator(all_items,10)
+    # page = request.GET.get('page')
+    # try:
+    #     contacts = paginator.page(page)
+    # except:
+    #     contacts = paginator.page(1)  
+    return render(request,"pagination.html",{'Fulfiller':Fulfiller,'user':user,'SLAFulfillerHead':SLAFullfillerHead,'FirstApprover':FirstApprover,'ApproverHead':ApproverHead,'FulfillerHead':FulfillerHead,'all_items':all_items})
     
 
 def slas(request,ticket_id):
@@ -1328,13 +1492,13 @@ def delete_sla(request, ticket_id):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 #import subprocess
-import os
+
 import webbrowser
 def view_document(request,name):
     #webbrowser.open("abc.jpg");
     name="media/Documents/" + name
     webbrowser.open('file://' + os.path.realpath(name))
-    print(name)
+
     #subprocess.call("manage.py",shell=True)
  
 
