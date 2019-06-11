@@ -5,6 +5,8 @@ from os.path import basename
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import os
+from HelpDesk import settings
 
 
 class EmailThread(threading.Thread):
@@ -20,12 +22,16 @@ class EmailThread(threading.Thread):
     def run(self):
         msg = EmailMultiAlternatives(self.subject, self.html_content, self.sender, self.recipient_list)
         msg.content_subtype = 'html'
-        print(self.files) 
+        print(self.files)
+
         if(self.files == " "):
             pass
         else:
             try:
-                with open("D:/Applications/HelpDesk"+self.files, "r") as fil:
+                basedir = os.path.realpath(os.path.dirname("HelpDesk"))
+              
+
+                with open(basedir+self.files, "r") as fil:
                     part = MIMEApplication(
                     fil.read(),
                     Name=basename(self.files)
@@ -36,7 +42,7 @@ class EmailThread(threading.Thread):
                 print("&"*100)
             except:
                 print("_"*100)
-                msg.attach_file("D:/Applications/HelpDesk"+self.files)
+                msg.attach_file(basedir+self.files)
         msg.send()
         
 def send_html_mail(subject, html_content, recipient_list, sender,files):

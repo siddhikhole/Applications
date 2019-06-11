@@ -44,6 +44,7 @@ def email(key,t_id,emailid,msg):
         print("4"*10)
         files = " "
     else:
+
         files = str(settings.MEDIA_URL) + str(message[0][10])
         print(files)
         print("4"*10)
@@ -99,22 +100,18 @@ def autocancel():
         date1 = datetime.datetime.strptime(date1, '%Y-%m-%d %H:%M:%S.%f')
         date2 = str(i.created_at)
         date2 = datetime.datetime.strptime(date2, '%Y-%m-%d %H:%M:%S.%f+00:00')
-        '''print(date1)
-        print(date2)
-''' 
-          
+
         diff = date1 - date2 
         days = diff.days
-    #   print (str(days) + ' day(s)')
+
         days_to_hours = days * 24
         diff_btw_two_times = (diff.seconds) / 3600
         overall_hours = days_to_hours + diff_btw_two_times
-          
-            #print (str(overall_hours) + ' hours');
+
         hours_to_minutes = overall_hours * 60
         diff_btw_two_times = (diff.seconds) / 60
         overall_minutes = hours_to_minutes + diff_btw_two_times
-        #print (str(overall_minutes) + ' minutes');
+
     
         days = np.busday_count( date2.date(), date1.date())
             #print(days) 
