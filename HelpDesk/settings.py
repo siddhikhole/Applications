@@ -152,9 +152,3 @@ EMAIL_HOST_USER = 'aditip@nitorinfotech.com'
 EMAIL_HOST_PASSWORD = 'fngmqbzbhrsfhsfb'
 EMAIL_PORT = 587
 
-'''
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'siddhikhole@gmail.com'
-EMAIL_HOST_PASSWORD = 'alohomora@1797'
-EMAIL_PORT = 587'''
