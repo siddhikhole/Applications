@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 from django.contrib.messages import constants as messages
+import configparser
+
+config = configparser.ConfigParser()
+
+config.read('setup.ini')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -39,9 +44,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'HelpDeskApp',
-    'background_task',
-    
-    
 ]
 
 MESSAGE_TAGS = {
@@ -90,12 +92,12 @@ WSGI_APPLICATION = 'HelpDesk.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'DBHelpDesk',
-        'USER': 'postgres',
-        'PASSWORD': 'siddhi1797',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': config['DATABASE']['database_engine'],
+        'NAME': config['DATABASE']['database_name'],
+        'USER': config['DATABASE']['database_user'],
+        'PASSWORD': config['DATABASE']['database_password'],
+        'HOST': config['DATABASE']['database_host'],
+        'PORT': config['DATABASE']['database_port'],
 
     }
 }
@@ -141,14 +143,12 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-MEDIA_URL='/media/'
+MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-#MEDIA_ROOT = '/var/www/media'
-
 
 EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.live.com'
-EMAIL_HOST_USER = 'aditip@nitorinfotech.com'
-EMAIL_HOST_PASSWORD = 'fngmqbzbhrsfhsfb'
-EMAIL_PORT = 587
+EMAIL_HOST = config['EMAIL']['EMAIL_HOST']
+EMAIL_HOST_USER = config['EMAIL']['EMAIL_HOST_USER']
+EMAIL_HOST_PASSWORD = config['EMAIL']['EMAIL_HOST_PASSWORD']
+EMAIL_PORT = config['EMAIL']['EMAIL_PORT']
 
