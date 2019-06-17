@@ -36,7 +36,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '10.21.16.101',
-    'helpdesk1797.herokuapp.com'
+    'siddhihelpdesk.herokuapp.com'
 ]
 
 
