@@ -43,8 +43,9 @@ class EmailThread(threading.Thread):
             except:
                 print("_"*100)
                 msg.attach_file(basedir+self.files)
-        msg.send()
-        
+        #msg.send()
+
+
 def send_html_mail(subject, html_content, recipient_list, sender,files):
     print("@"*100)
     EmailThread(subject, html_content, recipient_list, sender,files).start()

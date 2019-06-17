@@ -205,7 +205,7 @@ def autocancel():
                     Pending = WorkflowRequest.objects.values_list('WorkflowPendingWith', flat=True).filter(
                         RequestStatus="Pending", RequestID_id=i.id)
                     key = "HelpdeskTemplate_AssignTask"
-                    msg = "Your attention is requested for following helpdesk ticket pending for " + Pending[0] + "-"
+                    msg = "Your attention is requested for following helpdesk ticket pending  "
                     employee = [Email[0]]
                     email(key, i.id, employee, msg)
                     if i.RequestStatus == "1":
