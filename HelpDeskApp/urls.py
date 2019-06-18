@@ -4,7 +4,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 
-app_name = 'tutorial'
+app_name = 'HelpDeskApp'
 urlpatterns = [
                 # The home view ('/tutorial/')
                 # url(r'^$', views.home, name='home'),

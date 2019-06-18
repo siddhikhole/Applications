@@ -5,7 +5,7 @@ import time
 import requests
 
 # Client ID and secret
-client_id = '46b1a846-0d94-41cc-9586-a190e66d35e2 '
+client_id = '46b1a846-0d94-41cc-9586-a190e66d35e2'
 client_secret = 'gogkpQKZT77_mcVGK491|[)'
 
 # Constant strings for OAuth2 flow
@@ -23,17 +23,18 @@ scopes = [ 'openid',
            'User.Read',
            'Mail.Read' ]
 
+
 def get_signin_url(redirect_uri):
-  # Build the query parameters for the signin url
-  params = { 'client_id': client_id,
+    # Build the query parameters for the signin url
+    params = { 'client_id': client_id,
              'redirect_uri': redirect_uri,
              'response_type': 'code',
              'scope': ' '.join(str(i) for i in scopes)
             }
 
-  signin_url = authorize_url.format(urlencode(params))
+    signin_url = authorize_url.format(urlencode(params))
 
-  return signin_url
+    return signin_url
 
 def get_token_from_code(auth_code, redirect_uri):
   # Build the post form for the token request
