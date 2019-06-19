@@ -17,23 +17,23 @@ from .models import WorkflowRequest, HelpdeskRequestSLAs, EmployeeMaster, AppLis
     HelpdeskDepartments, Categories, sub_categories, HelpdeskFulfillerGroups, HelpRequest, Workflow_email_templates
 from .service import get_users
 import matplotlib
-import datetime, calendar
+import datetime
+import calendar
 matplotlib.use('Agg')
 
 
-def email(key, t_id, emailid, msg):
+def email(key, t_id, email_id, msg):
 
     """
     Generates email body
     :param key: key in Workflow_email_templates table
     :param t_id: ticket_id to get ticket details
-    :param emailid: receivers email id
+    :param email_id: receivers email id
     :param msg: message in body of email
     :return: call send_html_mail function from email.py
     """
 
     email_content = Workflow_email_templates.objects.values_list('template_body', 'template_subject').filter(key=key)
-    print(t_id)
     message = HelpRequest.objects.values_list('OnBehalfUserEmployeeName', 'id', 'created_at', 'request_type',
                                               'HelpdeskOffice', 'department', 'category', 'sub_category', 'priority',
                                               'description', 'Files', 'expected_closure').filter(id=t_id)
@@ -56,26 +56,22 @@ def email(key, t_id, emailid, msg):
         replace('@@Description', str(message[0][9]))
 
     if message[0][10] == "":
-        print("4"*10)
         files = " "
     else:
         files = str(settings.MEDIA_URL) + str(message[0][10])
-        print(files)
-        print("4"*10)
-    print(str(files))
     try:
         subject = email_content[0][1].replace('@@EmployeeName',str(message[0][0]))
     except Exception as e:
         print(e)
         subject = "Ticket 2018-2019/Helpdesk/Request/"+str(t_id)+" -Helpdesk Ticket Updated"
-    to = emailid
-    sender = "aditip@nitorinfotech.com"
+    to = email_id
+    sender = "siddhikhole@nitorinfotech.com"
     send_html_mail(subject, email_msg, to, sender, files)
 
 
 def autocancel():
     """
-        sends email for auto cancel, auto close and SLA's
+        sends email for auto cancel, auto close and SLA's escaleted tickets
     """
     # threading.Timer(60.0, autocancel).start()
     total_hrs = 40
@@ -245,7 +241,7 @@ def gettoken(request):
     user_name = user['mail']
     try:
         print(user_name)
-        item = EmployeeMaster.objects.values_list('empid',flat = True).filter(email = user_name)
+        item = EmployeeMaster.objects.values_list('empid', flat=True).filter(email=user_name)
         request.session['username'] = item[0]
     except Exception as e:
         messages.success("Invalid user...")
@@ -264,7 +260,9 @@ def view_Report(request):
     except Exception as e:
         print(e)
         return redirect('home')
-    return render(request, "view_Report.html",{'Fulfiller':Fulfiller,'user':user,'SLAFulfillerHead':SLAFullfillerHead,'FirstApprover':FirstApprover,'ApproverHead':ApproverHead,'FulfillerHead':FulfillerHead})
+    return render(request, "view_Report.html", {'Fulfiller': Fulfiller, 'user': user,
+                                                'SLAFulfillerHead': SLAFullfillerHead, 'FirstApprover': FirstApprover,
+                                                'ApproverHead': ApproverHead, 'FulfillerHead': FulfillerHead})
 
 
 def Report(request):
@@ -699,8 +697,8 @@ def AssignedTickets(request):
         return redirect('home')
     empName = EmployeeMaster.objects.get(empid = request.session['username'])
     empName = empName.associated_user_account
-    all_items = WorkflowRequest.objects.all().filter(ActedByUser = request.session['username'],Process = "Complete",WorkflowPendingWith = empName,RequestStatus = "Pending")
-    print(all_items)
+    all_items = WorkflowRequest.objects.all().filter(ActedByUser=request.session['username'], Process="Complete",
+                                                     WorkflowPendingWith=empName, RequestStatus="Pending")
     total = {}
     try:
         for i in all_items:
@@ -715,13 +713,12 @@ def AssignedTickets(request):
             return HttpResponseRedirect('/main')
     except:
         if Fulfiller:
-            return render(request,"assigned.html",{})
+            return render(request, "assigned.html", {'all_items': total, 'Fulfiller': Fulfiller, 'user': user,
+                                                     'SLAFulfillerHead': SLAFullfillerHead,
+                                                     'FirstApprover': FirstApprover, 'ApproverHead': ApproverHead,
+                                                     'FulfillerHead': FulfillerHead})
         else:
             return HttpResponseRedirect('/main')
-    if Fulfiller:
-        return render(request,"assigned.html",{'all_items':total,'Fulfiller':Fulfiller,'user':user,'SLAFulfillerHead':SLAFullfillerHead,'FirstApprover':FirstApprover,'ApproverHead':ApproverHead,'FulfillerHead':FulfillerHead})
-    else:
-        return HttpResponseRedirect('/main')
 
 def complete(request,ticket_id):
     """Completeticket"""
@@ -1044,7 +1041,12 @@ def approve1(request,ticket_id):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 def reject(request,ticket_id):
-    """To reject ticket"""
+    """
+    To reject ticket
+    :param request:
+    :param ticket_id: id of ticket which is to be rejected  
+    :return:
+    """
     item = HelpRequest.objects.get(pk = ticket_id)
     item.WorkflowStatus = "Rejected"
     item.WorkflowCurrentStatus = "Rejected"
@@ -1060,9 +1062,9 @@ def reject(request,ticket_id):
         emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat = True).filter(id = ticket_id)
         Employee = EmployeeMaster.objects.values_list('email',flat = True).filter(empid = emailid[0])
         Employee = [Employee[0]]
-        email(key,ticket_id,Employee,msg)
-
+        email(key, ticket_id, Employee, msg)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 
 def reject1(request,ticket_id):
     """To reject ticket"""
