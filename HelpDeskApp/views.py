@@ -1,4 +1,8 @@
 import threading
+import matplotlib
+import datetime
+import calendar
+import webbrowser
 from datetime import timedelta
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
@@ -16,9 +20,6 @@ from HelpDesk import settings
 from .models import WorkflowRequest, HelpdeskRequestSLAs, EmployeeMaster, AppList, HelpdeskOfficeLocation, \
     HelpdeskDepartments, Categories, sub_categories, HelpdeskFulfillerGroups, HelpRequest, Workflow_email_templates
 from .service import get_users
-import matplotlib
-import datetime
-import calendar
 matplotlib.use('Agg')
 
 
@@ -43,7 +44,7 @@ def email(key, t_id, email_id, msg):
     exp = exp.strftime("%Y-%m-%d %H:%M:%S")
     email_msg = email_content[0][0].replace('@@ExpectedClosure', str(exp)).\
         replace('@@message', str(msg)).\
-        replace('@@links', '<a href="http://127.0.0.1:8000/display/'+str(t_id)+'">Click here</a>' ).\
+        replace('@@links', '<a href="http://127.0.0.1:8000/display/'+str(t_id)+'">Click here</a>').\
         replace('@@RequestorName', str(message[0][0])).\
         replace('@@RequestId', str(message[0][1])).\
         replace('@@Created', str(created)).\
@@ -65,15 +66,15 @@ def email(key, t_id, email_id, msg):
         print(e)
         subject = "Ticket 2018-2019/Helpdesk/Request/"+str(t_id)+" -Helpdesk Ticket Updated"
     to = email_id
-    sender = "siddhikhole@nitorinfotech.com"
+    sender = "siddhi.khole@nitorinfotech.com"
     send_html_mail(subject, email_msg, to, sender, files)
 
 
-def autocancel():
+def auto_cancel():
     """
         sends email for auto cancel, auto close and SLA's escaleted tickets
     """
-    # threading.Timer(60.0, autocancel).start()
+    # threading.Timer(60.0, auto_cancel).start()
     total_hrs = 40
     seconds = 0
     days = total_hrs / 8
@@ -212,7 +213,7 @@ def autocancel():
                         i.save()
 
 
-autocancel()
+auto_cancel()
 
 
 def home(request):
@@ -244,28 +245,29 @@ def gettoken(request):
         item = EmployeeMaster.objects.values_list('empid', flat=True).filter(email=user_name)
         request.session['username'] = item[0]
     except Exception as e:
-        messages.success("Invalid user...")
+        messages.success("Invalid user")
         print(e)
         return redirect('home')
     return HttpResponseRedirect('/main')
 
 
-def view_Report(request):
+def view_report(request):
     """
     Filters to generates monthly report
     :return: to view_report.html for selecting month and department to generate report
     """
     try:
-        user, SLAFullfillerHead, FirstApprover, ApproverHead, FulfillerHead, Fulfiller = fulfiller(request)
+        user, sla_ful_filler_head, first_approve, approve_head, full_filler_head, ful_filler = fulfiller(request)
     except Exception as e:
         print(e)
         return redirect('home')
-    return render(request, "view_Report.html", {'Fulfiller': Fulfiller, 'user': user,
-                                                'SLAFulfillerHead': SLAFullfillerHead, 'FirstApprover': FirstApprover,
-                                                'ApproverHead': ApproverHead, 'FulfillerHead': FulfillerHead})
+    return render(request, "view_Report.html", {'Fulfiller': ful_filler, 'user': user,
+                                                'SLAFulfillerHead': sla_ful_filler_head,
+                                                'FirstApprover': first_approve, 'ApproverHead': approve_head,
+                                                'FulfillerHead': full_filler_head})
 
 
-def Report(request):
+def report(request):
     """
     Generates monthly reports using filters
     :return: to report.html to display report's dashboard
@@ -531,7 +533,7 @@ def reopened(request):
                                            'FulfillerHead': FulfillerHead, 'all_items': all_items})
 
 
-def raisedQ(request):
+def raised_query(request):
     """
     Display tickets which needs more description
     :return: to raisedQ.html to Display active tickets for which first_approver/manager or approver_head raised a query
@@ -630,7 +632,7 @@ def rejected(request):
                                            'FulfillerHead': FulfillerHead, 'all_items': all_items})
 
 
-def HelpdeskApprover(request):
+def help_desk_approve(request):
     """
     Display tickets pending for your approval if you are a Helpdesk approver
     :return: to helpdeskapprover.html to Display tickets waiting for your(Helpdesk approver head's) approval
@@ -681,37 +683,41 @@ def HelpdeskApprover(request):
                                                              'SLAFulfillerHead': SLAFullfillerHead,
                                                              'FirstApprover': FirstApprover,
                                                              'ApproverHead': ApproverHead,
-                                                             'FulfillerHead':FulfillerHead})
+                                                             'FulfillerHead': FulfillerHead})
         else:
             return HttpResponseRedirect('/main')
 
 
-def AssignedTickets(request):
+def assigned_tickets(request):
     """
     Display tickets assigned to you
-    :return:
+    :return: To assigned.html to display tickets assigned to you(Fulfiller)
     """
     try:
         user, SLAFullfillerHead, FirstApprover, ApproverHead,FulfillerHead,Fulfiller = fulfiller(request)
-    except:
+    except Exception as e:
+        print(e)
         return redirect('home')
-    empName = EmployeeMaster.objects.get(empid = request.session['username'])
-    empName = empName.associated_user_account
+    emp_name = EmployeeMaster.objects.get(empid=request.session['username'])
+    emp_name = emp_name.associated_user_account
     all_items = WorkflowRequest.objects.all().filter(ActedByUser=request.session['username'], Process="Complete",
-                                                     WorkflowPendingWith=empName, RequestStatus="Pending")
+                                                     WorkflowPendingWith=emp_name, RequestStatus="Pending")
     total = {}
     try:
         for i in all_items:
-            print(i.RequestID_id)
-            all_i = HelpRequest.objects.all().filter(id = i.RequestID_id)
+            all_i = HelpRequest.objects.all().filter(id=i.RequestID_id)
             items = get_users(all_i)
             for k,v in items.items():
                 total[k] = v
         if Fulfiller:
-            return render(request,"assigned.html",{'Fulfiller':Fulfiller,'user':user,'SLAFulfillerHead':SLAFullfillerHead,'FirstApprover':FirstApprover,'ApproverHead':ApproverHead,'FulfillerHead':FulfillerHead,'all_items':total})
+            return render(request, "assigned.html", {'Fulfiller': Fulfiller, 'user': user,
+                                                     'SLAFulfillerHead': SLAFullfillerHead,
+                                                     'FirstApprover': FirstApprover, 'ApproverHead': ApproverHead,
+                                                     'FulfillerHead': FulfillerHead, 'all_items': total})
         else:
             return HttpResponseRedirect('/main')
-    except:
+    except Exception as e:
+        print(e)
         if Fulfiller:
             return render(request, "assigned.html", {'all_items': total, 'Fulfiller': Fulfiller, 'user': user,
                                                      'SLAFulfillerHead': SLAFullfillerHead,
@@ -720,13 +726,20 @@ def AssignedTickets(request):
         else:
             return HttpResponseRedirect('/main')
 
-def complete(request,ticket_id):
-    """Completeticket"""
-    item1 = HelpRequest.objects.get(pk = ticket_id)
+
+def complete(request, ticket_id):
+    """
+    Completes ticket after fulfillment
+    :param request: to fulfill ticket
+    :param ticket_id: id of ticket which is to be completed
+    :return: to prvious page
+    """
+    item1 = HelpRequest.objects.get(pk=ticket_id)
     item1.WorkflowStatus = "Completed"
     item1.WorkflowCurrentStatus = "Completed"
     item1.save()
-    item = WorkflowRequest.objects.get(RequestID_id = ticket_id,ActedByUser = request.session['username'],RequestStatus = "Pending")
+    item = WorkflowRequest.objects.get(RequestID_id=ticket_id, ActedByUser=request.session['username'],
+                                       RequestStatus="Pending")
     item.RequestStatus = "Completed"
     item.ActedOn = str(datetime.datetime.now())
     item.ActionData = request.GET.get('comments')
@@ -735,75 +748,95 @@ def complete(request,ticket_id):
     if item1.InActive == "on":
         key = "HelpdeskTemplate_UpdateTicket"
         msg = "Your service request is completed of which details are:"
-        emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat = True).filter(id = ticket_id)
-        Employee = EmployeeMaster.objects.values_list('email',flat = True).filter(empid = emailid[0])
-        Employee = [Employee[0]]
-        email(key,ticket_id,Employee,msg)
+        email_id = HelpRequest.objects.values_list('OnBehalfUserEmployeeId', flat=True).filter(id=ticket_id)
+        employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=email_id[0])
+        employee = [employee[0]]
+        email(key, ticket_id, employee, msg)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-
-
-def HelpdeskFulfillerHead(request):
-    """ Returns data of fulfiller head"""
+def help_desk_ful_filler_head(request):
+    """
+    Returns data of fulfiller head
+    :param request: to get data of fulfiller head
+    :return: data of tickets pending for your(Fulfiller HEad's approval)
+    """
     try:
-        user,SLAFullfillerHead,FirstApprover,ApproverHead,FulfillerHead,Fulfiller = fulfiller(request)
-    except:
+        user, SLAFullfillerHead, FirstApprover, ApproverHead, FulfillerHead, Fulfiller = fulfiller(request)
+    except Exception as e:
+        print(e)
         return redirect('home')
-    name = EmployeeMaster.objects.get(empid = request.session['username'])
-    #print(name.associated_user_account)
+    name = EmployeeMaster.objects.get(empid=request.session['username'])
     all_items = " "
-    Approver = AppList.objects.all()
-    for i in Approver:
-        if(i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_HR1"):
-            all_items = WorkflowRequest.objects.all().filter(WorkflowPendingWith = "Helpdesk Fullfiller Head HR",RequestStatus = "Pending")
-        elif(i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_IT1"):
-            all_items = WorkflowRequest.objects.all().filter(WorkflowPendingWith = "Helpdesk Fullfiller Head IT",RequestStatus = "Pending")
-        elif(i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_Admin1"):
-            all_items = WorkflowRequest.objects.all().filter(WorkflowPendingWith = "Helpdesk Fullfiller Head Admin",RequestStatus = "Pending")
-        elif(i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_Finance1"):
-            all_items = WorkflowRequest.objects.all().filter(WorkflowPendingWith = "Helpdesk Fullfiller Head Finance",RequestStatus = "Pending")
+    approver = AppList.objects.all()
+    for i in approver:
+        if i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_HR1":
+            all_items = WorkflowRequest.objects.all().filter(WorkflowPendingWith="Helpdesk Fullfiller Head HR",
+                                                             RequestStatus="Pending")
+        elif i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_IT1":
+            all_items = WorkflowRequest.objects.all().filter(WorkflowPendingWith="Helpdesk Fullfiller Head IT",
+                                                             RequestStatus="Pending")
+        elif i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_Admin1":
+            all_items = WorkflowRequest.objects.all().filter(WorkflowPendingWith="Helpdesk Fullfiller Head Admin",
+                                                             RequestStatus="Pending")
+        elif i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_Finance1":
+            all_items = WorkflowRequest.objects.all().filter(WorkflowPendingWith="Helpdesk Fullfiller Head Finance",
+                                                             RequestStatus="Pending")
 
     total = {}
     try:
         for i in all_items:
-            all_i = HelpRequest.objects.all().filter(id = i.RequestID_id)
+            all_i = HelpRequest.objects.all().filter(id=i.RequestID_id)
             items = get_users(all_i)
-            for k,v in items.items():
+            for k, v in items.items():
                 total[k] = v
 
-        return render(request,"fulfillerhead.html",{'Fulfiller':Fulfiller,'user':user,'SLAFulfillerHead':SLAFullfillerHead,'FirstApprover':FirstApprover,'ApproverHead':ApproverHead,'FulfillerHead':FulfillerHead,'all_items':total})
+        return render(request, "fulfillerhead.html", {'Fulfiller': Fulfiller, 'user': user,
+                                                      'SLAFulfillerHead':SLAFullfillerHead,
+                                                      'FirstApprover': FirstApprover, 'ApproverHead': ApproverHead,
+                                                      'FulfillerHead': FulfillerHead, 'all_items': total})
 
-    except:
-        return render(request,"fulfillerhead.html",{'Fulfiller':Fulfiller,'user':user,'SLAFulfillerHead':SLAFullfillerHead,'FirstApprover':FirstApprover,'ApproverHead':ApproverHead,'FulfillerHead':FulfillerHead})
+    except Exception as e:
+        print(e)
+        return render(request, "fulfillerhead.html", {'Fulfiller': Fulfiller, 'user': user,
+                                                      'SLAFulfillerHead': SLAFullfillerHead,
+                                                      'FirstApprover': FirstApprover, 'ApproverHead': ApproverHead,
+                                                      'FulfillerHead': FulfillerHead})
 
 
-def addTicket(request):
-    """To add ticket"""
-    if(request.method == "POST"):
+def add_ticket(request):
+    """
+    To add ticket
+    :param request: to raise a ticket
+    :return: to previous page after raising ticket
+    """
+    if request.method == "POST":
         employee_id = request.session['username']
         created_at = datetime.datetime.now()
         description = request.POST.get('Description')
         request_type = request.POST.get('RequestType')
-        department = HelpdeskDepartments.objects.values_list('department',flat = True).filter(id = request.POST.get('department'))
+        department = HelpdeskDepartments.objects.values_list('department', flat=True).\
+            filter(id=request.POST.get('department'))
         department = department[0]
-        category = Categories.objects.values_list('title',flat = True).filter(id = request.POST.get('category'))
+        category = Categories.objects.values_list('title', flat=True).filter(id=request.POST.get('category'))
         category = category[0]
-        sub_category = sub_categories.objects.values_list('title',flat = True).filter(id = request.POST.get('sub_category'))
+        sub_category = sub_categories.objects.values_list('title', flat=True).\
+            filter(id=request.POST.get('sub_category'))
         sub_category = sub_category[0]
         priority = request.POST.get('priority')
         ticket_for = request.POST.get('yesno')
-        onBehalfOf = request.POST.get('onBehalfOf')
-        HelpdeskOffice = HelpdeskOfficeLocation.objects.values_list('title',flat=True).filter(id=request.POST.get('officeLocation'))
-        HelpdeskOffice = HelpdeskOffice[0]
-        DeskLocation = request.POST.get('deskLocation')
-        Files = request.FILES.get('documents')
-        email_notification=request.POST.get('email_notification')
-        print("#"*100)
-        print(email_notification)
-        print("#"*100)
+        on_behalf_of = request.POST.get('onBehalfOf')
+        help_desk_office = HelpdeskOfficeLocation.objects.values_list('title',flat=True).\
+            filter(id=request.POST.get('officeLocation'))
+        help_desk_office = help_desk_office[0]
+        desk_location = request.POST.get('deskLocation')
+        files = request.FILES.get('documents')
+        email_notification = request.POST.get('email_notification')
+
         try:
-            item = HelpdeskRequestSLAs.objects.all().filter(HelpdeskCategory = category,HelpdeskDepartment = department,HelpdeskPriority = priority,HelpdeskSubCategory = sub_category)
+            item = HelpdeskRequestSLAs.objects.all().filter(HelpdeskCategory=category, HelpdeskDepartment=department,
+                                                            HelpdeskPriority=priority,
+                                                            HelpdeskSubCategory=sub_category)
 
             for i in item:
                 TATHrs = i.TATHrs
@@ -820,95 +853,105 @@ def addTicket(request):
             for i in range(int(days)):
 
                 dt1 = datetime.datetime.now() + timedelta(i + 1)
-                if(dt1.strftime("%A") == "Saturday"):
-
+                if dt1.strftime("%A") == "Saturday":
                     a = a + 172800
-
-            dt = datetime.datetime.now() + timedelta(seconds = a + seconds)
-
-
-
-            print(dt)
-        except:
+            dt = datetime.datetime.now() + timedelta(seconds=a+seconds)
+        except Exception as e:
+            print(e)
             dt = ""
-        if(ticket_for == "OnBehalf"):
-
-            Employee = EmployeeMaster.objects.values_list('reporting_to','empid','email').filter(associated_user_account = onBehalfOf)
+        if ticket_for == "OnBehalf":
+            employee = EmployeeMaster.objects.values_list('reporting_to', 'empid', 'email').\
+                filter(associated_user_account=on_behalf_of)
             try:
-                OnBehalfUserEmployeeId = Employee[0][1]
+                on_behalf_user_employee_id = employee[0][1]
             except:
                 messages.warning(request, 'Invalid employee name.')
                 return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-            OnBehalfUserEmployeeName = onBehalfOf
-            Employee1 = EmployeeMaster.objects.values_list('associated_user_account','email').filter(empid = employee_id)
+            OnBehalfUserEmployeeName = on_behalf_of
+            Employee1 = EmployeeMaster.objects.values_list('associated_user_account', 'email').filter(empid=employee_id)
             EmployeeName = Employee1[0][0]
         else:
-            Employee = EmployeeMaster.objects.values_list('reporting_to','associated_user_account','email').filter(empid = employee_id)
-            EmployeeName = Employee[0][1]
+            employee = EmployeeMaster.objects.values_list('reporting_to', 'associated_user_account', 'email').\
+                filter(empid=employee_id)
+            EmployeeName = employee[0][1]
             OnBehalfUserEmployeeId = employee_id
             OnBehalfUserEmployeeName = EmployeeName
-
-
-        FirstLevelApproverEmployeeName = Employee[0][0]
-
-        FirstApprover = EmployeeMaster.objects.values_list('empid','email').filter(associated_user_account = FirstLevelApproverEmployeeName)
+        FirstLevelApproverEmployeeName = employee[0][0]
+        FirstApprover = EmployeeMaster.objects.values_list('empid', 'email').\
+            filter(associated_user_account=FirstLevelApproverEmployeeName)
         FirstLevelApproverEmployeeId = FirstApprover[0][0]
         FirstApproverEmail = FirstApprover[0][1]
-        print("#"*40)
-        form = HelpRequest(InActive = email_notification, RequestStatus = "1",expected_closure = dt,OnBehalfUserEmployeeId = OnBehalfUserEmployeeId,OnBehalfUserEmployeeName = OnBehalfUserEmployeeName,WorkflowStatus = "Workflow Initiated",employee_id = employee_id,FirstLevelApproverEmployeeId = FirstLevelApproverEmployeeId,FirstLevelApproverEmployeeName = FirstLevelApproverEmployeeName,EmployeeName = EmployeeName,created_at = created_at,description = description,request_type = request_type,department = department,category = category,sub_category = sub_category,priority = priority,ticket_for = ticket_for,HelpdeskOffice = HelpdeskOffice,DeskLocation = DeskLocation,Files = Files)
+        form = HelpRequest(InActive=email_notification, RequestStatus="1", expected_closure=dt,
+                           OnBehalfUserEmployeeId=OnBehalfUserEmployeeId,
+                           OnBehalfUserEmployeeName=OnBehalfUserEmployeeName, WorkflowStatus="Workflow Initiated",
+                           employee_id=employee_id, FirstLevelApproverEmployeeId=FirstLevelApproverEmployeeId,
+                           FirstLevelApproverEmployeeName=FirstLevelApproverEmployeeName, EmployeeName=EmployeeName,
+                           created_at=created_at, description=description, request_type=request_type,
+                           department=department, category=category, sub_category=sub_category, priority=priority,
+                           ticket_for=ticket_for, HelpdeskOffice=help_desk_office, DeskLocation=desk_location,
+                           Files=files)
         try:
             form.save()
-
             key = 'HelpdeskTemplate_AssignTask'
             t_id = form.id
-
-            form1 = WorkflowRequest(ActedByUser = OnBehalfUserEmployeeId,Process = "Raised Ticket",ActedOn = str(datetime.datetime.now()),Action = "Raised Ticket",Actor = OnBehalfUserEmployeeName,RequestStatus = "Workflow Initiated",WorkflowPendingWith = FirstLevelApproverEmployeeName,RequestID_id = t_id)
+            form1 = WorkflowRequest(ActedByUser=OnBehalfUserEmployeeId, Process="Raised Ticket",
+                                    ActedOn=str(datetime.datetime.now()), Action="Raised Ticket",
+                                    Actor=OnBehalfUserEmployeeName, RequestStatus="Workflow Initiated",
+                                    WorkflowPendingWith=FirstLevelApproverEmployeeName, RequestID_id=t_id)
             form1.save()
-            form1 = WorkflowRequest(ActedByUser = FirstLevelApproverEmployeeId,Process = "For First Approver",ActedOn = str(datetime.datetime.now()),Actor = FirstLevelApproverEmployeeName,RequestStatus = "Pending",WorkflowPendingWith = FirstLevelApproverEmployeeName,RequestID_id = t_id)
+            form1 = WorkflowRequest(ActedByUser=FirstLevelApproverEmployeeId, Process="For First Approver",
+                                    ActedOn=str(datetime.datetime.now()), Actor=FirstLevelApproverEmployeeName,
+                                    RequestStatus="Pending", WorkflowPendingWith=FirstLevelApproverEmployeeName,
+                                    RequestID_id=t_id)
             form1.save()
-            if(email_notification == "on"):
+            if email_notification == "on":
                 msg = "You have been assigned a service request for approval of which details are:"
                 FirstApproverEmail = [FirstApproverEmail]
-                email(key,t_id,FirstApproverEmail,msg)
-                if(ticket_for == "OnBehalf"):
+                email(key, t_id, FirstApproverEmail, msg)
+                if ticket_for == "OnBehalf":
                     key = 'HelpdeskTemplate_InitiateWorkflow'
-                    msg = "You have raised a service request on behalf of " + onBehalfOf + " for which the details are:"
+                    msg = "You have raised a service request on behalf of " + on_behalf_of + \
+                          " for which the details are:"
                     to = [Employee1[0][1]]
-
-                    email(key,t_id,to,msg)
-
+                    email(key, t_id, to, msg)
                     key = 'HelpdeskTemplate_InitiateWorkflow'
                     msg = EmployeeName + " have raised a service request on behalf of you for which the details are:"
-                    to = [Employee[0][2]]
-
-                    email(key,t_id,to,msg)
-
+                    to = [employee[0][2]]
+                    email(key, t_id, to, msg)
                 else:
-
                     key = 'HelpdeskTemplate_InitiateWorkflow'
                     msg = "You have raised a service request of which the details are:"
-                    to = [Employee[0][2]]
-                    email(key,t_id,to,msg)
+                    to = [employee[0][2]]
+                    email(key, t_id, to, msg)
             messages.warning(request, 'Ticket raised successfully')
             return HttpResponseRedirect('/main')
-        except:
+        except Exception as e:
+            print(e)
             messages.warning(request, 'Something went wrong')
             return HttpResponseRedirect('/main')
 
 
-def updateTicket(request,ticket_id):
-    """To add ticket"""
-    if(request.method == "POST"):
-        item = HelpRequest.objects.get(pk = ticket_id)
+def update_ticket(request, ticket_id):
+    """
+    To update ticket
+    :param request: to update ticket if current status is pending
+    :param ticket_id: id of ticket which is to be updated
+    :return: to previous page
+    """
+    if request.method == "POST":
+        item = HelpRequest.objects.get(pk=ticket_id)
         item.description = request.POST.get('Description')
-        department = HelpdeskDepartments.objects.values_list('department',flat = True).filter(id = request.POST.get('department'))
+        department = HelpdeskDepartments.objects.values_list('department', flat=True).\
+            filter(id=request.POST.get('department'))
         item.department = department[0]
-        category = Categories.objects.values_list('title',flat = True).filter(id = request.POST.get('category'))
+        category = Categories.objects.values_list('title', flat=True).filter(id=request.POST.get('category'))
         item.category = category[0]
-        sub_category = sub_categories.objects.values_list('title',flat = True).filter(id = request.POST.get('sub_category'))
+        sub_category = sub_categories.objects.values_list('title', flat=True).\
+            filter(id=request.POST.get('sub_category'))
         item.sub_category = sub_category[0]
         item.priority = request.POST.get('priority')
-        HelpdeskOffice = HelpdeskOfficeLocation.objects.values_list('title',flat = True).filter(id = request.POST.get('officeLocation'))
+        HelpdeskOffice = HelpdeskOfficeLocation.objects.values_list('title', flat=True).\
+            filter(id=request.POST.get('officeLocation'))
         item.HelpdeskOffice = HelpdeskOffice[0]
         item.DeskLocation = request.POST.get('deskLocation')
         item.Files = request.FILES.get('documents')
@@ -917,358 +960,416 @@ def updateTicket(request,ticket_id):
         if item.InActive == "on":
             key = "HelpdeskTemplate_UpdateTicket"
             msg = "Your ticket is updated successfully of which details are:"
-            emailid = HelpRequest.objects.values_list('employee_id',flat = True).filter(id = ticket_id)
-            Employee = EmployeeMaster.objects.values_list('email',flat = True).filter(empid = emailid[0])
+            emailid = HelpRequest.objects.values_list('employee_id', flat=True).filter(id=ticket_id)
+            Employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=emailid[0])
             Employee = [Employee[0]]
-            email(key,ticket_id,Employee,msg)
-
+            email(key, ticket_id, Employee, msg)
             key = "HelpdeskTemplate_UpdateTicket"
             msg = "Helpdesk ticket is updated of which details are:"
-            emailid = HelpRequest.objects.values_list('FirstLevelApproverEmployeeId',flat=True).filter(id=ticket_id)
-            Employee = EmployeeMaster.objects.values_list('email',flat=True).filter(empid=emailid[0])
+            emailid = HelpRequest.objects.values_list('FirstLevelApproverEmployeeId', flat=True).filter(id=ticket_id)
+            Employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=emailid[0])
             Employee = [Employee[0]]
-            email(key,ticket_id,Employee,msg)
-
+            email(key, ticket_id, Employee, msg)
         return HttpResponseRedirect('/main')
 
 
-def approve(request,ticket_id):
-    """To approve ticket """
-    print("HI")
-    item1 = HelpRequest.objects.get(pk = ticket_id)
+def approve(request, ticket_id):
+    """
+    To activate ticket
+    :param request: To approve ticket from first approver or manager
+    :param ticket_id: id of ticket
+    :return: to previous page
+    """
+    item1 = HelpRequest.objects.get(pk=ticket_id)
     item1.WorkflowStatus = "Activated"
     item1.WorkflowCurrentStatus = "Activated"
     item1.WorkflowModifiedOn = datetime.datetime.now()
     item1.save()
-    print(item1.department)
-    item = WorkflowRequest.objects.get(RequestID_id = ticket_id,ActedByUser = request.session['username'],RequestStatus = "Pending")
+    item = WorkflowRequest.objects.get(RequestID_id=ticket_id, ActedByUser=request.session['username'],
+                                       RequestStatus="Pending")
     item.RequestStatus = "Approved"
-    if(item1.department == "HR"):
+    if item1.department == "HR":
         item.WorkflowPendingWith = "Helpdesk HR Approver"
         roles = "HelpdeskHRApprover1"
-    elif(item1.department == "IT"):
+    elif item1.department == "IT":
         item.WorkflowPendingWith = "Helpdesk IT Approver"
         roles = "HelpdeskITApprover1"
     elif(item1.department == "Admin"):
         item.WorkflowPendingWith = "Helpdesk Admin Approver"
         roles = "HelpdeskAdminApprover1"
-    elif(item1.department == "Finance"):
+    elif item1.department == "Finance":
         item.WorkflowPendingWith = "Helpdesk Finance Approver"
         roles = "HelpdeskFinanceApprover1"
     item.ActedOn = datetime.datetime.now()
     item.ActionData = request.GET.get('comments')
-    #print(ActionData)
     item.save()
-    form1 = WorkflowRequest(ActedOn = str(datetime.datetime.now()),Actor = item.WorkflowPendingWith,RequestStatus = "Pending",WorkflowPendingWith = item.WorkflowPendingWith,Process = "For Helpdesk Approver",RequestID_id = ticket_id)
+    form1 = WorkflowRequest(ActedOn=str(datetime.datetime.now()), Actor=item.WorkflowPendingWith,
+                            RequestStatus="Pending", WorkflowPendingWith=item.WorkflowPendingWith,
+                            Process="For Helpdesk Approver", RequestID_id=ticket_id)
     form1.save()
-
     if item1.InActive == "on":
         key = "HelpdeskTemplate_UpdateTicket"
         msg = "Your service request is approved by " + item1.EmployeeName + " of which details are:"
-        emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat = True).filter(id = ticket_id)
-        Employee = EmployeeMaster.objects.values_list('email',flat = True).filter(empid = emailid[0])
+        emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId', flat=True).filter(id=ticket_id)
+        Employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=emailid[0])
         Employee = [Employee[0]]
-        email(key,ticket_id,Employee,msg)
-
-
+        email(key, ticket_id, Employee, msg)
         Employee = []
         key = "HelpdeskTemplate_AssignTask"
         msg = "You have been assigned a service request for approval of which details are:"
-        user = AppList.objects.all().filter(roles = roles)
+        user = AppList.objects.all().filter(roles=roles)
         for i in user:
-            item = EmployeeMaster.objects.get(associated_user_account = i.user)
+            item = EmployeeMaster.objects.get(associated_user_account=i.user)
             Employee.append(item.email)
-        email(key,ticket_id,Employee,msg)
-
+        email(key, ticket_id, Employee, msg)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-def approve1(request,ticket_id):
-    """To approve ticket"""
-    name = EmployeeMaster.objects.get(empid = request.session['username'])
-    Approver = AppList.objects.all()
+def approve1(request, ticket_id):
+    """
+    To approve ticket
+    :param request: To approve ticket from approver head
+    :param ticket_id: id of ticket
+    :return: to previous page
+    """
+    name = EmployeeMaster.objects.get(empid=request.session['username'])
+    Approver=AppList.objects.all()
     for i in Approver:
-        if(i.user == name.associated_user_account and i.roles == "HelpdeskHRApprover1"):
-            item = WorkflowRequest.objects.get((Q(WorkflowPendingWith = "Helpdesk HR Approver") | (Q(WorkflowPendingWith = name.associated_user_account))),RequestStatus = "Pending",RequestID_id = ticket_id)
+        if i.user == name.associated_user_account and i.roles == "HelpdeskHRApprover1":
+            item = WorkflowRequest.objects.get((Q(WorkflowPendingWith="Helpdesk HR Approver") |
+                                                (Q(WorkflowPendingWith=name.associated_user_account))),
+                                               RequestStatus="Pending", RequestID_id=ticket_id)
             item.WorkflowPendingWith = "Helpdesk Fullfiller Head HR"
             roles = "HelpdeskFulfillerHead_HR1"
-        elif(i.user == name.associated_user_account and i.roles == "HelpdeskITApprover1"):
-            item = WorkflowRequest.objects.get(RequestID_id = ticket_id,Actor = "Helpdesk IT Approver",RequestStatus = "Pending")
+        elif i.user == name.associated_user_account and i.roles == "HelpdeskITApprover1":
+            item = WorkflowRequest.objects.get(RequestID_id=ticket_id, Actor="Helpdesk IT Approver",
+                                               RequestStatus="Pending")
             item.WorkflowPendingWith = "Helpdesk Fullfiller Head IT"
             roles = "HelpdeskFulfillerHead_IT1"
-        elif(i.user == name.associated_user_account and i.roles == "HelpdeskAdminApprover1"):
-            item = WorkflowRequest.objects.get(RequestID_id = ticket_id,Actor = "Helpdesk Admin Approver",RequestStatus = "Pending")
+        elif i.user == name.associated_user_account and i.roles == "HelpdeskAdminApprover1":
+            item = WorkflowRequest.objects.get(RequestID_id=ticket_id, Actor="Helpdesk Admin Approver",
+                                               RequestStatus="Pending")
             item.WorkflowPendingWith = "Helpdesk Fullfiller Head Admin"
             roles = "HelpdeskFulfillerHead_Admin1"
-        elif(i.user == name.associated_user_account and i.roles == "HelpdeskFinanceApprover1"):
-            item = WorkflowRequest.objects.get(RequestID_id = ticket_id,Actor = "Helpdesk Finance Approver",RequestStatus = "Pending")
+
+        elif i.user == name.associated_user_account and i.roles == "HelpdeskFinanceApprover1":
+            item = WorkflowRequest.objects.get(RequestID_id=ticket_id, Actor="Helpdesk Finance Approver",
+                                               RequestStatus="Pending")
             item.WorkflowPendingWith = "Helpdesk Fullfiller Head Finance"
             roles = "HelpdeskFulfillerHead_Finance1"
-
-
     item.RequestStatus = "Approved"
     item.ActedByUser = request.session['username']
     item.ActedOn = str(datetime.datetime.now())
-    Actor = EmployeeMaster.objects.get(empid = request.session['username'])
+    Actor = EmployeeMaster.objects.get(empid=request.session['username'])
     item.Actor = Actor.associated_user_account
     item.ActionData = request.GET.get('comments')
-
     item.save()
-
-    form1 = WorkflowRequest(ActedOn = str(datetime.datetime.now()),Process = "For Helpdesk Fulfiller Head",Actor = item.WorkflowPendingWith,RequestStatus = "Pending",WorkflowPendingWith = item.WorkflowPendingWith,RequestID_id = ticket_id)
-    print(form1)
+    form1 = WorkflowRequest(ActedOn=str(datetime.datetime.now()), Process="For Helpdesk Fulfiller Head",
+                            Actor=item.WorkflowPendingWith, RequestStatus="Pending",
+                            WorkflowPendingWith=item.WorkflowPendingWith, RequestID_id=ticket_id)
     form1.save()
-
-    item1 = HelpRequest.objects.get(pk = ticket_id)
+    item1 = HelpRequest.objects.get(pk=ticket_id)
     if item1.InActive == "on":
         key = "HelpdeskTemplate_UpdateTicket"
         msg = "Your service request is approved by " + item.Actor + " of which details are:"
-        emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat = True).filter(id = ticket_id)
-        Employee = EmployeeMaster.objects.values_list('email',flat = True).filter(empid = emailid[0])
+        emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId', flat=True).filter(id=ticket_id)
+        Employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=emailid[0])
         Employee = [Employee[0]]
-        email(key,ticket_id,Employee,msg)
-
-
+        email(key, ticket_id, Employee, msg)
         Employee = []
         key = "HelpdeskTemplate_AssignTask"
         msg = "You have been assigned a service request of which details are:"
-        user = AppList.objects.all().filter(roles = roles)
+        user = AppList.objects.all().filter(roles=roles)
         for i in user:
-            item = EmployeeMaster.objects.get(associated_user_account = i.user)
+            item = EmployeeMaster.objects.get(associated_user_account=i.user)
             Employee.append(item.email)
-        email(key,ticket_id,Employee,msg)
-
+        email(key, ticket_id, Employee, msg)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-def reject(request,ticket_id):
+
+def reject(request, ticket_id):
     """
     To reject ticket
-    :param request:
-    :param ticket_id: id of ticket which is to be rejected  
-    :return:
+    :param request: to reject ticket from first approver or manager
+    :param ticket_id: id of ticket which is to be rejected
+    :return: to previous page
     """
-    item = HelpRequest.objects.get(pk = ticket_id)
+    item = HelpRequest.objects.get(pk=ticket_id)
     item.WorkflowStatus = "Rejected"
     item.WorkflowCurrentStatus = "Rejected"
     item.save()
-    item1 = WorkflowRequest.objects.get(RequestID_id = ticket_id,RequestStatus = "Pending")
-    print(item1)
+    item1 = WorkflowRequest.objects.get(RequestID_id=ticket_id, RequestStatus="Pending")
     item1.RequestStatus = "Rejected"
     item1.ActionData = request.GET.get('comments')
     item1.save()
     if item.InActive == "on":
         key = "HelpdeskTemplate_UpdateTicket"
         msg = "Your service request is rejected of which details are:"
-        emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat = True).filter(id = ticket_id)
-        Employee = EmployeeMaster.objects.values_list('email',flat = True).filter(empid = emailid[0])
+        emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId', flat=True).filter(id=ticket_id)
+        Employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=emailid[0])
         Employee = [Employee[0]]
         email(key, ticket_id, Employee, msg)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-def reject1(request,ticket_id):
-    """To reject ticket"""
-    item = HelpRequest.objects.get(pk = ticket_id)
+def reject1(request, ticket_id):
+    """
+    To reject ticket
+    :param request: to reject ticket from approver head
+    :param ticket_id: id of ticket which is to be rejected
+    :return: to previous page
+    """
+    item = HelpRequest.objects.get(pk=ticket_id)
     item.WorkflowStatus = "Rejected"
     item.WorkflowCurrentStatus = "Rejected"
     item.save()
-    item1 = WorkflowRequest.objects.get(RequestID_id = ticket_id,RequestStatus = "Pending")
+    item1 = WorkflowRequest.objects.get(RequestID_id=ticket_id, RequestStatus="Pending")
     item1.RequestStatus = "Rejected"
     item1.save()
     if item.InActive == "on":
-
         key = "HelpdeskTemplate_UpdateTicket"
         msg = "Your service request is rejected of which details are:"
-        emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat = True).filter(id = ticket_id)
-        Employee = EmployeeMaster.objects.values_list('email',flat = True).filter(empid = emailid[0])
+        emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId', flat=True).filter(id=ticket_id)
+        Employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=emailid[0])
         Employee = [Employee[0]]
-        email(key,ticket_id,Employee,msg)
-    
+        email(key, ticket_id, Employee, msg)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-def display(request,ticket_id):
-    """To reject ticket"""
-    
+
+def display(request, ticket_id):
+    """
+    To display ticket
+    :param request:To view ticket details
+    :param ticket_id:id of ticket
+    :return: to display.html to view ticket details
+    """
     try:
-        user,SLAFullfillerHead,FirstApprover,ApproverHead,FulfillerHead,Fulfiller = fulfiller(request)
-    except:
+        user, SLAFullfillerHead, FirstApprover, ApproverHead, FulfillerHead, Fulfiller = fulfiller(request)
+    except Exception as e:
+        print(e)
         return redirect('home')
-    print(ticket_id)
-    item = HelpRequest.objects.get(pk = ticket_id)
+    item = HelpRequest.objects.get(pk=ticket_id)
     emp1 = ""
-    print(item.id)
     try:
         emp = request.session['username']
-        empName = EmployeeMaster.objects.get(empid = emp)
+        empName = EmployeeMaster.objects.get(empid=emp)
         empName = empName.associated_user_account
-    except:
+    except Exception as e:
+        print(e)
         return HttpResponseRedirect('/home')
     Approver = AppList.objects.all()
     for i in Approver:
-        if(i.user == empName and i.roles == "HelpdeskHRApprover1"):
+        if i.user == empName and i.roles == "HelpdeskHRApprover1":
             emp1 = "Helpdesk HR Approver"     
-        elif(i.user == empName and i.roles == "HelpdeskITApprover1"):
+        elif i.user == empName and i.roles == "HelpdeskITApprover1":
             emp1 = "Helpdesk IT Approver"
                 
-        elif(i.user == empName and i.roles == "HelpdeskAdminApprover1"):
+        elif i.user == empName and i.roles == "HelpdeskAdminApprover1":
             emp1 = "Helpdesk Admin Approver"
                 
-        elif(i.user == empName and i.roles == "HelpdeskFinanceApprover1"):
+        elif i.user == empName and i.roles == "HelpdeskFinanceApprover1":
             emp1 = "Helpdesk Finance Approver"
-            
-
     try:
-        workflow = WorkflowRequest.objects.get((Q(RequestStatus = "Pending")|(Q(RequestStatus = "Completed",Process = "Complete"))),RequestID_id = ticket_id)
-        print(workflow.Process)
-        workflow1 = WorkflowRequest.objects.all().filter(Action = "Raised Query",RequestID_id = ticket_id)
-        return render(request,"display.html",{'media_url':settings.MEDIA_URL,'Fulfiller':Fulfiller,'user':user,'SLAFulfillerHead':SLAFullfillerHead,'FirstApprover':FirstApprover,'ApproverHead':ApproverHead,'FulfillerHead':FulfillerHead,'item':item,'workflow1':workflow1,'emp':empName,'workflow':workflow,'emp1':emp1})
-        
+        workflow = WorkflowRequest.objects.get((Q(RequestStatus="Pending") |
+                                                (Q(RequestStatus="Completed", Process="Complete"))),
+                                               RequestID_id=ticket_id)
+        workflow1 = WorkflowRequest.objects.all().filter(Action="Raised Query", RequestID_id=ticket_id)
+        return render(request, "display.html", {'media_url': settings.MEDIA_URL, 'Fulfiller': Fulfiller, 'user': user,
+                                                'SLAFulfillerHead': SLAFullfillerHead, 'FirstApprover': FirstApprover,
+                                                'ApproverHead': ApproverHead, 'FulfillerHead': FulfillerHead,
+                                                'item': item, 'workflow1': workflow1, 'emp': empName,
+                                                'workflow': workflow, 'emp1': emp1})
     except:
-        return render(request,"display.html",{'media_url':settings.MEDIA_URL,'Fulfiller':Fulfiller,'user':user,'SLAFulfillerHead':SLAFullfillerHead,'FirstApprover':FirstApprover,'ApproverHead':ApproverHead,'FulfillerHead':FulfillerHead,'item':item,'emp':empName,'emp1':emp1})
-
-def workflow(request,ticket_id):
-    """To delete pending ticket"""
-    workflow = WorkflowRequest.objects.all().filter(RequestID_id = ticket_id).order_by('ActedOn')
-    print(ticket_id)
-    user,SLAFullfillerHead,FirstApprover,ApproverHead,FulfillerHead,Fulfiller = fulfiller(request)
-    return render(request,"workflow.html",{'Fulfiller':Fulfiller,'user':user,'SLAFulfillerHead':SLAFullfillerHead,'FirstApprover':FirstApprover,'ApproverHead':ApproverHead,'FulfillerHead':FulfillerHead,'workflow':workflow})
-
-def assign(request,ticket_id):
-    """Sends data of Fulfillers from fulfiller group"""
-    name = EmployeeMaster.objects.get(empid = request.session['username'])
-    print(name.associated_user_account)
-    
-    Approver = AppList.objects.all()
-    for i in Approver:
-        if(i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_HR1"):
-            all_items = HelpdeskFulfillerGroups.objects.all().filter(group_name = "HR")
-        elif(i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_IT1"):
-            all_items = HelpdeskFulfillerGroups.objects.all().filter(group_name = "IT")
-        elif(i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_Admin1"):
-            all_items = HelpdeskFulfillerGroups.objects.all().filter(group_name = "Admin")
-        elif(i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_Finance1"):
-            all_items = HelpdeskFulfillerGroups.objects.all().filter(group_name = "Finance")
-    user,SLAFullfillerHead,FirstApprover,ApproverHead,FulfillerHead,Fulfiller = fulfiller(request)
-    return render(request,"assign.html",{'Fulfiller':Fulfiller,'user':user,'SLAFulfillerHead':SLAFullfillerHead,'FirstApprover':FirstApprover,'ApproverHead':ApproverHead,'FulfillerHead':FulfillerHead,'all_items':all_items,'ticket_id':ticket_id})
+        return render(request, "display.html", {'media_url': settings.MEDIA_URL, 'Fulfiller': Fulfiller, 'user': user,
+                                                'SLAFulfillerHead': SLAFullfillerHead, 'FirstApprover': FirstApprover,
+                                                'ApproverHead': ApproverHead, 'FulfillerHead': FulfillerHead,
+                                                'item': item, 'emp': empName, 'emp1': emp1})
 
 
-def assignTicket(request,ticket_id):
-    """Assigns ticket for fulfillment"""
-    name = EmployeeMaster.objects.get(empid = request.session['username'])
+def workflow(request, ticket_id):
+    """
+        To display workflow of ticket
+        :param request:To view workflow of ticket in details
+        :param ticket_id:id of ticket
+        :return: to details of workflow
+    """
+    workflow = WorkflowRequest.objects.all().filter(RequestID_id=ticket_id).order_by('ActedOn')
+    user, SLAFullfillerHead, FirstApprover, ApproverHead, FulfillerHead, Fulfiller = fulfiller(request)
+    return render(request, "workflow.html", {'Fulfiller': Fulfiller, 'user': user,
+                                             'SLAFulfillerHead': SLAFullfillerHead, 'FirstApprover': FirstApprover,
+                                             'ApproverHead': ApproverHead, 'FulfillerHead': FulfillerHead,
+                                             'workflow': workflow})
 
-    print(name.associated_user_account)
+
+def assign(request, ticket_id):
+    """
+    Sends data of Fulfillers from fulfiller group
+    :param request: Sends data of Fulfillers from fulfiller group foe particular ticket
+    :param ticket_id:id of ticket
+    :return: to assign.html with details of fulfillers list
+    """
+    name = EmployeeMaster.objects.get(empid=request.session['username'])
+    approver_list = AppList.objects.all()
+    for approver in approver_list:
+        if approver.user == name.associated_user_account and approver.roles == "HelpdeskFulfillerHead_HR1":
+            all_items = HelpdeskFulfillerGroups.objects.all().filter(group_name="HR")
+        elif approver.user == name.associated_user_account and approver.roles == "HelpdeskFulfillerHead_IT1":
+            all_items = HelpdeskFulfillerGroups.objects.all().filter(group_name="IT")
+        elif approver.user == name.associated_user_account and approver.roles == "HelpdeskFulfillerHead_Admin1":
+            all_items = HelpdeskFulfillerGroups.objects.all().filter(group_name="Admin")
+        elif approver.user == name.associated_user_account and approver.roles == "HelpdeskFulfillerHead_Finance1":
+            all_items = HelpdeskFulfillerGroups.objects.all().filter(group_name="Finance")
+    user, SLAFullfillerHead, FirstApprover, ApproverHead, FulfillerHead, Fulfiller = fulfiller(request)
+    return render(request, "assign.html", {'Fulfiller': Fulfiller, 'user': user, 'SLAFulfillerHead': SLAFullfillerHead,
+                                           'FirstApprover': FirstApprover, 'ApproverHead': ApproverHead,
+                                           'FulfillerHead': FulfillerHead, 'all_items': all_items,
+                                           'ticket_id': ticket_id})
+
+
+def assign_ticket(request, ticket_id):
+    """
+    Assigns ticket for fulfillment
+    :param request: to assign a ticket to particular fulfiller
+    :param ticket_id: id of ticket
+    :return: to previous page
+    """
+    name = EmployeeMaster.objects.get(empid=request.session['username'])
     approver = AppList.objects.all()
     for i in approver:
-        
-        if(i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_HR1"):
-            item = WorkflowRequest.objects.get(RequestID_id = ticket_id,Actor = "Helpdesk Fullfiller Head HR",RequestStatus = "Pending")
-            
-        elif(i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_IT1"):
-            item = WorkflowRequest.objects.get(RequestID_id = ticket_id,Actor = "Helpdesk Fullfiller Head IT",RequestStatus = "Pending")
-                
-        elif(i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_Admin1"):
-            item = WorkflowRequest.objects.get(RequestID_id = ticket_id,Actor = "Helpdesk Fullfiller Head Admin",RequestStatus = "Pending")
-            
-        elif(i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_Finance1"):
-            item = WorkflowRequest.objects.get(RequestID_id = ticket_id,Actor = "Helpdesk Fullfiller Head Finance",RequestStatus = "Pending")
-    item.RequestStatus = "Assigned"
+        if i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_HR1":
+            item = WorkflowRequest.objects.get(RequestID_id=ticket_id, Actor="Helpdesk Fullfiller Head HR",
+                                               RequestStatus="Pending")
+        elif i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_IT1":
+            item = WorkflowRequest.objects.get(RequestID_id=ticket_id, Actor="Helpdesk Fullfiller Head IT",
+                                               RequestStatus="Pending")
 
+        elif i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_Admin1":
+            item = WorkflowRequest.objects.get(RequestID_id=ticket_id, Actor="Helpdesk Fullfiller Head Admin",
+                                               RequestStatus="Pending")
+            
+        elif i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_Finance1":
+            item = WorkflowRequest.objects.get(RequestID_id=ticket_id, Actor="Helpdesk Fullfiller Head Finance",
+                                               RequestStatus="Pending")
+    item.RequestStatus = "Assigned"
     item.ActedByUser = request.session['username']
     item.ActedOn = str(datetime.datetime.now())
-    actor = EmployeeMaster.objects.get(empid = request.session['username'])
-
+    actor = EmployeeMaster.objects.get(empid=request.session['username'])
     item.ActionData = request.POST.get('comments')
     item.Actor = actor.associated_user_account
-    
-
     assign_to = request.POST.get('assignTo')
     assign_to = EmployeeMaster.objects.get(empid=assign_to)
-    
     assign_to_name = assign_to.associated_user_account
-    
-    item1 = HelpRequest.objects.get(id = ticket_id)
-
-    form1 = WorkflowRequest(ActedByUser = assign_to.empid,Process = "Complete",ActedOn = str(datetime.datetime.now()),Actor = assign_to_name,RequestStatus = "Pending",WorkflowPendingWith = assign_to_name,RequestID_id = ticket_id)
+    item1 = HelpRequest.objects.get(id=ticket_id)
+    form1 = WorkflowRequest(ActedByUser=assign_to.empid, Process="Complete", ActedOn=str(datetime.datetime.now()),
+                            Actor=assign_to_name, RequestStatus="Pending", WorkflowPendingWith=assign_to_name,
+                            RequestID_id=ticket_id)
     form1.save()
     item.save()
-
     if item1.InActive == "on":    
         key = "HelpdeskTemplate_UpdateTicket"
         msg = "Your service request is assigned to "+assign_to_name+" of which details are:"
-        emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat = True).filter(id = ticket_id)
-        Employee = EmployeeMaster.objects.values_list('email',flat = True).filter(empid = emailid[0])
+        emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId', flat=True).filter(id=ticket_id)
+        Employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=emailid[0])
         Employee = [Employee[0]]
-        email(key,ticket_id,Employee,msg)
-    
+        email(key, ticket_id, Employee, msg)
         key = "HelpdeskTemplate_AssignTask"
         msg = "You have been assigned a service request for fulfillment of which details are:"
-        
         employee = [assign_to.email]
-        email(key,ticket_id,employee,msg)
-
+        email(key, ticket_id, employee, msg)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+
 def update(request,ticket_id):
-    """To delete pending ticket"""
+    """
+    Provide data for update ticket
+    :param request: to send data of ticket which is to be updated
+    :param ticket_id: id of ticket
+    :return: to raiseTicket.html with data to update
+    """""
     try:
-        user,SLAFullfillerHead,FirstApprover,ApproverHead,FulfillerHead,Fulfiller = fulfiller(request)
+        user, SLAFullfillerHead, FirstApprover, ApproverHead, FulfillerHead, Fulfiller = fulfiller(request)
     except:
         return redirect('home')
-    item = HelpRequest.objects.get(pk = ticket_id)
+    item = HelpRequest.objects.get(pk=ticket_id)
     officelocation = HelpdeskOfficeLocation.objects.all()
-    departments = HelpdeskDepartments.objects.all().filter(request_type = "Request")
+    departments = HelpdeskDepartments.objects.all().filter(request_type="Request")
     category = Categories.objects.all()
     subCategory = sub_categories.objects.all()
     employee = EmployeeMaster.objects.all()
-    firstApprover = EmployeeMaster.objects.values_list('reporting_to',flat = True).filter(empid = request.session['username'])
+    firstApprover = EmployeeMaster.objects.values_list('reporting_to', flat=True).\
+        filter(empid=request.session['username'])
     firstApprover = firstApprover[0]
-    return render(request,"raiseTicket.html",{'firstApprover':firstApprover,'Fulfiller':Fulfiller,'user':user,'SLAFulfillerHead':SLAFullfillerHead,'FirstApprover':FirstApprover,'ApproverHead':ApproverHead,'FulfillerHead':FulfillerHead,'employee':employee,'item':item,'subCategory':subCategory,'officelocation':officelocation,'departments':departments,'category':category})
+    return render(request, "raiseTicket.html", {'firstApprover': firstApprover, 'Fulfiller': Fulfiller, 'user': user,
+                                                'SLAFulfillerHead': SLAFullfillerHead, 'FirstApprover': FirstApprover,
+                                                'ApproverHead': ApproverHead, 'FulfillerHead': FulfillerHead,
+                                                'employee': employee, 'item': item, 'subCategory': subCategory,
+                                                'officelocation': officelocation, 'departments': departments,
+                                                'category': category})
 
 
 def log(request):
     """Returns to main page for invalid credentials"""
-    return render(request, "login.html",{})
+    return render(request, "login.html", {})
 
-def raiseTicket(request):
-    """Sends data required to raise a ticket""" 
+
+def raise_ticket(request):
+    """
+    Sends data required to raise a ticket
+    :param request: to provide data to raise ticket
+    :return: to raiseTicket.html with data
+    """
     try:
-        user,SLAFullfillerHead,FirstApprover,ApproverHead,FulfillerHead,Fulfiller = fulfiller(request)
+        user, SLAFullfillerHead, FirstApprover, ApproverHead, FulfillerHead, Fulfiller = fulfiller(request)
     except:
         return redirect('home')
     officelocation = HelpdeskOfficeLocation.objects.all()
-    departments = HelpdeskDepartments.objects.all().filter(request_type = "Request")
+    departments = HelpdeskDepartments.objects.all().filter(request_type="Request")
     category = Categories.objects.all()
     subCategory = sub_categories.objects.all()
-    firstApprover = EmployeeMaster.objects.values_list('reporting_to',flat = True).filter(empid = request.session['username'])
+    firstApprover = EmployeeMaster.objects.values_list('reporting_to', flat=True).\
+        filter(empid=request.session['username'])
     firstApprover = firstApprover[0]
     employee = EmployeeMaster.objects.all()
-    return render(request, "raiseTicket.html",{'Fulfiller':Fulfiller,'user':user,'SLAFulfillerHead':SLAFullfillerHead,'FirstApprover':FirstApprover,'ApproverHead':ApproverHead,'FulfillerHead':FulfillerHead,'employee':employee,'firstApprover':firstApprover,'subCategory':subCategory,'officelocation':officelocation,'departments':departments,'category':category})
+    return render(request, "raiseTicket.html", {'Fulfiller': Fulfiller, 'user': user,
+                                                'SLAFulfillerHead': SLAFullfillerHead, 'FirstApprover': FirstApprover,
+                                                'ApproverHead': ApproverHead, 'FulfillerHead': FulfillerHead,
+                                                'employee': employee, 'firstApprover': firstApprover,
+                                                'subCategory': subCategory, 'officelocation': officelocation,
+                                                'departments': departments, 'category': category})
 
-def raiseQuery(request,ticket_id):
-    """Raise Query"""
-    item = HelpRequest.objects.get(id = ticket_id)
-    print(item.EmployeeName)
+
+def raise_query(request, ticket_id):
+    """
+    Raise Query
+    :param request: to raise a query (for first approver/manage and helpdesk approver  head)
+    :param ticket_id:
+    :return:
+    """
+    item = HelpRequest.objects.get(id=ticket_id)
     item.WorkflowStatus = "Raised Query"
-    name = EmployeeMaster.objects.get(empid = request.session['username'])
+    name = EmployeeMaster.objects.get(empid=request.session['username'])
     item.save()
     try:
-        item1 = WorkflowRequest.objects.get((Q(Process = "For First Approver") | Q(Process = "For Helpdesk Approver")),RequestID_id = ticket_id,ActedByUser = request.session['username'],RequestStatus = "Pending")
-    
+        item1 = WorkflowRequest.objects.get((Q(Process="For First Approver") | Q(Process="For Helpdesk Approver")),
+                                            RequestID_id=ticket_id, ActedByUser=request.session['username'],
+                                            RequestStatus="Pending")
     except:
-        
         Approver = AppList.objects.all()
         for i in Approver:
-            if(i.user == name.associated_user_account and i.roles == "HelpdeskHRApprover1"):
-                item1 = WorkflowRequest.objects.get((Q(WorkflowPendingWith = "Helpdesk HR Approver")|(Q(WorkflowPendingWith = name.associated_user_account))),RequestStatus = "Pending",Process = "For Helpdesk Approver",RequestID_id = ticket_id)
-                    
-            elif(i.user == name.associated_user_account and i.roles == "HelpdeskITApprover1"):
-                item1 = WorkflowRequest.objects.get(RequestID_id = ticket_id,Actor = "Helpdesk IT Approver",RequestStatus = "Pending")
-                    
-            elif(i.user == name.associated_user_account and i.roles == "HelpdeskAdminApprover1"):
-                item1 = WorkflowRequest.objects.get(RequestID_id = ticket_id,Actor = "Helpdesk Admin Approver",RequestStatus = "Pending")
-                        
-            elif(i.user == name.associated_user_account and i.roles == "HelpdeskFinanceApprover1"):
-                item1 = WorkflowRequest.objects.get(RequestID_id = ticket_id,Actor = "Helpdesk Finance Approver",RequestStatus = "Pending")
+            if i.user == name.associated_user_account and i.roles == "HelpdeskHRApprover1":
+                item1 = WorkflowRequest.objects.get((Q(WorkflowPendingWith="Helpdesk HR Approver") |
+                                                     (Q(WorkflowPendingWith=name.associated_user_account))),
+                                                    RequestStatus="Pending", Process="For Helpdesk Approver",
+                                                    RequestID_id=ticket_id)
+            elif i.user == name.associated_user_account and i.roles == "HelpdeskITApprover1":
+                item1 = WorkflowRequest.objects.get(RequestID_id=ticket_id, Actor="Helpdesk IT Approver",
+                                                    RequestStatus="Pending")
+            elif i.user == name.associated_user_account and i.roles == "HelpdeskAdminApprover1":
+                item1 = WorkflowRequest.objects.get(RequestID_id=ticket_id, Actor="Helpdesk Admin Approver",
+                                                    RequestStatus="Pending")
+            elif i.user == name.associated_user_account and i.roles == "HelpdeskFinanceApprover1":
+                item1 = WorkflowRequest.objects.get(RequestID_id=ticket_id, Actor="Helpdesk Finance Approver",
+                                                    RequestStatus="Pending")
     item1.Action = "Raised Query"         
     item1.RequestStatus = "Raised Query"
     item1.ActedOn = str(datetime.datetime.now())
@@ -1277,132 +1378,140 @@ def raiseQuery(request,ticket_id):
     item1.Actor = name.associated_user_account
     item1.WorkflowPendingWith = name.associated_user_account
     item1.save()
-
-
-    form = WorkflowRequest(ActedByUser = item.OnBehalfUserEmployeeId,Process = "Answer Query",ActedOn = str(datetime.datetime.now()),Actor = item.OnBehalfUserEmployeeName,RequestStatus = "Pending",WorkflowPendingWith = item.OnBehalfUserEmployeeName,RequestID_id = ticket_id)
+    form = WorkflowRequest(ActedByUser=item.OnBehalfUserEmployeeId, Process="Answer Query",
+                           ActedOn=str(datetime.datetime.now()), Actor=item.OnBehalfUserEmployeeName,
+                           RequestStatus="Pending", WorkflowPendingWith=item.OnBehalfUserEmployeeName,
+                           RequestID_id=ticket_id)
     form.save()
     if item.InActive == "on":
         key = "HelpdeskTemplate_AssignTask"
         msg = name.associated_user_account + " raised a query for ticket of which details are:"
-        emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat = True).filter(id = ticket_id)
-        employee = EmployeeMaster.objects.values_list('email',flat = True).filter(empid = emailid[0])
+        email_id = HelpRequest.objects.values_list('OnBehalfUserEmployeeId', flat=True).filter(id=ticket_id)
+        employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=email_id[0])
         employee = [employee[0]]
-        email(key,ticket_id,employee,msg)
+        email(key, ticket_id, employee, msg)
     
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-
-
-
-def cancel(request,ticket_id):
-    """Cancel Request manually"""
-    item = HelpRequest.objects.get(id = ticket_id)
+def cancel(request, ticket_id):
+    """
+    Cancel Request manually
+    :param request: to cancel a ticket
+    :param ticket_id: id of ticket
+    :return: to previous page
+    """
+    item = HelpRequest.objects.get(id=ticket_id)
     item.WorkflowStatus = "Cancel"
     item.WorkflowCurrentStatus = "Cancel"
     item.save()
-    item1 = WorkflowRequest.objects.get(RequestID_id = ticket_id,RequestStatus = "Pending")
+    item1 = WorkflowRequest.objects.get(RequestID_id=ticket_id, RequestStatus="Pending")
     item1.RequestStatus = "Incomplete"
     item1.save()
-    form = WorkflowRequest(ActedByUser = request.session['username'],Process = "Cancel",ActedOn = str(datetime.datetime.now()),Actor = item.OnBehalfUserEmployeeName,RequestStatus = "Cancelled",RequestID_id = ticket_id)
+    form = WorkflowRequest(ActedByUser=request.session['username'], Process="Cancel",
+                           ActedOn=str(datetime.datetime.now()), Actor=item.OnBehalfUserEmployeeName,
+                           RequestStatus="Cancelled", RequestID_id=ticket_id)
     form.save()
-
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-
-def ansQuery(request,ticket_id):
-    """Answer query"""
-    item = HelpRequest.objects.get(id = ticket_id)
-
-    print(item.OnBehalfUserEmployeeName)
-            
+def ans_query(request, ticket_id):
+    """
+    Answer query
+    :param request: to answer a query for ticket
+    :param ticket_id: id of ticket
+    :return: to previous page
+    """
+    item = HelpRequest.objects.get(id=ticket_id)
     item.WorkflowStatus = item.WorkflowCurrentStatus
-
-    print(item.WorkflowStatus)
-
-    item1 = WorkflowRequest.objects.get(RequestID_id = ticket_id,ActedByUser = request.session['username'],RequestStatus = "Pending")
+    item1 = WorkflowRequest.objects.get(RequestID_id=ticket_id, ActedByUser=request.session['username'],
+                                        RequestStatus="Pending")
     item1.RequestStatus = "Answered Query"
     item1.ActedOn = str(datetime.datetime.now())
     item1.ActionData = request.GET.get('comments')
-    
-
-    item2 = WorkflowRequest.objects.get(Action = "Raised Query",RequestStatus = "Raised Query",RequestID_id = ticket_id)
+    item2 = WorkflowRequest.objects.get(Action="Raised Query", RequestStatus="Raised Query", RequestID_id=ticket_id)
     item.save()
     item1.save()
-    form = WorkflowRequest(ActedByUser = item2.ActedByUser,Process = item2.Process,ActedOn = str(datetime.datetime.now()),Actor = item2.Actor,RequestStatus = "Pending",WorkflowPendingWith = item2.Actor,RequestID_id = ticket_id)
+    form = WorkflowRequest(ActedByUser=item2.ActedByUser, Process=item2.Process, ActedOn=str(datetime.datetime.now()),
+                           Actor=item2.Actor, RequestStatus="Pending", WorkflowPendingWith=item2.Actor,
+                           RequestID_id=ticket_id)
     form.save()
-    print(item2.Process)
     item2.Action = "Raise Query"
     item2.save()
-
     if item.InActive == "on":
         key = "HelpdeskTemplate_AssignTask"
         msg = item.OnBehalfUserEmployeeName + " answered a query for ticket of which details are:"
-        employee = EmployeeMaster.objects.values_list('email',flat = True).filter(empid = item2.ActedByUser)
+        employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=item2.ActedByUser)
         employee = [employee[0]]
-        email(key,ticket_id,employee,msg)
-
+        email(key, ticket_id, employee, msg)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-def Reopen(request,ticket_id):
-    """Reopen ticket after completion"""
-    item = WorkflowRequest.objects.get(RequestID_id = ticket_id,RequestStatus = "Completed",Process = "Complete")
+
+def reopen(request, ticket_id):
+    """
+    Reopen ticket after completion
+    :param request: to reopen ticket
+    :param ticket_id: id of ticket
+    :return: to previous page
+    """
+    item = WorkflowRequest.objects.get(RequestID_id=ticket_id, RequestStatus="Completed", Process="Complete")
     item.Process = "Reopened"
     item.save()
-
-    item1 = HelpRequest.objects.get(id = ticket_id)
+    item1 = HelpRequest.objects.get(id=ticket_id)
     item1.WorkflowStatus = "Reopened"
     item1.WorkflowCurrentStatus = "Reopened"
     item1.save()
-
     comments = request.GET.get('comments')
-
-    form1 = WorkflowRequest(ActionData = comments,ActedByUser = request.session['username'],Process = "Reopen",ActedOn = str(datetime.datetime.now()),Actor = item1.OnBehalfUserEmployeeName,RequestStatus = "Reopened",WorkflowPendingWith = item.Actor,RequestID_id = ticket_id)
+    form1 = WorkflowRequest(ActionData=comments, ActedByUser=request.session['username'], Process="Reopen",
+                            ActedOn=str(datetime.datetime.now()), Actor=item1.OnBehalfUserEmployeeName,
+                            RequestStatus="Reopened", WorkflowPendingWith=item.Actor, RequestID_id=ticket_id)
     form1.save()
-
-    form = WorkflowRequest(ActedByUser = item.ActedByUser,ActedOn = str(datetime.datetime.now()),Actor = item.Actor,Process = "Complete",RequestStatus = "Pending",WorkflowPendingWith = item.Actor,RequestID_id = ticket_id)
+    form = WorkflowRequest(ActedByUser=item.ActedByUser, ActedOn=str(datetime.datetime.now()), Actor=item.Actor,
+                           Process="Complete", RequestStatus="Pending", WorkflowPendingWith=item.Actor,
+                           RequestID_id=ticket_id)
     form.save()
-
     if item1.InActive == "on":
         key = "HelpdeskTemplate_AssignTask"
         msg = item1.OnBehalfUserEmployeeName + " reopened ticket of which details are:"
-        employee = EmployeeMaster.objects.values_list('email',flat = True).filter(empid = item.ActedByUser)
+        employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=item.ActedByUser)
         employee = [employee[0]]
-        email(key,ticket_id,employee,msg)
-
+        email(key, ticket_id, employee, msg)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))   
 
-def Close(request,ticket_id):
-    """Close ticket after completion"""
-    item = HelpRequest.objects.get(id = ticket_id)
+
+def Close(request, ticket_id):
+    """
+    Close ticket after completion
+    :param request: close ticket
+    :param ticket_id: id of ticket
+    :return: to previous page
+    """
+    item = HelpRequest.objects.get(id=ticket_id)
     item.WorkflowStatus = "Closed"
     item.WorkflowCurrentStatus = "Closed"
     item.save()
-
-    item1 = WorkflowRequest.objects.get(RequestID_id = ticket_id,RequestStatus = "Completed",Process = "Complete")
+    item1 = WorkflowRequest.objects.get(RequestID_id=ticket_id, RequestStatus="Completed", Process="Complete")
     item1.Process = "Closed"
     item1.save()
-
     comments = request.GET.get('comments')
-
-    form1 = WorkflowRequest(ActionData = comments,ActedByUser = request.session['username'],Process = "Close",ActedOn = str(datetime.datetime.now()),Actor = item.OnBehalfUserEmployeeName,RequestStatus = "Closed",RequestID_id = ticket_id)
+    form1 = WorkflowRequest(ActionData=comments, ActedByUser=request.session['username'], Process="Close",
+                            ActedOn=str(datetime.datetime.now()), Actor=item.OnBehalfUserEmployeeName,
+                            RequestStatus="Closed", RequestID_id=ticket_id)
     form1.save()
     if item.InActive == "on":
         key = "HelpdeskTemplate_AssignTask"
         msg = "You closed a service ticket of which details are:"
-        emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId',flat = True).filter(id = ticket_id)
-        employee = EmployeeMaster.objects.values_list('email',flat = True).filter(empid = emailid[0])
+        emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId', flat=True).filter(id=ticket_id)
+        employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=emailid[0])
         employee = [employee[0]]
-        email(key,ticket_id,employee,msg)
+        email(key, ticket_id, employee, msg)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))   
 
 
-
-
-
 def logout(request):
-    """Logout"""
+    """
+    Logout
+    """
     request.session.flush()
     if hasattr(request, 'user'):
         request.user = AnonymousUser()
@@ -1410,39 +1519,54 @@ def logout(request):
 
 
 def sla(request):
-    """Display SLA's using paginator"""
+    """
+    Display SLA's using bootstrap paginator
+    :param request: to display SLA's
+    :return:
+    """
     try:
-        user,SLAFullfillerHead,FirstApprover,ApproverHead,FulfillerHead,Fulfiller = fulfiller(request)
+        user, SLAFullfillerHead, FirstApprover, ApproverHead, FulfillerHead, Fulfiller = fulfiller(request)
     except:
         return redirect('home')
-    all_items = HelpdeskRequestSLAs.objects.all().order_by('HelpdeskDepartment','HelpdeskCategory','HelpdeskSubCategory')
-    # paginator = Paginator(all_items,10)
-    # page = request.GET.get('page')
-    # try:
-    #     contacts = paginator.page(page)
-    # except:
-    #     contacts = paginator.page(1)  
-    return render(request,"pagination.html",{'Fulfiller':Fulfiller,'user':user,'SLAFulfillerHead':SLAFullfillerHead,'FirstApprover':FirstApprover,'ApproverHead':ApproverHead,'FulfillerHead':FulfillerHead,'all_items':all_items})
+    all_items = HelpdeskRequestSLAs.objects.all().order_by('HelpdeskDepartment', 'HelpdeskCategory',
+                                                           'HelpdeskSubCategory')
+    return render(request, "pagination.html", {'Fulfiller': Fulfiller, 'user': user,
+                                               'SLAFulfillerHead': SLAFullfillerHead, 'FirstApprover': FirstApprover,
+                                               'ApproverHead': ApproverHead, 'FulfillerHead': FulfillerHead,
+                                               'all_items': all_items})
     
 
-def slas(request,ticket_id):
-    """Returns data for editing or adding SLA"""
+def slas(request, ticket_id):
+    """
+    Returns data for editing or adding SLA
+    :param request: to provide data
+    :param ticket_id: id of SLA's
+    :return:
+    """
     officelocation = HelpdeskOfficeLocation.objects.all()
-    departments = HelpdeskDepartments.objects.all().filter(request_type = "Request")
+    departments = HelpdeskDepartments.objects.all().filter(request_type="Request")
     category = Categories.objects.all()
     sub_category = sub_categories.objects.all()
     employee = EmployeeMaster.objects.all()
-    print(ticket_id)
     try:
-        ticket_id = HelpdeskRequestSLAs.objects.get(pk = ticket_id)
-        return render(request,"edit_sla.html",{'ticket':ticket_id,'employee':employee,'subCategory':sub_category,'officelocation':officelocation,'departments':departments,'category':category}) 
+        ticket_id = HelpdeskRequestSLAs.objects.get(pk=ticket_id)
+        return render(request, "edit_sla.html", {'ticket': ticket_id, 'employee': employee, 'subCategory': sub_category,
+                                                 'officelocation': officelocation, 'departments': departments,
+                                                 'category': category})
     except:
-        return render(request,"edit_sla.html",{'employee':employee,'subCategory':sub_category,'officelocation':officelocation,'departments':departments,'category':category})
+        return render(request, "edit_sla.html", {'employee': employee, 'subCategory': sub_category,
+                                                 'officelocation': officelocation, 'departments': departments,
+                                                 'category': category})
 
 
 def edit_sla(request, ticket_id):
-    """Edit SLA"""
-    item = HelpdeskRequestSLAs.objects.get(pk = ticket_id)
+    """
+    Edit SLA
+    :param request: to edit SLA
+    :param ticket_id: id of SLA
+    :return:
+    """
+    item = HelpdeskRequestSLAs.objects.get(pk=ticket_id)
     item.TATHrs = request.POST.get('TATHrs')
     item.TATMins = request.POST.get('TATMins')
     item.EM_0_AfterHrs = request.POST.get('EM_0_AfterHrs')
@@ -1450,12 +1574,11 @@ def edit_sla(request, ticket_id):
     item.EM_0_AfterMin = request.POST.get('EM_0_AfterMin')
     item.EM_1_AfterMin = request.POST.get('EM_1_AfterMin')
     item.EM_0_Name = request.POST.get('EM_0_Name')
-    item.EM_1_Name=request.POST.get('EM_1_Name')
-    em_zero_to = EmployeeMaster.objects.values_list('empid',flat = True).filter(associated_user_account = request.POST.get('EM_0_Name'))
-    em_one_to = EmployeeMaster.objects.values_list('empid',flat = True).filter(associated_user_account = request.POST.get('EM_1_Name'))
-    print(ticket_id)
-    print("$"*40)
-    print(request.POST.get('EM_0_Name'))
+    item.EM_1_Name = request.POST.get('EM_1_Name')
+    em_zero_to = EmployeeMaster.objects.values_list('empid', flat=True).\
+        filter(associated_user_account=request.POST.get('EM_0_Name'))
+    em_one_to = EmployeeMaster.objects.values_list('empid', flat=True).\
+        filter(associated_user_account=request.POST.get('EM_1_Name'))
     try:
         print(em_zero_to[0],em_one_to[0])
     except:
@@ -1465,31 +1588,29 @@ def edit_sla(request, ticket_id):
     item.EM_1_To = em_one_to[0]
     item.EM_0_To = em_zero_to[0]
     item.save()
-
-    print("%"*50)
     messages.warning(request, 'Successfully Edited')
-    
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-def add_sla(request):
-    """Add SLA""" 
-    helpdesk_location = request.POST.get('location')
 
-    department = HelpdeskDepartments.objects.values_list('department',flat = True).filter(id = request.POST.get('department'))
-    print(department)
-    helpdesk_department = department[0]
-    category = Categories.objects.values_list('title',flat = True).filter(id = request.POST.get('category'))
-    helpdesk_category = category[0]
-    print(category)
-    sub_category = sub_categories.objects.values_list('title',flat = True).filter(id = request.POST.get('sub_category'))
-    helpdesk_sub_category = sub_category[0]
-    print(sub_category)
-    helpdesk_priority = request.POST.get('priority')
-    print(helpdesk_priority)
+def add_sla(request):
+    """
+    Add SLA
+    :param request: to add new SLA
+    :return:
+    """
+    help_desk_location = request.POST.get('location')
+    department = HelpdeskDepartments.objects.values_list('department', flat=True).\
+        filter(id=request.POST.get('department'))
+    help_desk_department = department[0]
+    category = Categories.objects.values_list('title', flat=True).filter(id=request.POST.get('category'))
+    help_desk_category = category[0]
+    sub_category = sub_categories.objects.values_list('title', flat=True).filter(id=request.POST.get('sub_category'))
+    help_desk_sub_category = sub_category[0]
+    help_desk_priority = request.POST.get('priority')
     try:
-        HelpdeskRequestSLAs.objects.get(HelpdeskDepartment = helpdesk_department,HelpdeskCategory = helpdesk_category,HelpdeskSubCategory =  helpdesk_sub_category ,HelpdeskPriority = helpdesk_priority)
+        HelpdeskRequestSLAs.objects.get(HelpdeskDepartment=help_desk_department, HelpdeskCategory=help_desk_category,
+                                        HelpdeskSubCategory=help_desk_sub_category, HelpdeskPriority=help_desk_priority)
         messages.warning(request, 'This SLA already exists. You can edit it.')
-         
     except: 
         total_hrs = request.POST.get('TATHrs')
         total_mins = request.POST.get('TATMins')
@@ -1499,41 +1620,57 @@ def add_sla(request):
         em_one_after_mins = request.POST.get('EM_1_AfterMin')
         em_zero_name = request.POST.get('EM_0_Name')
         em_one_name = request.POST.get('EM_1_Name')
-        #print(helpdesk_department,helpdesk_sub_categorylp,helpdesk_priority,total_hrs,total_mins,em_zero_after_hrs,em_zero_after_mins,em_zero_name,em_one_after_hrs,em_one_name)
-        em_zero_to = EmployeeMaster.objects.values_list('empid',flat = True).filter(associated_user_account = request.POST.get('EM_0_Name'))
-        em_one_to = EmployeeMaster.objects.values_list('empid',flat = True).filter(associated_user_account = request.POST.get('EM_1_Name'))
+        em_zero_to = EmployeeMaster.objects.values_list('empid', flat=True).\
+            filter(associated_user_account=request.POST.get('EM_0_Name'))
+        em_one_to = EmployeeMaster.objects.values_list('empid', flat=True).\
+            filter(associated_user_account=request.POST.get('EM_1_Name'))
         try:
-            print(em_zero_to[0],em_one_to[0])
+            print(em_zero_to[0], em_one_to[0])
         except:
             messages.warning(request, 'Invalid employee name.')
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         em_one_to = em_one_to[0]
         em_zero_to = em_zero_to[0]
-        form = HelpdeskRequestSLAs(EM_0_AfterHrs = em_zero_after_hrs,EM_0_AfterMin = em_zero_after_mins,EM_0_Name = em_zero_name,EM_0_To = em_zero_to,EM_1_AfterHrs = em_one_after_hrs,EM_1_AfterMin = em_one_after_mins,EM_1_Name = em_one_name,EM_1_To = em_one_to,HelpdeskCategory = helpdesk_category,HelpdeskDepartment = helpdesk_department,HelpdeskLocation = helpdesk_location,HelpdeskPriority = helpdesk_priority,HelpdeskSubCategory = helpdesk_sub_category,TATHrs = total_hrs,TATMins = total_mins)
-        
+        form = HelpdeskRequestSLAs(EM_0_AfterHrs=em_zero_after_hrs, EM_0_AfterMin=em_zero_after_mins,
+                                   EM_0_Name=em_zero_name, EM_0_To=em_zero_to, EM_1_AfterHrs=em_one_after_hrs,
+                                   EM_1_AfterMin=em_one_after_mins, EM_1_Name=em_one_name, EM_1_To=em_one_to,
+                                   HelpdeskCategory=help_desk_category, HelpdeskDepartment=help_desk_department,
+                                   HelpdeskLocation=help_desk_location, HelpdeskPriority=help_desk_priority,
+                                   HelpdeskSubCategory=help_desk_sub_category, TATHrs=total_hrs, TATMins=total_mins)
         form.save()
-        print("%"*50)
         messages.warning(request, 'Successfully Added')
-        
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 def delete_sla(request, ticket_id):
-    """Delete SLA"""
-    item = HelpdeskRequestSLAs.objects.get(pk = ticket_id)
+    """
+    Delete SLA
+    :param request: Delete SLA
+    :param ticket_id: id of SLA
+    :return:
+    """
+    item = HelpdeskRequestSLAs.objects.get(pk=ticket_id)
     item.delete()
     messages.warning(request, 'Successfully Deleted')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-#import subprocess
 
-import webbrowser
-def view_document(request,name):
-    #webbrowser.open("abc.jpg");
-    name="media/Documents/" + name
+def view_document(request, name):
+    """
+    Display documnets
+    :param request: display documents from database
+    :param name: name of file stored in database
+    :return:
+    """
+    name = "media/Documents/" + name
     webbrowser.open('file://' + os.path.realpath(name))
-
-    #subprocess.call("manage.py",shell=True)
- 
-
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+def view_employees(request):
+    """
+    Get all employees
+    :param request: Display employees from employee master
+    :return: to employee.html
+    """
+    pass
