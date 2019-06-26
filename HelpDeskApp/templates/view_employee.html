@@ -1,0 +1,129 @@
+<html>
+<head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="bootstrap.min.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+    <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#myTable').dataTable();
+        });
+    </script>
+    <script>
+        {% if messages %}
+            {% for message in messages%}
+                alert("{{message}}")
+            {%endfor%}
+    {% endif %}
+    </script>
+    <style type="text/css">
+        label {
+            display: inline-block;
+            max-width: 100%;
+            margin-bottom: 5px;
+            font-weight: 700;
+            float: right;
+            margin-right: 50px;
+            margin-bottom: 50px
+            padding-bottom:20px;
+        }
+        #myTable_info,#myTable_paginate{
+          text-align: center;
+          padding-bottom: 30px;
+        }
+        #myTable_wrapper
+        {
+          padding-bottom: 50px
+        }
+        #myTable_previous,#myTable_next
+        {
+         background-color: red;
+          color: white;
+          margin-top: 20px;
+          padding: 1em 1.5em;
+          text-decoration: none;
+          text-transform: uppercase;
+          border:1px solid #444;
+        }
+        .paginate_button
+        {
+          margin-right: 4px;
+          margin-left: 4px;
+        }
+        .current
+        {
+           margin-right: 4px;
+          margin-left: 4px;
+           background-color: yellow;
+           padding-right: 5px;
+           padding-left: 5px;
+        }
+        a, a:hover, a:focus {
+             color:   #0645AD;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+    </style>
+
+</head>
+<body>
+<h1>Employee Details</h1>
+<div class="container" style="width:100%">
+    <div class="row" >
+        <div class="col-sm-12">
+            {% if all_items%}
+            <div class="table-responsive">
+                <table class="table" id="myTable" width="100%">
+                    <thead>
+                    <tr>
+                        <td>Employee ID</td>
+                        <td>Employee Name</td>
+                        <td>Email ID</td>
+                        <td>Designation</td>
+                        <td>Reporting To</td>
+                        <td>Edit</td>
+                    </tr>
+                    </thead>
+                    {% for item in all_items %}
+                    <tr >
+                        <td>{{item.empid}}</td>
+                        <td>{{item.associated_user_account}}</td>
+                        <td>{{item.email}}</td>
+                        <td>{{item.position}}</td>
+                        <td>{{item.reporting_to}}</td>
+                        <td>
+                            <a data-toggle="modal" data-target="#myModal" href="/get_employee_details/{{item.id}}">
+                            <span class="glyphicon glyphicon-pencil"> </span>Edit</a>
+                        </td>
+                    </tr>
+                    {%endfor%}
+                </table>
+            </div>
+            {% endif %}
+        </div>
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-body">
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

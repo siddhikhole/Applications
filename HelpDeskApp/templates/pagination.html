@@ -1,6 +1,6 @@
 {% extends 'index.html' %}
 {%block content %}
-<!DOCTYPE html>
+
 <html>
 <head>
   <title></title>
@@ -114,52 +114,27 @@ a, a:hover, a:focus {
               <td>{{item.HelpdeskCategory}}</td>
               <td>{{item.HelpdeskSubCategory}}</td>
               <td>{{item.HelpdeskPriority}}</td>
-              <td>  <a  data-toggle="modal" data-target="#myModal" href="/slas/{{item.id}}" > <span class="glyphicon glyphicon-pencil"></span> Edit</a> </td>
+              <td>  <a  data-toggle="modal" data-target="#myModal" href="/slas/{{item.id}}" >
+                <span class="glyphicon glyphicon-pencil"></span> Edit</a> </td>
             </tr>
             {%endfor%}
           </table>
         </div>
         {%endif%}
       </div>
- 
-    <!-- <div class="pagination">
-      <nav>
-        <ul class="pagination">
-      </nav>
-    </div> -->
-   <!--  <ul class="pager" style="margin-left: 700px;">
-      <li class="page-link"><a href="?page=1"><span class="glyphicon glyphicon-fast-backward"></span></a></li>
-      {% if all_items.has_previous %}
-      <li class="page-link"><a href="?page={{ all_items.previous_page_number }}"><span class="glyphicon glyphicon-step-backward"></a></li>
-      {% else %}
-      <li class="page-link"><a href="?page=1"><span class="glyphicon glyphicon-step-backward"></a></li>{% endif %}
-        <li> Page {{ all_items.number }} of {{ all_items.paginator.num_pages }}</li>
-        {% if all_items.has_next %}
-        <li> <a href="?page={{ all_items.next_page_number }}"><span class="glyphicon glyphicon-step-forward"></span></a></li>
-        {% else %}
-        <li> <a href="?page={{ all_items.paginator.num_pages }}"><span class="glyphicon glyphicon-step-forward"></span></a></li>
-        {% endif %}
-        <li class="page-link"><a href="?page={{ all_items.paginator.num_pages }}"><span class="glyphicon glyphicon-fast-forward"></span></a></li>
-    </ul> -->
-
   <div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog modal-lg">
     
       <!-- Modal content-->
       <div class="modal-content">
            <div class="modal-body">
-          
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
       </div>
-      
     </div>
-  </div> 
-
-
-
+  </div>
 </form>
 
 </body>

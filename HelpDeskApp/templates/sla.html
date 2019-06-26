@@ -1,6 +1,5 @@
 {% extends 'index.html' %}
 {%block content %}
-<!DOCTYPE html>
 <html>
 <head>
   <title>Help desk</title>
@@ -76,25 +75,6 @@ $(document).ready(function(){
         </div>
         {%endif%}
       </div>
-      <!-- <div class="pagination">
-      <nav>
-        <ul class="pagination">
-      </nav>
-    </div> -->
-   <!--  <ul class="pager" style="margin-left: 700px;">
-      <li class="page-link"><a href="?page=1"><span class="glyphicon glyphicon-fast-backward"></span></a></li>
-      {% if all_items.has_previous %}
-      <li class="page-link"><a href="?page={{ all_items.previous_page_number }}"><span class="glyphicon glyphicon-step-backward"></a></li>
-      {% else %}
-      <li class="page-link"><a href="?page=1"><span class="glyphicon glyphicon-step-backward"></a></li>{% endif %}
-        <li> Page {{ all_items.number }} of {{ all_items.paginator.num_pages }}</li>
-        {% if all_items.has_next %}
-        <li> <a href="?page={{ all_items.next_page_number }}"><span class="glyphicon glyphicon-step-forward"></span></a></li>
-        {% else %}
-        <li> <a href="?page={{ all_items.paginator.num_pages }}"><span class="glyphicon glyphicon-step-forward"></span></a></li>
-        {% endif %}
-        <li class="page-link"><a href="?page={{ all_items.paginator.num_pages }}"><span class="glyphicon glyphicon-fast-forward"></span></a></li>
-    </ul> -->
 
   <div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog modal-lg">

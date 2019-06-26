@@ -568,7 +568,7 @@ def closed(request):
     all_items = get_users(all_items)
     return render(request, "closed.html", {'Fulfiller': Fulfiller, 'user': user, 'SLAFulfillerHead': SLAFullfillerHead,
                                            'FirstApprover': FirstApprover, 'ApproverHead': ApproverHead,
-                                           'FulfillerHead': FulfillerHead, 'all_items':all_items})
+                                           'FulfillerHead': FulfillerHead, 'all_items': all_items})
 
 
 def cancelled(request):
@@ -628,7 +628,7 @@ def rejected(request):
                                                  WorkflowStatus="Rejected")
     all_items = get_users(all_items)
     return render(request, "reject.html", {'Fulfiller': Fulfiller, 'user': user, 'SLAFulfillerHead': SLAFullfillerHead,
-                                           'FirstApprover': FirstApprover, 'ApproverHead':ApproverHead,
+                                           'FirstApprover': FirstApprover, 'ApproverHead': ApproverHead,
                                            'FulfillerHead': FulfillerHead, 'all_items': all_items})
 
 
@@ -707,7 +707,7 @@ def assigned_tickets(request):
         for i in all_items:
             all_i = HelpRequest.objects.all().filter(id=i.RequestID_id)
             items = get_users(all_i)
-            for k,v in items.items():
+            for k, v in items.items():
                 total[k] = v
         if Fulfiller:
             return render(request, "assigned.html", {'Fulfiller': Fulfiller, 'user': user,
@@ -752,6 +752,7 @@ def complete(request, ticket_id):
         employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=email_id[0])
         employee = [employee[0]]
         email(key, ticket_id, employee, msg)
+    #messages.warning(request, 'Task Completed')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
@@ -826,7 +827,7 @@ def add_ticket(request):
         priority = request.POST.get('priority')
         ticket_for = request.POST.get('yesno')
         on_behalf_of = request.POST.get('onBehalfOf')
-        help_desk_office = HelpdeskOfficeLocation.objects.values_list('title',flat=True).\
+        help_desk_office = HelpdeskOfficeLocation.objects.values_list('title', flat=True).\
             filter(id=request.POST.get('officeLocation'))
         help_desk_office = help_desk_office[0]
         desk_location = request.POST.get('deskLocation')
@@ -839,15 +840,15 @@ def add_ticket(request):
                                                             HelpdeskSubCategory=sub_category)
 
             for i in item:
-                TATHrs = i.TATHrs
+                total_hours = i.TATHrs
 
             seconds = 0
-            days = TATHrs / 8
-            while TATHrs >= 8:
+            days = total_hours / 8
+            while total_hours >= 8:
                 seconds = seconds + 86400
-                TATHrs = TATHrs - 8
+                total_hours = total_hours - 8
 
-            seconds = seconds + (TATHrs * 3600)
+            seconds = seconds + (total_hours * 3600)
 
             a = 0
             for i in range(int(days)):
@@ -864,7 +865,8 @@ def add_ticket(request):
                 filter(associated_user_account=on_behalf_of)
             try:
                 on_behalf_user_employee_id = employee[0][1]
-            except:
+            except Exception as e:
+                print(e)
                 messages.warning(request, 'Invalid employee name.')
                 return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
             OnBehalfUserEmployeeName = on_behalf_of
@@ -874,7 +876,7 @@ def add_ticket(request):
             employee = EmployeeMaster.objects.values_list('reporting_to', 'associated_user_account', 'email').\
                 filter(empid=employee_id)
             EmployeeName = employee[0][1]
-            OnBehalfUserEmployeeId = employee_id
+            on_behalf_user_employee_id = employee_id
             OnBehalfUserEmployeeName = EmployeeName
         FirstLevelApproverEmployeeName = employee[0][0]
         FirstApprover = EmployeeMaster.objects.values_list('empid', 'email').\
@@ -882,7 +884,7 @@ def add_ticket(request):
         FirstLevelApproverEmployeeId = FirstApprover[0][0]
         FirstApproverEmail = FirstApprover[0][1]
         form = HelpRequest(InActive=email_notification, RequestStatus="1", expected_closure=dt,
-                           OnBehalfUserEmployeeId=OnBehalfUserEmployeeId,
+                           OnBehalfUserEmployeeId=on_behalf_user_employee_id,
                            OnBehalfUserEmployeeName=OnBehalfUserEmployeeName, WorkflowStatus="Workflow Initiated",
                            employee_id=employee_id, FirstLevelApproverEmployeeId=FirstLevelApproverEmployeeId,
                            FirstLevelApproverEmployeeName=FirstLevelApproverEmployeeName, EmployeeName=EmployeeName,
@@ -894,7 +896,7 @@ def add_ticket(request):
             form.save()
             key = 'HelpdeskTemplate_AssignTask'
             t_id = form.id
-            form1 = WorkflowRequest(ActedByUser=OnBehalfUserEmployeeId, Process="Raised Ticket",
+            form1 = WorkflowRequest(ActedByUser=on_behalf_user_employee_id, Process="Raised Ticket",
                                     ActedOn=str(datetime.datetime.now()), Action="Raised Ticket",
                                     Actor=OnBehalfUserEmployeeName, RequestStatus="Workflow Initiated",
                                     WorkflowPendingWith=FirstLevelApproverEmployeeName, RequestID_id=t_id)
@@ -950,9 +952,9 @@ def update_ticket(request, ticket_id):
             filter(id=request.POST.get('sub_category'))
         item.sub_category = sub_category[0]
         item.priority = request.POST.get('priority')
-        HelpdeskOffice = HelpdeskOfficeLocation.objects.values_list('title', flat=True).\
+        help_desk_office = HelpdeskOfficeLocation.objects.values_list('title', flat=True).\
             filter(id=request.POST.get('officeLocation'))
-        item.HelpdeskOffice = HelpdeskOffice[0]
+        item.HelpdeskOffice = help_desk_office[0]
         item.DeskLocation = request.POST.get('deskLocation')
         item.Files = request.FILES.get('documents')
         item.InActive = request.POST.get('email_notification')
@@ -970,6 +972,7 @@ def update_ticket(request, ticket_id):
             Employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=emailid[0])
             Employee = [Employee[0]]
             email(key, ticket_id, Employee, msg)
+        messages.warning(request, 'Successfully Edited')
         return HttpResponseRedirect('/main')
 
 
@@ -1010,18 +1013,19 @@ def approve(request, ticket_id):
     if item1.InActive == "on":
         key = "HelpdeskTemplate_UpdateTicket"
         msg = "Your service request is approved by " + item1.EmployeeName + " of which details are:"
-        emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId', flat=True).filter(id=ticket_id)
-        Employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=emailid[0])
-        Employee = [Employee[0]]
-        email(key, ticket_id, Employee, msg)
-        Employee = []
+        email_id = HelpRequest.objects.values_list('OnBehalfUserEmployeeId', flat=True).filter(id=ticket_id)
+        employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=email_id[0])
+        employee = [employee[0]]
+        email(key, ticket_id, employee, msg)
+        employee = []
         key = "HelpdeskTemplate_AssignTask"
         msg = "You have been assigned a service request for approval of which details are:"
         user = AppList.objects.all().filter(roles=roles)
         for i in user:
             item = EmployeeMaster.objects.get(associated_user_account=i.user)
-            Employee.append(item.email)
-        email(key, ticket_id, Employee, msg)
+            employee.append(item.email)
+        email(key, ticket_id, employee, msg)
+    messages.warning(request, 'Ticket Approved')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
@@ -1072,18 +1076,19 @@ def approve1(request, ticket_id):
     if item1.InActive == "on":
         key = "HelpdeskTemplate_UpdateTicket"
         msg = "Your service request is approved by " + item.Actor + " of which details are:"
-        emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId', flat=True).filter(id=ticket_id)
-        Employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=emailid[0])
-        Employee = [Employee[0]]
-        email(key, ticket_id, Employee, msg)
-        Employee = []
+        email_id = HelpRequest.objects.values_list('OnBehalfUserEmployeeId', flat=True).filter(id=ticket_id)
+        employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=email_id[0])
+        employee = [employee[0]]
+        email(key, ticket_id, employee, msg)
+        employee = []
         key = "HelpdeskTemplate_AssignTask"
         msg = "You have been assigned a service request of which details are:"
         user = AppList.objects.all().filter(roles=roles)
         for i in user:
             item = EmployeeMaster.objects.get(associated_user_account=i.user)
-            Employee.append(item.email)
-        email(key, ticket_id, Employee, msg)
+            employee.append(item.email)
+        email(key, ticket_id, employee, msg)
+    messages.warning(request, 'Ticket Approved')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
@@ -1105,10 +1110,11 @@ def reject(request, ticket_id):
     if item.InActive == "on":
         key = "HelpdeskTemplate_UpdateTicket"
         msg = "Your service request is rejected of which details are:"
-        emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId', flat=True).filter(id=ticket_id)
-        Employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=emailid[0])
-        Employee = [Employee[0]]
-        email(key, ticket_id, Employee, msg)
+        email_id = HelpRequest.objects.values_list('OnBehalfUserEmployeeId', flat=True).filter(id=ticket_id)
+        employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=email_id[0])
+        employee = [employee[0]]
+        email(key, ticket_id, employee, msg)
+    messages.warning(request, 'Ticket Rejected')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
@@ -1129,10 +1135,11 @@ def reject1(request, ticket_id):
     if item.InActive == "on":
         key = "HelpdeskTemplate_UpdateTicket"
         msg = "Your service request is rejected of which details are:"
-        emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId', flat=True).filter(id=ticket_id)
-        Employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=emailid[0])
-        Employee = [Employee[0]]
-        email(key, ticket_id, Employee, msg)
+        email_id = HelpRequest.objects.values_list('OnBehalfUserEmployeeId', flat=True).filter(id=ticket_id)
+        employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=email_id[0])
+        employee = [employee[0]]
+        email(key, ticket_id, employee, msg)
+    messages.warning(request, 'Ticket Rejected')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
@@ -1179,7 +1186,8 @@ def display(request, ticket_id):
                                                 'ApproverHead': ApproverHead, 'FulfillerHead': FulfillerHead,
                                                 'item': item, 'workflow1': workflow1, 'emp': empName,
                                                 'workflow': workflow, 'emp1': emp1})
-    except:
+    except Exception as e:
+        print(e)
         return render(request, "display.html", {'media_url': settings.MEDIA_URL, 'Fulfiller': Fulfiller, 'user': user,
                                                 'SLAFulfillerHead': SLAFullfillerHead, 'FirstApprover': FirstApprover,
                                                 'ApproverHead': ApproverHead, 'FulfillerHead': FulfillerHead,
@@ -1193,12 +1201,12 @@ def workflow(request, ticket_id):
         :param ticket_id:id of ticket
         :return: to details of workflow
     """
-    workflow = WorkflowRequest.objects.all().filter(RequestID_id=ticket_id).order_by('ActedOn')
+    work_flow = WorkflowRequest.objects.all().filter(RequestID_id=ticket_id).order_by('ActedOn')
     user, SLAFullfillerHead, FirstApprover, ApproverHead, FulfillerHead, Fulfiller = fulfiller(request)
     return render(request, "workflow.html", {'Fulfiller': Fulfiller, 'user': user,
                                              'SLAFulfillerHead': SLAFullfillerHead, 'FirstApprover': FirstApprover,
                                              'ApproverHead': ApproverHead, 'FulfillerHead': FulfillerHead,
-                                             'workflow': workflow})
+                                             'workflow': work_flow})
 
 
 def assign(request, ticket_id):
@@ -1209,15 +1217,15 @@ def assign(request, ticket_id):
     :return: to assign.html with details of fulfillers list
     """
     name = EmployeeMaster.objects.get(empid=request.session['username'])
-    approver_list = AppList.objects.all()
-    for approver in approver_list:
-        if approver.user == name.associated_user_account and approver.roles == "HelpdeskFulfillerHead_HR1":
+    approve_list = AppList.objects.all()
+    for approve in approve_list:
+        if approve.user == name.associated_user_account and approve.roles == "HelpdeskFulfillerHead_HR1":
             all_items = HelpdeskFulfillerGroups.objects.all().filter(group_name="HR")
-        elif approver.user == name.associated_user_account and approver.roles == "HelpdeskFulfillerHead_IT1":
+        elif approve.user == name.associated_user_account and approve.roles == "HelpdeskFulfillerHead_IT1":
             all_items = HelpdeskFulfillerGroups.objects.all().filter(group_name="IT")
-        elif approver.user == name.associated_user_account and approver.roles == "HelpdeskFulfillerHead_Admin1":
+        elif approve.user == name.associated_user_account and approve.roles == "HelpdeskFulfillerHead_Admin1":
             all_items = HelpdeskFulfillerGroups.objects.all().filter(group_name="Admin")
-        elif approver.user == name.associated_user_account and approver.roles == "HelpdeskFulfillerHead_Finance1":
+        elif approve.user == name.associated_user_account and approve.roles == "HelpdeskFulfillerHead_Finance1":
             all_items = HelpdeskFulfillerGroups.objects.all().filter(group_name="Finance")
     user, SLAFullfillerHead, FirstApprover, ApproverHead, FulfillerHead, Fulfiller = fulfiller(request)
     return render(request, "assign.html", {'Fulfiller': Fulfiller, 'user': user, 'SLAFulfillerHead': SLAFullfillerHead,
@@ -1234,8 +1242,8 @@ def assign_ticket(request, ticket_id):
     :return: to previous page
     """
     name = EmployeeMaster.objects.get(empid=request.session['username'])
-    approver = AppList.objects.all()
-    for i in approver:
+    approve = AppList.objects.all()
+    for i in approve:
         if i.user == name.associated_user_account and i.roles == "HelpdeskFulfillerHead_HR1":
             item = WorkflowRequest.objects.get(RequestID_id=ticket_id, Actor="Helpdesk Fullfiller Head HR",
                                                RequestStatus="Pending")
@@ -1268,18 +1276,19 @@ def assign_ticket(request, ticket_id):
     if item1.InActive == "on":    
         key = "HelpdeskTemplate_UpdateTicket"
         msg = "Your service request is assigned to "+assign_to_name+" of which details are:"
-        emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId', flat=True).filter(id=ticket_id)
-        Employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=emailid[0])
-        Employee = [Employee[0]]
-        email(key, ticket_id, Employee, msg)
+        email_id = HelpRequest.objects.values_list('OnBehalfUserEmployeeId', flat=True).filter(id=ticket_id)
+        employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=email_id[0])
+        employee = [employee[0]]
+        email(key, ticket_id, employee, msg)
         key = "HelpdeskTemplate_AssignTask"
         msg = "You have been assigned a service request for fulfillment of which details are:"
         employee = [assign_to.email]
         email(key, ticket_id, employee, msg)
+    #messages.warning(request, 'Ticket Assigned to '+assign_to_name)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-def update(request,ticket_id):
+def update(request, ticket_id):
     """
     Provide data for update ticket
     :param request: to send data of ticket which is to be updated
@@ -1288,22 +1297,23 @@ def update(request,ticket_id):
     """""
     try:
         user, SLAFullfillerHead, FirstApprover, ApproverHead, FulfillerHead, Fulfiller = fulfiller(request)
-    except:
+    except Exception as e:
+        print(e)
         return redirect('home')
     item = HelpRequest.objects.get(pk=ticket_id)
-    officelocation = HelpdeskOfficeLocation.objects.all()
+    office_location = HelpdeskOfficeLocation.objects.all()
     departments = HelpdeskDepartments.objects.all().filter(request_type="Request")
     category = Categories.objects.all()
-    subCategory = sub_categories.objects.all()
+    sub_category = sub_categories.objects.all()
     employee = EmployeeMaster.objects.all()
-    firstApprover = EmployeeMaster.objects.values_list('reporting_to', flat=True).\
+    first_approve = EmployeeMaster.objects.values_list('reporting_to', flat=True).\
         filter(empid=request.session['username'])
-    firstApprover = firstApprover[0]
-    return render(request, "raiseTicket.html", {'firstApprover': firstApprover, 'Fulfiller': Fulfiller, 'user': user,
+    first_approve = first_approve[0]
+    return render(request, "raiseTicket.html", {'firstApprover': first_approve, 'Fulfiller': Fulfiller, 'user': user,
                                                 'SLAFulfillerHead': SLAFullfillerHead, 'FirstApprover': FirstApprover,
                                                 'ApproverHead': ApproverHead, 'FulfillerHead': FulfillerHead,
-                                                'employee': employee, 'item': item, 'subCategory': subCategory,
-                                                'officelocation': officelocation, 'departments': departments,
+                                                'employee': employee, 'item': item, 'subCategory': sub_category,
+                                                'officelocation': office_location, 'departments': departments,
                                                 'category': category})
 
 
@@ -1320,21 +1330,22 @@ def raise_ticket(request):
     """
     try:
         user, SLAFullfillerHead, FirstApprover, ApproverHead, FulfillerHead, Fulfiller = fulfiller(request)
-    except:
+    except Exception as e:
+        print(e)
         return redirect('home')
-    officelocation = HelpdeskOfficeLocation.objects.all()
+    office_location = HelpdeskOfficeLocation.objects.all()
     departments = HelpdeskDepartments.objects.all().filter(request_type="Request")
     category = Categories.objects.all()
-    subCategory = sub_categories.objects.all()
-    firstApprover = EmployeeMaster.objects.values_list('reporting_to', flat=True).\
+    sub_category = sub_categories.objects.all()
+    first_approve = EmployeeMaster.objects.values_list('reporting_to', flat=True).\
         filter(empid=request.session['username'])
-    firstApprover = firstApprover[0]
+    first_approve = first_approve[0]
     employee = EmployeeMaster.objects.all()
     return render(request, "raiseTicket.html", {'Fulfiller': Fulfiller, 'user': user,
                                                 'SLAFulfillerHead': SLAFullfillerHead, 'FirstApprover': FirstApprover,
                                                 'ApproverHead': ApproverHead, 'FulfillerHead': FulfillerHead,
-                                                'employee': employee, 'firstApprover': firstApprover,
-                                                'subCategory': subCategory, 'officelocation': officelocation,
+                                                'employee': employee, 'firstApprover': first_approve,
+                                                'subCategory': sub_category, 'officelocation': office_location,
                                                 'departments': departments, 'category': category})
 
 
@@ -1353,9 +1364,10 @@ def raise_query(request, ticket_id):
         item1 = WorkflowRequest.objects.get((Q(Process="For First Approver") | Q(Process="For Helpdesk Approver")),
                                             RequestID_id=ticket_id, ActedByUser=request.session['username'],
                                             RequestStatus="Pending")
-    except:
-        Approver = AppList.objects.all()
-        for i in Approver:
+    except Exception as e:
+        print(e)
+        approver = AppList.objects.all()
+        for i in approver:
             if i.user == name.associated_user_account and i.roles == "HelpdeskHRApprover1":
                 item1 = WorkflowRequest.objects.get((Q(WorkflowPendingWith="Helpdesk HR Approver") |
                                                      (Q(WorkflowPendingWith=name.associated_user_account))),
@@ -1390,7 +1402,7 @@ def raise_query(request, ticket_id):
         employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=email_id[0])
         employee = [employee[0]]
         email(key, ticket_id, employee, msg)
-    
+    messages.warning(request, 'Raise Query')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
@@ -1412,6 +1424,7 @@ def cancel(request, ticket_id):
                            ActedOn=str(datetime.datetime.now()), Actor=item.OnBehalfUserEmployeeName,
                            RequestStatus="Cancelled", RequestID_id=ticket_id)
     form.save()
+    messages.warning(request, 'Ticket Cancelled')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
@@ -1444,6 +1457,7 @@ def ans_query(request, ticket_id):
         employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=item2.ActedByUser)
         employee = [employee[0]]
         email(key, ticket_id, employee, msg)
+    messages.warning(request, 'Answered Query')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
@@ -1476,10 +1490,11 @@ def reopen(request, ticket_id):
         employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=item.ActedByUser)
         employee = [employee[0]]
         email(key, ticket_id, employee, msg)
+    messages.warning(request, 'Ticket Reopened')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))   
 
 
-def Close(request, ticket_id):
+def close(request, ticket_id):
     """
     Close ticket after completion
     :param request: close ticket
@@ -1501,10 +1516,11 @@ def Close(request, ticket_id):
     if item.InActive == "on":
         key = "HelpdeskTemplate_AssignTask"
         msg = "You closed a service ticket of which details are:"
-        emailid = HelpRequest.objects.values_list('OnBehalfUserEmployeeId', flat=True).filter(id=ticket_id)
-        employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=emailid[0])
+        email_id = HelpRequest.objects.values_list('OnBehalfUserEmployeeId', flat=True).filter(id=ticket_id)
+        employee = EmployeeMaster.objects.values_list('email', flat=True).filter(empid=email_id[0])
         employee = [employee[0]]
         email(key, ticket_id, employee, msg)
+    messages.warning(request, 'Ticket Closed')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))   
 
 
@@ -1525,14 +1541,15 @@ def sla(request):
     :return:
     """
     try:
-        user, SLAFullfillerHead, FirstApprover, ApproverHead, FulfillerHead, Fulfiller = fulfiller(request)
-    except:
+        user, SLAFullfillerHead, first_approve, approve_head, ful_filler_head, ful_filler = fulfiller(request)
+    except Exception as e:
+        print(e)
         return redirect('home')
     all_items = HelpdeskRequestSLAs.objects.all().order_by('HelpdeskDepartment', 'HelpdeskCategory',
                                                            'HelpdeskSubCategory')
-    return render(request, "pagination.html", {'Fulfiller': Fulfiller, 'user': user,
-                                               'SLAFulfillerHead': SLAFullfillerHead, 'FirstApprover': FirstApprover,
-                                               'ApproverHead': ApproverHead, 'FulfillerHead': FulfillerHead,
+    return render(request, "pagination.html", {'Fulfiller': ful_filler, 'user': user,
+                                               'SLAFulfillerHead': SLAFullfillerHead, 'FirstApprover': first_approve,
+                                               'ApproverHead': approve_head, 'FulfillerHead': ful_filler_head,
                                                'all_items': all_items})
     
 
@@ -1543,7 +1560,7 @@ def slas(request, ticket_id):
     :param ticket_id: id of SLA's
     :return:
     """
-    officelocation = HelpdeskOfficeLocation.objects.all()
+    office_location = HelpdeskOfficeLocation.objects.all()
     departments = HelpdeskDepartments.objects.all().filter(request_type="Request")
     category = Categories.objects.all()
     sub_category = sub_categories.objects.all()
@@ -1551,11 +1568,12 @@ def slas(request, ticket_id):
     try:
         ticket_id = HelpdeskRequestSLAs.objects.get(pk=ticket_id)
         return render(request, "edit_sla.html", {'ticket': ticket_id, 'employee': employee, 'subCategory': sub_category,
-                                                 'officelocation': officelocation, 'departments': departments,
+                                                 'officelocation': office_location, 'departments': departments,
                                                  'category': category})
-    except:
+    except Exception as e:
+        print(e)
         return render(request, "edit_sla.html", {'employee': employee, 'subCategory': sub_category,
-                                                 'officelocation': officelocation, 'departments': departments,
+                                                 'officelocation': office_location, 'departments': departments,
                                                  'category': category})
 
 
@@ -1580,8 +1598,9 @@ def edit_sla(request, ticket_id):
     em_one_to = EmployeeMaster.objects.values_list('empid', flat=True).\
         filter(associated_user_account=request.POST.get('EM_1_Name'))
     try:
-        print(em_zero_to[0],em_one_to[0])
-    except:
+        print(em_zero_to[0], em_one_to[0])
+    except Exception as e:
+        print(e)
         messages.warning(request, 'Invalid employee name.')
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -1611,7 +1630,8 @@ def add_sla(request):
         HelpdeskRequestSLAs.objects.get(HelpdeskDepartment=help_desk_department, HelpdeskCategory=help_desk_category,
                                         HelpdeskSubCategory=help_desk_sub_category, HelpdeskPriority=help_desk_priority)
         messages.warning(request, 'This SLA already exists. You can edit it.')
-    except: 
+    except Exception as e:
+        print(e)
         total_hrs = request.POST.get('TATHrs')
         total_mins = request.POST.get('TATMins')
         em_zero_after_hrs = request.POST.get('EM_0_AfterHrs')
@@ -1626,7 +1646,8 @@ def add_sla(request):
             filter(associated_user_account=request.POST.get('EM_1_Name'))
         try:
             print(em_zero_to[0], em_one_to[0])
-        except:
+        except Exception as e:
+            print(e)
             messages.warning(request, 'Invalid employee name.')
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         em_one_to = em_one_to[0]
@@ -1673,4 +1694,39 @@ def view_employees(request):
     :param request: Display employees from employee master
     :return: to employee.html
     """
-    pass
+    all_items = EmployeeMaster.objects.all()
+    return render(request, "view_employee.html", {'all_items': all_items})
+
+
+def get_employee_details(request, ticket_id):
+    """
+    Get details of employee
+    :param request: to get details of employee from employee master
+    :param ticket_id: id of ticket
+    :return: to view_employee_details.html
+    """
+    all_items = EmployeeMaster.objects.get(id=ticket_id)
+    employee = EmployeeMaster.objects.all()
+    return render(request, "view_employee_details.html", {'all_items': all_items, 'employee': employee})
+
+
+def edit_employee(request, emp_id):
+    """
+    To edit employee
+    :param request: Edit details of employee
+    :param emp_id: id of employee
+    :return: to previous page
+    """
+    item = EmployeeMaster.objects.get(pk=emp_id)
+    item.empid = request.POST.get('empid')
+    item.new_emp_id = request.POST.get('new_emp_id')
+    item.position = request.POST.get('position')
+    item.name1 = request.POST.get('name1')
+    item.name3 = request.POST.get('name3')
+    item.associated_user_account = request.POST.get('associated_user_account')
+    item.email = request.POST.get('email')
+    item.department = request.POST.get('department')
+    item.reporting_to = request.POST.get('reporting_to')
+    item.save()
+    messages.warning(request, 'Successfully Edited')
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

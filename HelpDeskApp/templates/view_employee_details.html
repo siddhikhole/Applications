@@ -1,0 +1,116 @@
+<html>
+<head>
+
+</head>
+<body>
+<div class="modal-header"><b> <span class="glyphicon glyphicon-pencil"></span> Edit Employee Details</b>
+    <button type="button" class="close" data-dismiss="modal">
+        <span class="glyphicon glyphicon-remove-circle"></span>
+    </button>
+    <h4 class="modal-title"></h4>
+</div>
+<div class="modal-body">
+    <form method="POST">
+    {%csrf_token%}
+    <div class="container">
+        <br>
+        <div class="row">
+            <div class="col-sm-1">
+                <b>Emp ID:</b>
+            </div>
+            <div class="col-sm-2">
+                <input type="text"  name="empid" class="form-control" value="{{all_items.empid}}">
+            </div>
+            <div class="col-sm-1">
+                <b>New Emp ID:</b>
+            </div>
+            <div class="col-sm-2">
+                <input type="text" name="new_emp_id" class="form-control" value="{{all_items.new_emp_id}}">
+            </div>
+             <div class="col-sm-1">
+                <b>Designation:</b>
+            </div>
+            <div class="col-sm-2">
+                <input type="text" name="position" class="form-control" value="{{all_items.position}}">
+            </div>
+        </div>
+        <br>
+        <div class="row">
+             <div class="col-sm-1">
+                <b>First Name:</b>
+            </div>
+            <div class="col-sm-2">
+                <input type="text" name="name1" class="form-control" value="{{all_items.name1}}">
+            </div>
+             <div class="col-sm-1">
+                <b>Last Name:</b>
+            </div>
+            <div class="col-sm-2">
+                <input type="text" name="name3" class="form-control" value="{{all_items.name3}}">
+            </div>
+            <div class="col-sm-1">
+                <b>User Name:</b>
+            </div>
+            <div class="col-sm-2">
+                <input type="text" name="associated_user_account" class="form-control" value="{{all_items.associated_user_account}}">
+            </div>
+        </div>
+        <br>
+        <div class="row">
+             <div class="col-sm-1">
+                <b>Email ID:</b>
+             </div>
+             <div class="col-sm-5">
+                <input type="text" name="email" class="form-control" value="{{all_items.email}}">
+            </div>
+             <div class="col-sm-1">
+                <b>Department:</b>
+            </div>
+            <div class="col-sm-2">
+                <input type="text" name="department" class="form-control" value="{{all_items.department}}">
+            </div>
+        </div>
+        <br>
+        <div class="row">
+             <div class="col-sm-1">
+                <b>Reporting To:</b>
+            </div>
+            <div class="col-sm-2">
+                <input type="text" name="reporting_to"  class="form-control" value="{{all_items.reporting_to}}" id="default" list="languages">
+            </div>
+        </div>
+    </div>
+        <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" formaction="/edit_employee/{{all_items.id}}">
+            <span class="glyphicon glyphicon-pencil"></span> Edit
+        </button>
+        </div>
+    </form>
+    <!--Peaple Picker-->
+	<div id="page-wrapper">
+		<datalist id="languages">
+			<select>
+				{% for emp in employee%}
+				<option value="{{emp.associated_user_account}}">  </option>
+					{%endfor%}
+			</select>
+		</datalist>
+	</div>
+
+</div>
+
+
+</body>
+<script>
+   $(document).ready(function(){
+   console.log("Hello world!");
+   $("#myModal").on('hidden.bs.modal', function(){
+    console.log("Hello world!");
+    location.reload();
+    {% for message in messages %}
+    alert("Hello! I am an alert box!!");
+    {% endfor %}
+    });
+    });
+</script>
+</html>
