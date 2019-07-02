@@ -7,41 +7,33 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
   <style>
-
   body {
     font-family: Arial, Helvetica, sans-serif;
     background-color: black;
   }
-
   * {
     box-sizing: border-box;
   }
-
   /* Add padding to containers */
   .container {
-    
+
     background-color: white;
   }
-
   table {
     font-family: arial, sans-serif;
     border-collapse: collapse;
     width:100%;
   }
-
   td{
-    
+
     text-align: left;
     padding: 8px;
   }
-
   th {
     background-color: #51B0F0;
      text-align: left;
     padding: 8px;
   }
-
-
   </style>
 </head>
 <body>
@@ -53,11 +45,11 @@
 
       <form action="/action_page.php">
         <div class="container">
-       
+
         <div class="col-10">
        {% if item %}
-       <div class="table-responsive">  
-          
+       <div class="table-responsive">
+
 
         <table>
           <tr>
@@ -69,7 +61,7 @@
             <td>
               <b>Request For:</b><i>{{item.OnBehalfUserEmployeeName}}</i>
             </td>
-            <td> 
+            <td>
               <b>Raised By:</b><i>{{item.EmployeeName}}</i>
             </td>
           </tr>
@@ -106,7 +98,7 @@
                 <a href="/view_document/{{item.Files}}">View Supporting Document</a>
               {% endif %}
             </td>
-            
+
           </tr>
           <tr>
             <td>
@@ -119,10 +111,10 @@
             </td>
           </tr>
           <tr>
-            
+
           </tr>
         <tr>
-          
+
         </tr>
         <tr>
           {% if workflow %}
@@ -162,7 +154,7 @@
                               <b><th>Raised Query Details</th></b>
                               <th></th><th></th>
                             </tr>
-                     
+
                    <tr><td colspan="4"><table><th>Raised Date</th>
                     <th>Raised By</th>
                    <th>Raised Query</th></tr>
@@ -170,20 +162,20 @@
                     <tr>
                      <td>{{i.ActedOn}}</td>
                      <td>{{i.Actor}}</td>
-              
+
                       <td>{{i.ActionData}}</td>
                     </tr>
                       {% endfor %}</table></td></tr>
-                      </tr> 
+                      </tr>
                     </table></td></tr>
-                    
+
               {% endif %}
        </tr><tr>
-        
+
             <td><b>Comments:</b></td><td></td></tr>
           <tr>
           <td><textarea name="comments" rows="4" cols="28"></textarea><br></td>
-              
+
             <td>
             <button type="submit" formaction="/answer/{{item.id}}" class="btn btn-primary"><span class="glyphicon glyphicon-ok" ></span> Answer Query</button>
 
@@ -194,16 +186,16 @@
             <td>
             <button type="submit" formaction="/reopen/{{item.id}}" class="btn btn-primary"><span class="glyphicon glyphicon-ok" ></span> Reopen Ticket</button>
             <button type="submit" formaction="/close/{{item.id}}" class="btn btn-warning"><span class="glyphicon glyphicon-remove" ></span>Close Ticket</button>
-          
 
 
-            
-            
-           
 
-             
+
+
+
+
+
              {%endif%}
-            
+
             {% endif%}
 
         </form>
@@ -212,7 +204,7 @@
   </td></tr>
       </table>
   {%endif%}
-  
+
 
 </body>
 </html>

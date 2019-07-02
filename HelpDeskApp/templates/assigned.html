@@ -1,120 +1,94 @@
 {%extends 'index.html' %}
 {%block content %}
-<!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8">
-
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
-        <title>HelpDeskApp</title>
-
-          <!-- Bootstrap CSS CDN -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-          <!-- Our Custom CSS -->
-          
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-
-
-
+     <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
     </head>
     <body>
-
-        <div class="row" style="margin-left: 20px; width: 100%;">
-            <div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
-              <h4><b> <span class="glyphicon glyphicon-tasks" style="margin-left: 20px;"></span> Assigned Tasks</b></h4>
-            </div>
-
-
-            <div class="container"style="margin-left:-15px; width: 100%;">
-
-
-                <div class="row"style=" margin-left: 5px;">
-                    <div class="col-12">
-                        {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-warning alert-dismissable" role="alert"> 
-
-                                {{message}}
-                                <button class="close" data-dismiss="alert">x</button>
-                            </div>
-                        {%endfor%}
-                        {%endif%}
-                        <div class="col-10">
-                            {% if all_items %}
-                            <div class="table-responsive">
-                                <table class="table" >
-                                    <thead>
-                                        <tr>
-                                           <th>Request ID</th>
-                                           <th>Raised By</th>
-                                           <th>Raised Date</th>
-                                           <th>Department</th>
-                                           <th>Category</th> 
-                                           <th>Sub-Category</th>
-                                           <th>Status</th> 
-                                           <th>Complete</th>
-                                           <th>History</th>
-                                        </tr>
-                                    </thead>
-                                    <div class="modal fade" id="myModal" role="dialog">
-                                        <div class="modal-dialog modal-lg">
-                                            <div class="modal-content">
-                                                <div class="modal-body">
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                </div>
+    <div class="row" style="margin-left: 20px; width: 100%;">
+        <div class="navbar" style="background-color: #616D7E;color: white; padding: 5px; margin-top: 10px; margin-left: -20px; padding-left: 20px;">
+            <h4><b> <span class="glyphicon glyphicon-tasks" style="margin-left: 20px;"></span> Assigned Tasks</b></h4>
+        </div>
+        <div class="container"style="margin-left:-15px; width: 100%;">
+            <div class="row"style=" margin-left: 5px;">
+                <div class="col-12">
+                    <div class="col-10">
+                        {% if all_items %}
+                        <div class="table-responsive">
+                            <table class="table" >
+                                <thead>
+                                <tr>
+                                    <th>Request ID</th>
+                                    <th>Raised By</th>
+                                   <th>Raised Date</th>
+                                   <th>Department</th>
+                                   <th>Category</th>
+                                   <th>Sub-Category</th>
+                                   <th>Status</th>
+                                   <th>Complete</th>
+                                   <th>History</th>
+                                </tr>
+                                </thead>
+                                <div class="modal fade" id="myModal" role="dialog">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-body">
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                                             </div>
                                         </div>
-                                    </div> 
-                                    {%for key,things in all_items.items%}
-                                    <tr>
-                                        <td>
-                                            <a href="/display/{{key}}">Helpdesk/Request/{{things.id}}</a>
-                                        </td>
-                                        <td>{{things.EmployeeName}}</td>
-                                        <td>{{things.created_at}}</td>
-                                        <td>{{things.department}}</td>
-                                        <td>{{things.category}}</td>
-                                        <td>{{things.sub_category}}</td>
-                                        <td>{{things.WorkflowCurrentStatus}}</td>
-                                        <td>
-                                            <a href="/complete/{{things.id}}" class="btn btn-info">Complete</a>
-                                        </td>
-                                        <td>
-                                            <center>
-                                                <a href="/workflow/{{things.id}}"  data-toggle="modal" data-target="#myModal" >
-                                                    <span class="glyphicon glyphicon-eye-open" ></span>
-                                                </a>
-                                            </center>
-                                        </td>
-                                    </tr>
-                                    {%endfor%}
-                                </table>
-                            </div>
-                            {% else %}
-                            <div class="alert alert-warning alert-dismissable" style="width: 100%" role="alert">  
-                                <h4>No tickets found!</h4>
-                            </div>
-
-                            {% endif %}
+                                    </div>
+                                </div>
+                                {%for key,things in all_items.items%}
+                                <tr>
+                                    <td>
+                                        <a href="/display/{{key}}">Helpdesk/Request/{{things.id}}</a>
+                                    </td>
+                                    <td>{{things.EmployeeName}}</td>
+                                    <td>{{things.created_at}}</td>
+                                    <td>{{things.department}}</td>
+                                    <td>{{things.category}}</td>
+                                    <td>{{things.sub_category}}</td>
+                                    <td>{{things.WorkflowCurrentStatus}}</td>
+                                    <td>
+                                        <a href="/complete/{{things.id}}" class="btn btn-info">Complete</a>
+                                    </td>
+                                    <td>
+                                        <center>
+                                            <a href="/workflow/{{things.id}}"  data-toggle="modal" data-target="#myModal" >
+                                                <span class="glyphicon glyphicon-eye-open" ></span>
+                                            </a>
+                                        </center>
+                                    </td>
+                                </tr>
+                                {%endfor%}
+                            </table>
                         </div>
+                        {% else %}
+                        <div class="alert alert-warning alert-dismissable" style="width: 100%" role="alert">
+                            <h4>No tickets found!</h4>
+                        </div>
+
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
-        <script>
-          $(document).ready(function(){
+    </div>
+    <script>
+      $(document).ready(function(){
 
-            $("#myModal").on('hidden.bs.modal', function(){
-               console.log("Hello world!");
-               location.reload();
-           });
-        });
-        </script>
+        $("#myModal").on('hidden.bs.modal', function(){
+           console.log("Hello world!");
+           location.reload();
+       });
+    });
+    </script>
     </body>
 </html>
 {%endblock%}
